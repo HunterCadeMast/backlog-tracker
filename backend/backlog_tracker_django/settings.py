@@ -48,6 +48,12 @@ INSTALLED_APPS = [
     'allauth.socialaccount.providers.google',
     'allauth.socialaccount.providers.github',
     'accounts',
+    'profiles',
+    'games',
+    'logs',
+    'playlists',
+    'recommendations',
+    'terminal'
 ]
 
 AUTH_USER_MODEL = 'accounts.CustomUser'
