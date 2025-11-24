@@ -11,7 +11,7 @@ class Logs(models.Model):
     platform_id = models.ForeignKey(Platforms, on_delete = models.CASCADE, null = False, blank = False)
     user_status = models.CharField(max_length = 12, null = False, blank = False)
     user_rating = models.IntegerField(null = True, blank = True)
-    playtime = models.IntegerField(null = True, blank = True)
+    user_playtime = models.IntegerField(null = True, blank = True)
     start_date = models.DateField(null = True, blank = True)
     completion_date = models.DateField(null = True, blank = True)
     creation_timestamp = models.DateTimeField(default = timezone.now, null = False, blank = False)
