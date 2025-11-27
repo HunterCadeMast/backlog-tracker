@@ -1,24 +1,50 @@
 from rest_framework import viewsets
-from rest_framework.permissions import AllowAny
+from rest_framework_simplejwt.authentication import JWTAuthentication
+from rest_framework.permissions import IsAuthenticated
+from accounts.permissions import IsAccountOwner
 from profiles.models import Profiles, OAuthenticationTokens, APIKeys, SteamProfiles
 from profiles.serializers import ProfilesSerialiser, OAuthenticationTokensSerialiser, APIKeysSerialiser, SteamProfilesSerialiser
 
 class ProfilesViewSet(viewsets.ModelViewSet):
-    queryset = Profiles.objects.all()
     serializer_class = ProfilesSerialiser
-    permission_classes = [AllowAny]
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated, IsAccountOwner]
+
+    def perform_create(self, serializer):
+        serializer.save(user = self.request.user)
+
+    def get_queryset(self):
+        return Profiles.objects.filter(user = self.request.user)
 
 class OAuthenticationTokensViewSet(viewsets.ModelViewSet):
-    queryset = OAuthenticationTokens.objects.all()
     serializer_class = OAuthenticationTokensSerialiser
-    permission_classes = [AllowAny]
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated, IsAccountOwner]
+
+    def perform_create(self, serializer):
+        serializer.save(user = self.request.user)
+
+    def get_queryset(self):
+        return OAuthenticationTokens.objects.filter(user = self.request.user)
 
 class APIKeysViewSet(viewsets.ModelViewSet):
-    queryset = APIKeys.objects.all()
     serializer_class = APIKeysSerialiser
-    permission_classes = [AllowAny]
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated, IsAccountOwner]
+
+    def perform_create(self, serializer):
+        serializer.save(user = self.request.user)
+
+    def get_queryset(self):
+        return APIKeys.objects.filter(user = self.request.user)
 
 class SteamProfilesViewSet(viewsets.ModelViewSet):
-    queryset = SteamProfiles.objects.all()
     serializer_class = SteamProfilesSerialiser
-    permission_classes = [AllowAny]
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated, IsAccountOwner]
+
+    def perform_create(self, serializer):
+        serializer.save(user = self.request.user)
+
+    def get_queryset(self):
+        return SteamProfiles.objects.filter(user = self.request.user)
