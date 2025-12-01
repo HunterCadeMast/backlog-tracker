@@ -1,21 +1,5 @@
 from rest_framework import serializers
-from accounts.models import CustomUser
 from profiles.models import Profiles, OAuthenticationTokens, APIKeys, SteamProfiles
-
-class CustomUserSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = CustomUser
-        fields = ['id', 'username', 'email', 'password', 'creation_timestamp']
-        read_only_fields = ['id', 'creation_timestamp']
-        extra_kwargs = {
-            'password': {'write_only': True},
-        }
-
-        def create(self, validated_data):
-            user = CustomUser(**validated_data)
-            user.set_password(validated_data['password'])
-            user.save()
-            return user
 
 class ProfilesSerialiser(serializers.ModelSerializer):
     class Meta:

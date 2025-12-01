@@ -22,9 +22,10 @@ from .views import Home
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('api/authentication/', include('accounts.urls')),
     path('accounts/', include('allauth.urls')),
     path('api/', include((router.urls, 'core_api'), namespace = 'core_api')),
     path('api/token/', TokenObtainPairView.as_view(), name = 'token_obtain_pair'),
     path('api/token/refresh/', TokenRefreshView.as_view(), name = 'token_refresh'),
-    path('', Home.as_view())
+    path('', Home.as_view(), name = 'home'),
 ]
