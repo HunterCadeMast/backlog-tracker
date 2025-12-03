@@ -4,8 +4,8 @@ from profiles.models import Profiles, OAuthenticationTokens, APIKeys, SteamProfi
 class ProfilesSerialiser(serializers.ModelSerializer):
     class Meta:
         model = Profiles
-        fields = ['user', 'profile_photo', 'bio']
-        read_only_fields = ['user']
+        fields = ['id', 'user', 'profile_photo', 'bio']
+        read_only_fields = ['id', 'user']
 
 class OAuthenticationTokensSerialiser(serializers.ModelSerializer):
     class Meta:
