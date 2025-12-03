@@ -4,6 +4,7 @@ from accounts.models import CustomUser
 import uuid
 
 class Profiles(models.Model):
+    id = models.UUIDField(primary_key = True, default = uuid.uuid4, editable = False, null = False, blank = False)
     user = models.OneToOneField(CustomUser, on_delete = models.CASCADE)
     profile_photo = models.ImageField(default = 'profile_pictures/default.jpg', upload_to = 'profile_pictures')
     bio = models.TextField(max_length = 255, null = True, blank = True)
@@ -13,9 +14,9 @@ class Profiles(models.Model):
     
 class OAuthenticationTokens(models.Model):
     id = models.UUIDField(primary_key = True, default = uuid.uuid4, editable = False, null = False, blank = False)
+    user = models.ForeignKey(CustomUser, on_delete = models.CASCADE, null = False, blank = False)
     profile_id = models.ForeignKey(Profiles, on_delete = models.CASCADE, null = False, blank = False)
     provider_id = models.CharField(max_length = 12, null = False, blank = False)
-    user = models.ForeignKey(CustomUser, on_delete = models.CASCADE)
     provider_name = models.CharField(max_length = 255, null = False, blank = False)
     access_token = models.TextField(null = True, blank = True)
     refresh_token = models.TextField(null = True, blank = True)
@@ -24,7 +25,7 @@ class OAuthenticationTokens(models.Model):
 
     class Meta:
         constraints = [
-            models.UniqueConstraint(fields = ['provider_id', 'provider_name'], name = 'Provider for User\'s OAuthentication')
+            models.UniqueConstraint(fields = ['provider_id', 'provider_name'], name = 'oauthentication_tokens')
         ]
 
     def __str__(self):
@@ -32,8 +33,8 @@ class OAuthenticationTokens(models.Model):
     
 class APIKeys(models.Model):
     id = models.UUIDField(primary_key = True, default = uuid.uuid4, editable = False, null = False, blank = False)
+    user = models.ForeignKey(CustomUser, on_delete = models.CASCADE, null = False, blank = False)
     profile_id = models.ForeignKey(Profiles, on_delete = models.CASCADE, null = False, blank = False)
-    user = models.ForeignKey(CustomUser, on_delete = models.CASCADE)
     api_token = models.CharField(max_length = 255, unique = True, null = False, blank = False)
     creation_timestamp = models.DateTimeField(default = timezone.now, null = False, blank = False)
     last_fetched = models.DateTimeField(null = True, blank = True)
@@ -44,7 +45,7 @@ class APIKeys(models.Model):
 class SteamProfiles(models.Model):
     id = models.UUIDField(primary_key = True, default = uuid.uuid4, editable = False, null = False, blank = False)
     steam_id = models.CharField(max_length = 18, null = True, blank = True)
-    user = models.ForeignKey(CustomUser, on_delete = models.CASCADE)
+    user = models.ForeignKey(CustomUser, on_delete = models.CASCADE, null = False, blank = False)
     steam_username = models.CharField(max_length = 32, null = True, blank = True)
     steam_avatar_link = models.TextField(null = True, blank = True)
     creation_timestamp = models.DateTimeField(default = timezone.now, null = False, blank = False)
