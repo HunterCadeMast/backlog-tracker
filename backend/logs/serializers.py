@@ -4,7 +4,7 @@ from logs.models import Logs, LogTags
 class LogsSerialiser(serializers.ModelSerializer):
     class Meta:
         model = Logs
-        fields = ['id', 'user', 'profile_id', 'game_id', 'platform_id', 'user_status', 'user_rating', 'user_review', 'user_playtime', 'start_date', 'completion_date', 'creation_timestamp',]
+        fields = ['id', 'user', 'profile_id', 'game_id', 'platform_id', 'user_status', 'user_rating', 'user_review', 'user_playtime', 'start_date', 'completion_date', 'full_completion', 'creation_timestamp',]
         read_only_fields = ['id', 'user', 'profile_id', 'game_id', 'platform_id', 'creation_timestamp']
 
     def create(self, validated_data):

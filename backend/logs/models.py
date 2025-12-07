@@ -18,6 +18,7 @@ class Logs(models.Model):
     user_playtime = models.IntegerField(null = True, blank = True)
     start_date = models.DateField(null = True, blank = True)
     completion_date = models.DateField(null = True, blank = True)
+    full_completion = models.BooleanField(default = False, null = False, blank = False)
     creation_timestamp = models.DateTimeField(default = timezone.now, null = False, blank = False)
 
     class Meta:
