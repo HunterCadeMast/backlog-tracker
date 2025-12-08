@@ -7,11 +7,6 @@ class PlaylistsSerialiser(serializers.ModelSerializer):
         fields = ['id', 'user', 'profile_id', 'playlist_title', 'creation_timestamp', 'updated_timestamp']
         read_only_fields = ['id', 'user', 'profile_id', 'creation_timestamp']
 
-    def create(self, validated_data):
-        validated_data['user'] = self.context['request'].user
-        validated_data['user'] = self.context['request'].user.profiles
-        return super().create(validated_data)
-
 class PlaylistLogsSerialiser(serializers.ModelSerializer):
     class Meta:
         model = PlaylistLogs

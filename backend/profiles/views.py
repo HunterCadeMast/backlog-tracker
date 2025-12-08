@@ -1,14 +1,15 @@
 from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework_simplejwt.authentication import JWTAuthentication
+from rest_framework_simple_api_key.models import APIKey
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from accounts.permissions import IsAccountOwner
-from profiles.models import Profiles, OAuthenticationTokens, APIKeys, SteamProfiles
-from profiles.serializers import ProfilesSerialiser, OAuthenticationTokensSerialiser, APIKeysSerialiser, SteamProfilesSerialiser
+from profiles.models import Profiles, OAuthenticationTokens, APIKeys
+from profiles.serializers import ProfilesSerializer, OAuthenticationTokensSerializer, APIKeysSerializer
 
 class ProfilesViewSet(viewsets.ModelViewSet):
-    serializer_class = ProfilesSerialiser
+    serializer_class = ProfilesSerializer
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated, IsAccountOwner]
 
@@ -44,7 +45,7 @@ class ProfilesViewSet(viewsets.ModelViewSet):
         return Response({'message': 'Updated profile!'}, status = 200)
 
 class OAuthenticationTokensViewSet(viewsets.ModelViewSet):
-    serializer_class = OAuthenticationTokensSerialiser
+    serializer_class = OAuthenticationTokensSerializer
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated, IsAccountOwner]
 
@@ -53,10 +54,9 @@ class OAuthenticationTokensViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         return OAuthenticationTokens.objects.filter(user = self.request.user)
-
+    
 class APIKeysViewSet(viewsets.ModelViewSet):
-    serializer_class = APIKeysSerialiser
-    authentication_classes = [JWTAuthentication]
+    serializer_class = APIKeysSerializer
     permission_classes = [IsAuthenticated, IsAccountOwner]
 
     def perform_create(self, serializer):
@@ -64,14 +64,21 @@ class APIKeysViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         return APIKeys.objects.filter(user = self.request.user)
-
-class SteamProfilesViewSet(viewsets.ModelViewSet):
-    serializer_class = SteamProfilesSerialiser
-    authentication_classes = [JWTAuthentication]
-    permission_classes = [IsAuthenticated, IsAccountOwner]
-
-    def perform_create(self, serializer):
-        serializer.save(user = self.request.user)
-
-    def get_queryset(self):
-        return SteamProfiles.objects.filter(user = self.request.user)
+    
+    @action(detail = False, methods = ['post'])
+    def create_key(self, request):
+        api_key, key = APIKey.objects.create_key(name = request.user.username)
+        api_key_model = APIKeys.objects.create(user = request.user, profile_id = request.user.profiles, api_token = api_key.prefix)
+        return Response({'message': 'API key successfully created!', 'api_key': key, 'id': api_key_model.id, 'creation_timestamp': api_key_model.creation_timestamp}, status = 201)
+    
+    @action(detail = True, methods = ['delete'])
+    def delete_key(self, request, pk = None):
+        try:
+            api_key = APIKey.objects.get(pk = pk, user = request.user)
+            APIKey.objects.filter(prefix = api_key.api_token).delete()
+            api_key.delete()
+            return Response({'message': 'API key successfully deleted!'}, status = 200)
+        except APIKey.DoesNotExist:
+            return Response({'error': 'API key not found!'}, status = 404)
+    
+    

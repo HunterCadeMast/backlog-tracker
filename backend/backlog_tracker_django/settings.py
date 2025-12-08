@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'rest_framework_simplejwt',
+    'rest_framework_simple_api_key',
     'django.contrib.sites',
     'allauth',
     'allauth.account',
@@ -115,6 +116,10 @@ SIMPLE_JWT = {
     'REFRESH_TOKEN_LIFETIME': timedelta(days = 7),
     'ROTATE_REFRESH_TOKENS': True,
     'BLACKLIST_AFTER_ROTATION': True,
+}
+
+SIMPLE_API_KEY = {
+    "FERNET_SECRET": os.environ.get("FERNET_SECRET"),
 }
 
 CORS_ALLOWED_ORIGINS = [
