@@ -3,13 +3,13 @@ from profiles.models import Profiles, OAuthenticationTokens, APIKeys, SteamProfi
 from games.models import Games, Developers, Publishers, Genres, Platforms, Franchises, Series
 
 class ProfilesSerialiser(serializers.ModelSerializer):
-    favorite_game = serializers.PrimaryKeyRelatedField(many = True, query_set = Games.objects.all(), required = False)
-    favorite_developer = serializers.PrimaryKeyRelatedField(many = True, query_set = Developers.objects.all(), required = False)
-    favorite_publisher = serializers.PrimaryKeyRelatedField(many = True, query_set = Publishers.objects.all(), required = False)
-    favorite_genre = serializers.PrimaryKeyRelatedField(many = True, query_set = Genres.objects.all(), required = False)
-    favorite_platform = serializers.PrimaryKeyRelatedField(many = True, query_set = Platforms.objects.all(), required = False)
-    favorite_franchise = serializers.PrimaryKeyRelatedField(many = True, query_set = Franchises.objects.all(), required = False)
-    favorite_series = serializers.PrimaryKeyRelatedField(many = True, query_set = Series.objects.all(), required = False)
+    favorite_game = serializers.PrimaryKeyRelatedField(many = True, queryset = Games.objects.all(), required = False)
+    favorite_developer = serializers.PrimaryKeyRelatedField(many = True, queryset = Developers.objects.all(), required = False)
+    favorite_publisher = serializers.PrimaryKeyRelatedField(many = True, queryset = Publishers.objects.all(), required = False)
+    favorite_genre = serializers.PrimaryKeyRelatedField(many = True, queryset = Genres.objects.all(), required = False)
+    favorite_platform = serializers.PrimaryKeyRelatedField(many = True, queryset = Platforms.objects.all(), required = False)
+    favorite_franchise = serializers.PrimaryKeyRelatedField(many = True, queryset = Franchises.objects.all(), required = False)
+    favorite_series = serializers.PrimaryKeyRelatedField(many = True, queryset = Series.objects.all(), required = False)
 
     class Meta:
         model = Profiles
