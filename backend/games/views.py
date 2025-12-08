@@ -1,6 +1,6 @@
 from rest_framework import viewsets
 from rest_framework_simplejwt.authentication import JWTAuthentication
-from rest_framework_simple_api_key.permissions import HasAPIKey
+from rest_framework_api_key.permissions import HasAPIKey
 from games.models import Games, Developers, GameSpecificDevelopers, Publishers, GameSpecificPublishers, Genres, GameSpecificGenres, Platforms, GameSpecificPlatforms, Franchises, GameSpecificFranchises, Series, GameSpecificSeries
 from games.serializers import GamesSerialiser, DevelopersSerialiser, GameSpecificDevelopersSerialiser, PublishersSerialiser, GameSpecificPublishersSerialiser, GenresSerialiser, GameSpecificGenresSerialiser, PlatformsSerialiser, GameSpecificPlatformsSerialiser, FranchisesSerialiser, GameSpecificFranchisesSerialiser, SeriesSerialiser, GameSpecificSeriesSerialiser
 

@@ -43,7 +43,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'rest_framework_simplejwt',
-    'rest_framework_simple_api_key',
+    'rest_framework_api_key',
     'django.contrib.sites',
     'allauth',
     'allauth.account',
@@ -57,6 +57,7 @@ INSTALLED_APPS = [
     'logs',
     'playlists',
     'recommendations',
+    'steam',
     'terminal'
 ]
 
@@ -118,8 +119,8 @@ SIMPLE_JWT = {
     'BLACKLIST_AFTER_ROTATION': True,
 }
 
-SIMPLE_API_KEY = {
-    "FERNET_SECRET": os.environ.get("FERNET_SECRET"),
+API_KEY = {
+    "FERNET_SECRET": os.getenv("FERNET_SECRET"),
 }
 
 CORS_ALLOWED_ORIGINS = [

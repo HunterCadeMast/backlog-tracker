@@ -1,9 +1,10 @@
 from rest_framework import routers
-from profiles.views import ProfilesViewSet, OAuthenticationTokensViewSet, APIKeysViewSet, SteamProfilesViewSet
+from profiles.views import ProfilesViewSet, OAuthenticationTokensViewSet, APIKeysViewSet
 from games.views import GamesViewSet, DevelopersViewSet, GameSpecificDevelopersViewSet, PublishersViewSet, GameSpecificPublishersViewSet, GenresViewSet, GameSpecificGenresViewSet, PlatformsViewSet, GameSpecificPlatformsViewSet, FranchisesViewSet, GameSpecificFranchisesViewSet, SeriesViewSet, GameSpecificSeriesViewSet
 from logs.views import LogsViewSet, LogTagsViewSet
 from playlists.views import PlaylistsViewSet, PlaylistLogsViewSet
 from recommendations.views import RecommendationsViewSet
+from steam.views import SteamProfilesViewSet
 
 router = routers.SimpleRouter()
 
@@ -11,7 +12,6 @@ router = routers.SimpleRouter()
 router.register(r'profile', ProfilesViewSet, basename = "profile")
 router.register(r'oauthentication-tokens', OAuthenticationTokensViewSet, basename = "oauthentication-tokens")
 router.register(r'api-keys', APIKeysViewSet, basename = "api-keys")
-router.register(r'steam-profile', SteamProfilesViewSet, basename = "steam-profile")
 
 # Games Routing
 router.register(r'games', GamesViewSet, basename = "games")
@@ -34,9 +34,12 @@ router.register(r'log-tags', LogTagsViewSet, basename = "log-tags")
 
 # Playlists Routing
 router.register(r'playlists', PlaylistsViewSet, basename = "playlists")
-router.register(r'palylist-logs', PlaylistLogsViewSet, basename = "palylist-logs")
+router.register(r'palylist-logs', PlaylistLogsViewSet, basename = "playlist-logs")
 
 # Recommendations Routing
 router.register(r'recommendations', RecommendationsViewSet, basename = "recommendations")
+
+# Steam Routing
+router.register(r'steam-profile', SteamProfilesViewSet, basename = "steam-profile")
 
 urlpatterns = router.urls

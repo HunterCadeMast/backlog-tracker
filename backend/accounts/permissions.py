@@ -1,5 +1,5 @@
 from rest_framework.permissions import BasePermission, IsAuthenticated
-from rest_framework_simple_api_key.permissions import HasAPIKey
+from rest_framework_api_key.permissions import HasAPIKey
 
 class IsAccountOwner(BasePermission):
     def has_object_permission(self, request, view, obj):
