@@ -108,7 +108,15 @@ REST_FRAMEWORK = {
     ),
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
-    )
+    ),
+    'DEFAULT_THROTTLE_CLASSES': [
+        'rest_framework.throttling.UserRateThrottle',
+        'rest_framework.throttling.AnonRateThrottle',
+    ],
+    'DEFAULT_THROTTLE_RATES': {
+        'anon': '100/day',
+        'user': '1000/day',
+    },
 }
 
 SIMPLE_JWT = {
@@ -117,6 +125,14 @@ SIMPLE_JWT = {
     'ROTATE_REFRESH_TOKENS': True,
     'BLACKLIST_AFTER_ROTATION': True,
 }
+
+REST_FRAMEWORK['DEFAULT_THROTTLE_CLASSES'] += [
+    'accounts.permissions.APIKeyThrottle'
+]
+
+REST_FRAMEWORK['DEFAULT_THROTTLE_RATES'].update({
+    'api_key': '500/hour',
+})
 
 API_KEY = {
     "FERNET_SECRET": os.getenv("FERNET_SECRET"),
