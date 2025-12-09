@@ -19,8 +19,5 @@ class ProfilesSerializer(serializers.ModelSerializer):
 class APIKeysSerializer(serializers.ModelSerializer):
     class Meta:
         model = APIKeys
-        fields = ['id', 'profile_id', 'user', 'api_token', 'creation_timestamp', 'last_fetched']
-        read_only_fields = ['id', 'profile_id', 'user', 'creation_timestamp', 'last_fetched']
-        extra_kwargs = {
-            'api_token': {'write_only': True}
-        }
+        fields = ['id', 'user', 'api_token_prefix', 'creation_timestamp', 'last_fetched', 'rotate', 'expiration_date', 'expired']
+        read_only_fields = ['id', 'user', 'api_token_prefix', 'creation_timestamp', 'last_fetched', 'rotate', 'expiration_date']

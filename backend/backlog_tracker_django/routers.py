@@ -1,5 +1,5 @@
 from rest_framework import routers
-from profiles.views import ProfilesViewSet, OAuthenticationTokensViewSet, APIKeysViewSet
+from profiles.views import ProfilesViewSet, APIKeysViewSet
 from games.views import GamesViewSet, DevelopersViewSet, GameSpecificDevelopersViewSet, PublishersViewSet, GameSpecificPublishersViewSet, GenresViewSet, GameSpecificGenresViewSet, PlatformsViewSet, GameSpecificPlatformsViewSet, FranchisesViewSet, GameSpecificFranchisesViewSet, SeriesViewSet, GameSpecificSeriesViewSet
 from logs.views import LogsViewSet, LogTagsViewSet
 from playlists.views import PlaylistsViewSet, PlaylistLogsViewSet
@@ -10,7 +10,6 @@ router = routers.SimpleRouter()
 
 # Profiles Routing
 router.register(r'profile', ProfilesViewSet, basename = "profile")
-router.register(r'oauthentication-tokens', OAuthenticationTokensViewSet, basename = "oauthentication-tokens")
 router.register(r'api-keys', APIKeysViewSet, basename = "api-keys")
 
 # Games Routing
