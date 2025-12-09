@@ -34,25 +34,6 @@ class Profiles(models.Model):
             profile_photo.thumbnail((300, 300))
             profile_photo.save()
     
-class OAuthenticationTokens(models.Model):
-    id = models.UUIDField(primary_key = True, default = uuid.uuid4, editable = False, null = False, blank = False)
-    user = models.ForeignKey(CustomUser, on_delete = models.CASCADE, null = False, blank = False)
-    profile_id = models.ForeignKey(Profiles, on_delete = models.CASCADE, null = False, blank = False)
-    provider_id = models.CharField(max_length = 12, null = False, blank = False)
-    provider_name = models.CharField(max_length = 255, null = False, blank = False)
-    access_token = models.TextField(null = True, blank = True)
-    refresh_token = models.TextField(null = True, blank = True)
-    creation_timestamp = models.DateTimeField(default = timezone.now, null = False, blank = False)
-    expiration_date = models.DateTimeField(null = True, blank = True)
-
-    class Meta:
-        constraints = [
-            models.UniqueConstraint(fields = ['user', 'provider_name'], name = 'oauthentication_tokens')
-        ]
-
-    def __str__(self):
-        return f"OAuthentication for {self.profile_id.username}"
-    
 class APIKeys(models.Model):
     id = models.UUIDField(primary_key = True, default = uuid.uuid4, editable = False, null = False, blank = False)
     user = models.ForeignKey(CustomUser, on_delete = models.CASCADE, null = False, blank = False)
