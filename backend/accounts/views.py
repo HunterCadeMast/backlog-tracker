@@ -4,10 +4,11 @@ from rest_framework.response import Response
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework_simplejwt.tokens import RefreshToken
+from allauth.socialaccount.models import SocialAccount
 from django.contrib.auth import authenticate
 from django.contrib.auth.tokens import default_token_generator as token_generator
-from .models import CustomUser
-from .serializers import CustomUserSerializer
+from accounts.models import CustomUser
+from accounts.serializers import CustomUserSerializer
 from profiles.models import Profiles
 
 class RegisterViewSet(APIView):
@@ -16,8 +17,7 @@ class RegisterViewSet(APIView):
     def post(self, request):
         serializer = CustomUserSerializer(data = request.data)
         serializer.is_valid(raise_exception = True)
-        user = serializer.save()
-        Profiles.objects.create(user = user)
+        serializer.save()
         return Response({'message': 'Account created!', 'user': serializer.data}, status = status.HTTP_201_CREATED)
     
 class LoginViewSet(APIView):
@@ -27,6 +27,10 @@ class LoginViewSet(APIView):
         user = authenticate(email = request.data.get('email'), password = request.data.get('password'))
         if not user:
             return Response({'error': 'Invalid credentials!'}, status = 401)
+        elif not user.has_usable_password():
+            return Response({'error': 'OAuthentication users cannot login with password!'}, status = 403) 
+        elif not request.user.emailaddress_set.filter(verified = True).exists():
+            return Response({'error', 'Email not verified!'}, status = 403)
         else:
             refresh_token = RefreshToken.for_user(user)
             serializer = CustomUserSerializer(user)
@@ -129,27 +133,26 @@ class PasswordResetConfirmationCompleteViewSet(APIView):
     def get(self, request):
         return Response({'message': 'Password reset!', 'status': 'password_reset'}, status = 200)
     
-class EmailVerificationViewSet(APIView):
-    authentication_classes = [JWTAuthentication]
+class OAuthenticationViewSet(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        profile = Profiles.objects.get(user = request.user)
+        user_info = CustomUserSerializer(request.user).data
+        return Response({'message': 'OAuthentication account created successfully!', 'refresh_token': str(RefreshToken.for_user(request.user)), 'access_token': str(RefreshToken.for_user(request.user).access_token), 'user': user_info, 'profile_id': profile.id, 'providers': list(request.user.socialaccount_set.values_list('provider', flat = True))}, status = 201)
+    
+class UnlinkAccountViewSet(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
-        user = request.user
-        token = token_generator.make_token(user)
-        # Add confirmation email after front-end
-        email_verification_url = f"http://127.0.0.1:8000/email/verification/{user.id}/{token}"
-        return Response({'message': 'Email verification sent!', 'email_verification_url': email_verification_url}, status = 200)
-    
-class EmailVerificationConfirmationViewSet(APIView):
-    permission_classes = [AllowAny]
-
-    def post(self, request, id, token):
-        try:
-            user = CustomUser.objects.get(id = id)
-        except CustomUser.DoesNotExist:
-            return Response({'error': 'Verification link invalid!'}, status = 400)
-        if not token_generator.check_token(user, token):
-            return Response({'error': 'Token invalid!'}, status = 400)
-        user.is_active = True
-        user.save()
-        return Response({'message': 'Email verified!'}, status = 202)
+        account_provider = request.data.get('provider')
+        if not account_provider:
+            return Response({'error': 'No account provider!'}, status = 400)
+        elif not request.user.has_usable_password() and request.user.socialaccount_set.count() == 1:
+            return Response({'error': 'Cannot unlink accounts!'}, status = 400)
+        else:
+            deleted_account, _ = SocialAccount.objects.filter(user = request.user, provider = account_provider).delete()
+            if not deleted_account:
+                return Response({'error': 'No linked provider!'}, status = 404)
+            else:
+                return Response({'message': 'Unlinked accounts successfully!'}, status = 200)  

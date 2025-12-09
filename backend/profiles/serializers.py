@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from profiles.models import Profiles, OAuthenticationTokens, APIKeys
+from profiles.models import Profiles, APIKeys
 from games.models import Games, Developers, Publishers, Genres, Platforms, Franchises, Series
 
 class ProfilesSerializer(serializers.ModelSerializer):
@@ -15,16 +15,6 @@ class ProfilesSerializer(serializers.ModelSerializer):
         model = Profiles
         fields = ['id', 'user', 'display_name', 'profile_photo', 'private_profile', 'website_theme', 'bio', 'favorite_game', 'favorite_developer', 'favorite_publisher', 'favorite_genre', 'favorite_platform', 'favorite_franchise', 'favorite_series', 'playstyle']
         read_only_fields = ['id', 'user']
-
-class OAuthenticationTokensSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = OAuthenticationTokens
-        fields = ['id', 'profile_id', 'provider_id', 'user', 'provider_name', 'access_token', 'refresh_token', 'creation_timestamp', 'expiration_date']
-        read_only_fields = ['id', 'profile_id', 'provider_id', 'user', 'provider_name', 'creation_timestamp']
-        extra_kwargs = {
-            'access_token': {'write_only': True},
-            'refresh_token': {'write_only': True}
-        }
 
 class APIKeysSerializer(serializers.ModelSerializer):
     class Meta:
