@@ -5,7 +5,7 @@ import uuid
 
 class SteamProfiles(models.Model):
     id = models.UUIDField(primary_key = True, default = uuid.uuid4, editable = False, null = False, blank = False)
-    steam_id = models.CharField(max_length = 18, null = True, blank = True)
+    steam_id = models.CharField(max_length = 18, unique = True, null = True, blank = True)
     user = models.ForeignKey(CustomUser, on_delete = models.CASCADE, null = False, blank = False)
     steam_username = models.CharField(max_length = 32, null = True, blank = True)
     steam_avatar_link = models.TextField(null = True, blank = True)
