@@ -44,6 +44,9 @@ class APIKeyThrottle(SimpleRateThrottle):
 
     def get_cache_key(self, request, view):
         api_key = request.META.get('HTTP_AUTHORIZATION', '')
-        if len(api_key.split()) == 2:
-            return f'api_key_{api_key.split()[1][:8]}'
-        return None
+        if not api_key.startswith('api-key '):
+            return None
+        api_key_prefix = api_key.split()[1][:8]
+        if not APIKeys.objects.filter(api_key_prefix = api_key_prefix, expired = False, expiration_date__gt = timezone.now()).exists():
+            return None
+        return f'api_key_{api_key_prefix}'
