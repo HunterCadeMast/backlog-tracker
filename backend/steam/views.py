@@ -7,11 +7,11 @@ from django.conf import settings
 from django.shortcuts import redirect
 from django.utils import timezone
 from urllib.parse import urlencode
-from games.models import Games
 from steam.models import SteamProfiles
-from backend.steam.manual_sync import fetch_steam_player, fetch_steam_games
+from steam.services import fetch_steam_player
+from steam.tasks import auto_sync_steam
     
-class SteamLinkViewSet(viewsets.ModelViewSet):
+class SteamLinkViewSet(viewsets.GenericViewSet):
     permission_classes = [IsAuthenticated]
 
     @action(detail = False, methods = ['get'])
@@ -26,18 +26,21 @@ class SteamLinkViewSet(viewsets.ModelViewSet):
         }
         return redirect(f'{settings.STEAM_OPENID_URL}?{urlencode(parameters)}')
     
-class SteamUnlinkViewSet(viewsets.ModelViewSet):
+class SteamUnlinkViewSet(viewsets.GenericViewSet):
     permission_classes = [IsAuthenticated]
 
     @action(detail = False, methods = ['post'])
     def unlink(self, request):
-        profile = SteamProfiles.objects.get(user = request.user)
+        try:
+            profile = SteamProfiles.objects.get(user = request.user)
+        except SteamProfiles.DoesNotExist:
+            return Response({'error': 'Steam account does not exist!'}, status = 404)
         if profile.auto_sync_games or profile.auto_sync_playtime:
             return Response({'error': 'Auto-sync should be disabled before unlinking Steam account!'}, status = 409)
         profile.delete()
         return Response({'message': 'Steam account unlinked!'}, status = 200)
 
-class SteamCallbackViewSet(viewsets.ModelViewSet):
+class SteamCallbackViewSet(viewsets.GenericViewSet):
     permission_classes = [IsAuthenticated]
 
     @action(detail = False, methods = ['get'])
@@ -57,7 +60,7 @@ class SteamCallbackViewSet(viewsets.ModelViewSet):
         profile.save()
         return Response({'message': 'Steam account linked!'}, status = 201)
     
-class SteamSyncViewSet(viewsets.ModelViewSet):
+class SteamSyncViewSet(viewsets.GenericViewSet):
     permission_classes = [IsAuthenticated]
 
     @action(detail = False, methods = ['post'])
@@ -66,11 +69,15 @@ class SteamSyncViewSet(viewsets.ModelViewSet):
         key = f'steam_sync:{profile.steam_id}'
         if cache.get(key):
             return Response({'error': 'Too many responses!'}, status = 429)
-        owned_games = fetch_steam_games(profile.steam_id)
-        for game in owned_games:
-            # UPDATE WITH IGDB
-            Games.objects.update_or_create()
+        auto_sync_steam.delay(profile.id)
         profile.last_fetched = timezone.now()
         profile.save()
         cache.set(key, True, timeout = 60)
         return Response({'message': 'Steam account synced!'}, status = 200)
+    
+    @action(detail = False, methods = ['post'])
+    def sync_toggle(self, request):
+        profile = SteamProfiles.objects.get(user = request.user)
+        profile.auto_sync_games = not profile.auto_sync_games
+        profile.save(update_fields = ['auto_sync_games'])
+        return Response({'message': 'Toggled auto-sync for Steam!'}, status = 200)

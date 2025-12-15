@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 from pathlib import Path
 from dotenv import load_dotenv
 from datetime import timedelta
+from celery.schedules import crontab
 import os
 
 load_dotenv()
@@ -49,6 +50,7 @@ INSTALLED_APPS = [
     'allauth.socialaccount',
     'allauth.socialaccount.providers.google',
     'allauth.socialaccount.providers.github',
+    'django_celery_beat',
     'corsheaders',
     'accounts',
     'profiles',
@@ -196,14 +198,39 @@ LOGIN_ON_EMAIL_CONFIRMATION = False
 STEAM_API_KEY = os.getenv("STEAM_API_KEY")
 STEAM_OPENID_URL = 'https://steamcommunity.com/openid'
 
-# CHECK REDIS
+CELERY_BROKER_URL = 'redis://localhost:6379/0'
+CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_TIMEZONE = 'UTC'
+
+CELERY_BEAT_SCHEDULE = {
+    'expire_api_keys': {
+        'task': 'profiles.tasks.api_key_expiration',
+        'schedule': 3600
+    },
+    'rotate_api_keys': {
+        'task': 'profiles.tasks.api_key_rotation',
+        'schedule': crontab(hour = 2, minute = 0)
+    }
+}
 
 CACHES = {
     'default': {
         'BACKEND': 'django.core.cache.backends.redis.RedisCache',
-        'LOCATION': 'redis://127.0.0.1:6379'
+        'LOCATION': 'redis://127.0.0.1:6379/1',
+        'OPTIONS': {
+            'CLIENT_CLASS': 'django_redis.client.DefaultClient',
+            'CONNECTION_POOL_KWARGS': {
+                'max_connections': 100,
+                'retry_on_timeout': True,
+            }
+        }
     }
 }
+
+SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
+SESSION_CACHE_ALIAS = 'default'
 
 # Internationalization
 # https://docs.djangoproject.com/en/5.2/topics/i18n/
