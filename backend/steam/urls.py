@@ -1,9 +1,12 @@
-from django.urls import path
-from steam.views import SteamProfiles, SteamLinkViewSet, SteamUnlinkViewSet, SteamCallbackViewSet, SteamSyncViewSet
+from rest_framework.routers import DefaultRouter
+from steam.views import SteamLinkViewSet, SteamUnlinkViewSet, SteamCallbackViewSet, SteamSyncViewSet
 
-urlpatterns = [
-    path('link/', SteamLinkViewSet.as_view(), name = 'steam_link'),
-    path('unlink/', SteamUnlinkViewSet.as_view(), name = 'steam_unlink'),
-    path('callback/', SteamCallbackViewSet.as_view(), name = 'steam_callback'),
-    path('sync/', SteamSyncViewSet.as_view(), name = 'steam_sync'),
-]
+router = DefaultRouter()
+router.register
+
+router.register(r'link/', SteamLinkViewSet, basename = 'steam_link')
+router.register(r'unlink/', SteamUnlinkViewSet, basename = 'steam_unlink')
+router.register(r'callback/', SteamCallbackViewSet, basename = 'steam_callback')
+router.register(r'sync/', SteamSyncViewSet, basename = 'steam_sync')
+
+urlpatterns = router.urls
