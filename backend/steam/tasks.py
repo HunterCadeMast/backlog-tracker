@@ -3,7 +3,8 @@ from django.core.cache import cache
 from steam.models import SteamProfiles
 from celery import shared_task
 from steam.services import fetch_steam_player, fetch_steam_games
-from games.models import Games
+from games.services import request_game_info_by_name
+from games.transfer import games_database_transfer
 
 @shared_task(bind = True, autoretry_for = Exception, retry_backoff = 60, retry_kwargs = {'max_retries': 5})
 def auto_sync_steam(self, profile_id):
@@ -16,7 +17,11 @@ def auto_sync_steam(self, profile_id):
         profile.steam_public_profile = (data['communityvisibilitystate'] == 3)
         owned_games = fetch_steam_games(profile.steam_id)
         for game in owned_games:
-            Games.objects.update_or_create(igdb_id = game['appid'], defaults = {'game_title': game['name'], 'completion_time': game.get('playtime_forever', 0)})
+            game_data = request_game_info_by_name(game['name'])
+            if not game_data:
+                continue
+            else:
+                game = games_database_transfer(game_data)
         profile.last_fetched = timezone.now()
         profile.save(update_fields = ['steam_username', 'steam_avatar_link', 'steam_public_profile', 'last_fetched'])
         cache.set(key, True, timeout = 300)

@@ -195,6 +195,10 @@ ACCOUNT_USERNAME_REQUIRED = False
 ACCOUNT_CONFIRM_EMAIL_ON_GET = False
 LOGIN_ON_EMAIL_CONFIRMATION = False
 
+IGDB_CLIENT_ID = os.getenv('IGDB_CLIENT_ID')
+IGDB_CLIENT_SECRET = os.getenv('IGDB_CLIENT_SECRET')
+IGDB_BASE_URL = 'https://api.igdb.com/v4'
+
 STEAM_API_KEY = os.getenv("STEAM_API_KEY")
 STEAM_OPENID_URL = 'https://steamcommunity.com/openid'
 
