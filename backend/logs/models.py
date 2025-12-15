@@ -15,7 +15,7 @@ class Logs(models.Model):
     user_status = models.CharField(max_length = 12, choices = STATUS_TYPES, default = 'backlog', null = False, blank = False)
     user_rating = models.IntegerField(null = True, blank = True)
     user_review = models.TextField(max_length = 255, null = True, blank = True)
-    user_playtime = models.IntegerField(null = True, blank = True)
+    user_playtime = models.IntegerField(default = 0, null = True, blank = True)
     start_date = models.DateField(null = True, blank = True)
     completion_date = models.DateField(null = True, blank = True)
     full_completion = models.BooleanField(default = False, null = False, blank = False)
@@ -28,6 +28,23 @@ class Logs(models.Model):
 
     def __str__(self):
         return f"{self.user.username} logged {self.game_id.game_title} on {self.platform_id.label}"
+    
+class LogSessions(models.Model):
+    id = models.UUIDField(primary_key = True, default = uuid.uuid4, editable = False, null = False, blank = False)
+    user = models.ForeignKey(CustomUser, on_delete = models.CASCADE, null = False, blank = False)
+    log_id = models.ForeignKey(Logs, on_delete = models.CASCADE, null = False, blank = False)
+    session_playtime = models.IntegerField(default = 0, null = False, blank = False)
+    start_time = models.DateTimeField(default = timezone.now(), null = True, blank = True)
+    end_time = models.DateTimeField(null = True, blank = True)
+    creation_timestamp = models.DateTimeField(default = timezone.now, null = False, blank = False)
+
+    def save(self, *args, **kwargs):
+        if self.start_time and self.end_time:
+            self.session_playtime = int((self.end_time - self.start_time).total_seconds() // 60)
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return f"{self.user.username} had a session of {self.log_id.game_id.game_title} for {self.session_playtime} minutes"
     
 class LogTags(models.Model):
     id = models.UUIDField(primary_key = True, default = uuid.uuid4, editable = False, null = False, blank = False)

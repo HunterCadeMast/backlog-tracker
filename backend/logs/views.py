@@ -4,11 +4,11 @@ from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from accounts.permissions import IsAccountOwner
-from logs.models import Logs, LogTags
-from logs.serializers import LogsSerialiser, LogTagsSerialiser
+from logs.models import Logs, LogSessions, LogTags
+from logs.serializers import LogsSerializer, LogSessionsSerializer, LogTagsSerializer
 
 class LogsViewSet(viewsets.ModelViewSet):
-    serializer_class = LogsSerialiser
+    serializer_class = LogsSerializer
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated, IsAccountOwner]
 
@@ -54,9 +54,23 @@ class LogsViewSet(viewsets.ModelViewSet):
     
     def perform_create(self, serializer):
         serializer.save(user = self.request.user)
+
+class LogSessionsViewSet(viewsets.ModelViewSet):
+    serializer_class = LogSessionsSerializer
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated, IsAccountOwner]
+
+    def get_queryset(self):
+        return LogSessions.objects.filter(user = self.request.user)
+    
+    def perform_create(self, serializer):
+        log = serializer.validated_data['log']
+        if log.user != self.request.user:
+            raise PermissionError
+        serializer.save(user = self.request.user, profile_id = log.profile_id)
     
 class LogTagsViewSet(viewsets.ModelViewSet):
-    serializer_class = LogTagsSerialiser
+    serializer_class = LogTagsSerializer
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated, IsAccountOwner]
 
