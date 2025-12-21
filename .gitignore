@@ -221,6 +221,7 @@ __marimo__/
 
 # next.js
 /.next/
+.next/
 /out/
 
 # production
