@@ -221,7 +221,7 @@ __marimo__/
 
 # next.js
 /.next/
-.next/
+frontend/backlog-tracker-next-js/.next/
 /out/
 
 # production
