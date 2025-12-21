@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import {Bebas_Neue, PT_Serif} from "next/font/google"
 import localFont from "next/font/local"
+import NavigationPanel from "./components/navigation";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -16,6 +17,7 @@ export default function RootLayout({children}: Readonly<{children: React.ReactNo
   return (
     <html lang="en" className = { `${bebasNeue.variable} ${ptSerif.variable}` }>
       <body>
+        <NavigationPanel />
         {children}
       </body>
     </html>
