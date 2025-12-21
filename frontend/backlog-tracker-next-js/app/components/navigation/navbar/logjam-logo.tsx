@@ -1,9 +1,12 @@
 import Image from "next/image";
+import Link from "next/link";
 
 const Logo = () => {
     return (
         <>
-            <Image src = {"/images/gaming-logjam-logo.svg"} alt = "gaming-logjam-logo" width = {62} height = {62} />
+            <Link href = "/">
+                <Image src = {"/images/gaming-logjam-logo.svg"} alt = "gaming-logjam-logo" width = {62} height = {62} />
+            </Link>
         </>
     );
 };

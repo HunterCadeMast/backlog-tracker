@@ -4,7 +4,9 @@
   --background: #e1f1ce;
   --foreground: #171717;
   --cream: #eed070;
-  --navbar: #8bdb8b;
+  --navbar: hsl(120, 53%, 70%);
+  --button: #74563b;
+  --button-border: #d4bca3;
 }
 
 @theme inline {
@@ -12,6 +14,8 @@
   --color-foreground: var(--foreground);
   --color-cream: var(--cream);
   --color-navbar: var(--navbar);
+  --color-button: var(--button);
+  --color-button-border: var(--button-border);
   --font-log-title: var(--font-bebasneue);
   --font-log-body: var(--font-ptserif);
   --font-main-title: var(--font-sekuya);

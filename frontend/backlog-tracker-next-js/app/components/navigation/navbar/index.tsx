@@ -1,7 +1,6 @@
 import React from "react"
 import Link from "next/link"
 import Logjam from "./logjam-logo"
-import Button from "./button"
 
 type NavbarProps = {
     navigationToggle: () => void;
@@ -10,8 +9,8 @@ type NavbarProps = {
 const Navbar = ({navigationToggle}: NavbarProps) => {
     return (
         <>
-            <div className = "sticky top-0 flex h-20 bg-navbar">
-                <div className = "container flex items-center justify-between max-w-7xl mx-auto px-4">
+            <div className = "sticky top-0 bg-navbar">
+                <div className = "container flex items-center justify-between max-w-screen mx-auto px-4">
                     <div className = "flex items-center p-2">
                         <Logjam />
                         <ul className = "hidden md:flex gap-x-7 pl-5 font-main-title  text-gray-800">
@@ -28,15 +27,19 @@ const Navbar = ({navigationToggle}: NavbarProps) => {
                         </ul>
                     </div>
                     <div className = "flex items-center p-2">
-                        <ul className = "hidden md:flex gap-x-7 pr-5 font-main-title  text-gray-800">
+                        <ul className = "hidden md:flex gap-x-7 pr-5 font-main-title font-bold text-cream">
                             <li>
                                 <Link href = "/signin">
-                                    <p>Sign In</p>
+                                    <button className = "h-10 rounded-lg bg-button outline-4 outline-button-border px-5">Sign In</button>
                                 </Link>
                             </li>
                         </ul>
-                        <button onClick = {navigationToggle}>
-                            <Button />
+                        <button className = "md:hidden justify-right p-2" onClick = {navigationToggle}>
+                            <div className = "container">
+                                <div className = "w-10 h-1 bg-gray-800 m-1.5"></div>
+                                <div className = "w-10 h-1 bg-gray-800 m-1.5"></div>
+                                <div className = "w-10 h-1 bg-gray-800 m-1.5"></div>
+                            </div>
                         </button>
                     </div>
                 </div>
