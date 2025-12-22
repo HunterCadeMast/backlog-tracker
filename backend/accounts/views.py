@@ -28,13 +28,15 @@ class LoginViewSet(APIView):
         if not user:
             return Response({'error': 'Invalid credentials!'}, status = 401)
         elif not user.has_usable_password():
-            return Response({'error': 'OAuthentication users cannot login with password!'}, status = 403) 
-        elif not request.user.emailaddress_set.filter(verified = True).exists():
+            return Response({'error': 'OAuthentication users cannot login with password!'}, status = 403)
+        elif not user.emailaddress_set.filter(verified = True).exists():
             return Response({'error', 'Email not verified!'}, status = 403)
         else:
             refresh_token = RefreshToken.for_user(user)
-            serializer = CustomUserSerializer(user)
-            return Response({'message': 'User logged in!', 'refresh': str(refresh_token), 'access': str(refresh_token.access_token), 'user': serializer.data}, status = 202)
+            response = Response({'message': 'User logged in!'}, status = 202)
+            response.set_cookie(key = "access", value = str(refresh_token.access_token), httponly = True, secure = True, samesite = 'Lax', max_age = 60 * 15)
+            response.set_cookie(key = "refresh", value = str(refresh_token), httponly = True, secure = True, samesite = 'Lax', max_age = 60 * 60 * 24 * 7)
+            return response
     
 class LogoutViewSet(APIView):
     authentication_classes = [JWTAuthentication]
@@ -42,11 +44,30 @@ class LogoutViewSet(APIView):
 
     def post(self, request):
         try:
-            refresh_token = request.data['refresh']
-            RefreshToken(refresh_token).blacklist()
-            return Response({'message': 'User logged out!'}, status = 202)
+            refresh_token = request.COOKIES.get("refresh")
+            if refresh_token:
+                RefreshToken(refresh_token).blacklist()
+            response = Response({'message': 'User logged out!'}, status = 200)
+            response.delete_cookie('access')
+            response.delete_cookie('refresh')
+            return response
         except:
             return Response({'error', 'Token invalid!'}, status = 400)
+        
+class RefreshViewSet(APIView):
+    permission_classes = [AllowAny]
+
+    def post(self, request):
+        refresh_token = request.COOKIES.get('refresh')
+        if not refresh_token:
+            return Response({'error', 'Token invalid!'}, status = 401)
+        else:
+            access_token = RefreshToken(refresh_token).access_token
+            if not access_token:
+                return Response({'error', 'Token invalid!'}, status = 401)
+            response = Response({'message': 'Token refreshed!'}, status = 200)
+            response.set_cookie(key = "access", value = str(access_token), httponly = True, secure = True, samesite = 'Lax', max_age = 60 * 15)
+            return response
     
 class ProfileViewSet(APIView):
     authentication_classes = [JWTAuthentication]
@@ -139,7 +160,11 @@ class OAuthenticationViewSet(APIView):
     def get(self, request):
         profile = Profiles.objects.get(user = request.user)
         user_info = CustomUserSerializer(request.user).data
-        return Response({'message': 'OAuthentication account created successfully!', 'refresh_token': str(RefreshToken.for_user(request.user)), 'access_token': str(RefreshToken.for_user(request.user).access_token), 'user': user_info, 'profile_id': profile.id, 'providers': list(request.user.socialaccount_set.values_list('provider', flat = True))}, status = 201)
+        refresh_token = RefreshToken.for_user(request.user)
+        response = Response({'message': 'OAuthentication account created successfully!', 'user': user_info, 'profile_id': profile.id, 'providers': list(request.user.socialaccount_set.values_list('provider', flat = True))}, status = 202)
+        response.set_cookie(key = "access", value = str(refresh_token.access_token), httponly = True, secure = True, samesite = 'Lax', max_age = 60 * 15)
+        response.set_cookie(key = "refresh", value = str(refresh_token), httponly = True, secure = True, samesite = 'Lax', max_age = 60 * 60 * 24 * 7)
+        return response
     
 class UnlinkAccountViewSet(APIView):
     permission_classes = [IsAuthenticated]
@@ -155,4 +180,4 @@ class UnlinkAccountViewSet(APIView):
             if not deleted_account:
                 return Response({'error': 'No linked provider!'}, status = 404)
             else:
-                return Response({'message': 'Unlinked accounts successfully!'}, status = 200)  
+                return Response({'message': 'Unlinked accounts successfully!'}, status = 200)

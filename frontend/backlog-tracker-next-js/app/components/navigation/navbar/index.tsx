@@ -29,8 +29,8 @@ const Navbar = ({navigationToggle}: NavbarProps) => {
                     <div className = "flex items-center p-2">
                         <ul className = "hidden md:flex gap-x-7 pr-5 font-main-title font-bold text-cream">
                             <li>
-                                <Link href = "/signin">
-                                    <button className = "h-10 rounded-lg bg-button outline-4 outline-button-border px-5">Sign In</button>
+                                <Link href = "/login">
+                                    <button className = "h-10 rounded-lg bg-button outline-4 outline-button-border px-5">Login</button>
                                 </Link>
                             </li>
                         </ul>

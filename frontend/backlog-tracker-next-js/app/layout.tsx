@@ -11,11 +11,11 @@ export const metadata: Metadata = {
 
 const bebasNeue = Bebas_Neue({subsets: ["latin"], weight: "400", variable: "--font-bebasneue"});
 const ptSerif = PT_Serif({subsets: ["latin"], weight: "400", variable: "--font-ptserif"});
-// const sekuya = localFont({src: "./frontend/backlog-tracker-next-js/fonts/Sekuya-Regular.ttf", variable: "--font-sekuya"})
+const sekuya = localFont({src: "./fonts/Sekuya-Regular.ttf", weight: "400", variable: "--font-sekuya"})
 
 export default function RootLayout({children}: Readonly<{children: React.ReactNode;}>) {
   return (
-    <html lang="en" className = { `${bebasNeue.variable} ${ptSerif.variable}` }>
+    <html lang="en" className = { `${bebasNeue.variable} ${ptSerif.variable} ${sekuya.variable}` }>
       <body>
         <NavigationPanel />
         {children}
