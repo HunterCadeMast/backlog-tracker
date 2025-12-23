@@ -15,8 +15,10 @@ class RegisterViewSet(APIView):
     permission_classes = [AllowAny]
 
     def post(self, request):
+        print(request.data)
         serializer = CustomUserSerializer(data = request.data)
-        serializer.is_valid(raise_exception = True)
+        if not serializer.is_valid():
+            return Response({'error': serializer.errors}, status = status.HTTP_400_BAD_REQUEST)
         serializer.save()
         return Response({'message': 'Account created!', 'user': serializer.data}, status = status.HTTP_201_CREATED)
     
