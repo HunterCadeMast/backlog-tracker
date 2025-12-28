@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { apiFetch } from "@/lib/api";
-import { userFetch } from "@/lib/authentication";
+import { userFetch } from "@/lib/user";
 import Link from "next/link"
 import Logjam from "./logjam-logo"
 
@@ -15,17 +15,27 @@ const Navbar = ({navigationToggle}: NavbarProps) => {
     const [loading, setLoading] = useState(true);
     const router = useRouter();
     useEffect(() => {
-        async function user() {
+        async function loadUser() {
             const account = await userFetch();
             setUser(account);
             setLoading(false);
         }
-        user();
+        loadUser();
     }, []);
     const handleLogout = async () => {
-        await apiFetch("/accounts/logout/", {method: "POST"});
+        try {
+            await apiFetch("/authentication/logout/", {
+                method: "POST",
+                body: JSON.stringify({
+                    refresh: localStorage.getItem("refresh"),
+                }),
+            });
+        }
+        catch {}
+        localStorage.removeItem("access");
+        localStorage.removeItem("refresh");
         setUser(null);
-        router.push("login");
+        router.push("/");
     };
     if (loading) {
         return null;
@@ -55,9 +65,7 @@ const Navbar = ({navigationToggle}: NavbarProps) => {
                                 {user ? (
                                     <>
                                         <li>
-                                            <Link href = "/logout">
-                                                <button onClick = {handleLogout} className = "h-10 rounded-lg bg-button outline-4 outline-button-border px-5">Logout</button>
-                                            </Link>
+                                            <button onClick = {handleLogout} className = "h-10 rounded-lg bg-button outline-4 outline-button-border px-5">Logout</button>
                                         </li>
                                     </>
                                 ) : (

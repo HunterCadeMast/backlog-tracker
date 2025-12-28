@@ -17,8 +17,6 @@ export async function registerAction(formData: FormData) {
             method: "POST",
             body: JSON.stringify({username, email, password: password1}),
         });
-        const user = await apiFetch("/authentication/profile/");
-        return user;
     }
     catch (error: any) {
         throw error;

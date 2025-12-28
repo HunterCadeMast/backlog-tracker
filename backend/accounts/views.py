@@ -12,17 +12,19 @@ from accounts.serializers import CustomUserSerializer
 from profiles.models import Profiles
 
 class RegisterViewSet(APIView):
+    authentication_classes = []
     permission_classes = [AllowAny]
 
     def post(self, request):
-        print(request.data)
         serializer = CustomUserSerializer(data = request.data)
         if not serializer.is_valid():
             return Response({'error': serializer.errors}, status = status.HTTP_400_BAD_REQUEST)
-        serializer.save()
-        return Response({'message': 'Account created!', 'user': serializer.data}, status = status.HTTP_201_CREATED)
+        user = serializer.save()
+        refresh_token = RefreshToken.for_user(user)
+        return Response({'message': 'Account created!', 'access': str(refresh_token.access_token), 'refresh': str(refresh_token), 'user': serializer.data,}, status = 201)
     
 class LoginViewSet(APIView):
+    authentication_classes = []
     permission_classes = [AllowAny]
 
     def post(self, request):
@@ -31,45 +33,39 @@ class LoginViewSet(APIView):
             return Response({'error': 'Invalid credentials!'}, status = 401)
         elif not user.has_usable_password():
             return Response({'error': 'OAuthentication users cannot login with password!'}, status = 403)
-        elif not user.emailaddress_set.filter(verified = True).exists():
-            return Response({'error', 'Email not verified!'}, status = 403)
         else:
             refresh_token = RefreshToken.for_user(user)
-            response = Response({'message': 'User logged in!'}, status = 202)
-            response.set_cookie(key = "access", value = str(refresh_token.access_token), httponly = True, secure = True, samesite = 'Lax', max_age = 60 * 15)
-            response.set_cookie(key = "refresh", value = str(refresh_token), httponly = True, secure = True, samesite = 'Lax', max_age = 60 * 60 * 24 * 7)
-            return response
-    
+            return Response({'message': 'User logged in!', 'access': str(refresh_token.access_token), 'refresh': str(refresh_token), 'user': CustomUserSerializer(user).data,}, status = 200)
+
 class LogoutViewSet(APIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
-        try:
-            refresh_token = request.COOKIES.get("refresh")
-            if refresh_token:
+        refresh_token = request.data.get('refresh')
+        if refresh_token:
+            try:
                 RefreshToken(refresh_token).blacklist()
-            response = Response({'message': 'User logged out!'}, status = 200)
-            response.delete_cookie('access')
-            response.delete_cookie('refresh')
-            return response
-        except:
-            return Response({'error', 'Token invalid!'}, status = 400)
-        
+            except Exception:
+                Response({'message': 'Cannot log out!'}, status = 403)
+        return Response({'message': 'Logged out!'}, status = 200)
+
 class RefreshViewSet(APIView):
+    authentication_classes = []
     permission_classes = [AllowAny]
 
     def post(self, request):
-        refresh_token = request.COOKIES.get('refresh')
-        if not refresh_token:
-            return Response({'error', 'Token invalid!'}, status = 401)
+        old_token = request.data.get('refresh')
+        if not old_token:
+            return Response({'error', 'Token needed!'}, status = 400)
         else:
-            access_token = RefreshToken(refresh_token).access_token
-            if not access_token:
+            try:
+                refresh_token = RefreshToken(old_token)
+                access_token = refresh_token.access_token
+                new_token = str(old_token)
+            except Exception:
                 return Response({'error', 'Token invalid!'}, status = 401)
-            response = Response({'message': 'Token refreshed!'}, status = 200)
-            response.set_cookie(key = "access", value = str(access_token), httponly = True, secure = True, samesite = 'Lax', max_age = 60 * 15)
-            return response
+            return Response({'message': 'Token refreshed!', 'access': str(access_token), 'refresh': str(new_token),}, status = 200)
     
 class ProfileViewSet(APIView):
     authentication_classes = [JWTAuthentication]
@@ -80,7 +76,7 @@ class ProfileViewSet(APIView):
         return Response(serializer.data)
     
     def patch(self, request):
-        serializer = CustomUserSerializer(request.user, data = request.data, partial = True)
+        serializer = CustomUserSerializer(request.user)
         serializer.is_valid(raise_exception = True)
         serializer.save()
         return Response(serializer.data)
@@ -105,12 +101,14 @@ class PasswordChangeViewSet(APIView):
             return Response({'message': 'Password changed!'}, status = 202)
     
 class PasswordChangeCompleteViewSet(APIView):
+    authentication_classes = []
     permission_classes = [AllowAny]
 
     def get(self, request):
         return Response({'message': 'Password changed!', 'status': 'password_changed'}, status = 200)
     
 class PasswordResetViewSet(APIView):
+    authentication_classes = []
     permission_classes = [AllowAny]
 
     def post(self, request):
@@ -125,12 +123,14 @@ class PasswordResetViewSet(APIView):
         return Response({'message': 'Password reset email sent!', 'password_reset_url': password_reset_url}, status = 200)
     
 class PasswordResetCompleteViewSet(APIView):
+    authentication_classes = []
     permission_classes = [AllowAny]
 
     def get(self, request):
         return Response({'message': 'Password reset link sent!', 'status': 'email_sent'}, status = 200)
     
 class PasswordResetConfirmatonViewSet(APIView):
+    authentication_classes = []
     permission_classes = [AllowAny]
 
     def post(self, request, id, token):
@@ -151,24 +151,24 @@ class PasswordResetConfirmatonViewSet(APIView):
                 return Response({'message': 'Password reset!'}, status = 202)
     
 class PasswordResetConfirmationCompleteViewSet(APIView):
+    authentication_classes = []
     permission_classes = [AllowAny]
 
     def get(self, request):
         return Response({'message': 'Password reset!', 'status': 'password_reset'}, status = 200)
     
 class OAuthenticationViewSet(APIView):
+    authentication_classes = []
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
         profile = Profiles.objects.get(user = request.user)
         user_info = CustomUserSerializer(request.user).data
         refresh_token = RefreshToken.for_user(request.user)
-        response = Response({'message': 'OAuthentication account created successfully!', 'user': user_info, 'profile_id': profile.id, 'providers': list(request.user.socialaccount_set.values_list('provider', flat = True))}, status = 202)
-        response.set_cookie(key = "access", value = str(refresh_token.access_token), httponly = True, secure = True, samesite = 'Lax', max_age = 60 * 15)
-        response.set_cookie(key = "refresh", value = str(refresh_token), httponly = True, secure = True, samesite = 'Lax', max_age = 60 * 60 * 24 * 7)
-        return response
+        return Response({'message': 'OAuthentication account created successfully!', 'user': user_info, 'profile_id': profile.id, 'providers': list(request.user.socialaccount_set.values_list('provider', flat = True)), 'access': str(refresh_token.access_token), 'refresh': str(refresh_token), }, status = 200,)
     
 class UnlinkAccountViewSet(APIView):
+    authentication_classes = []
     permission_classes = [IsAuthenticated]
 
     def post(self, request):

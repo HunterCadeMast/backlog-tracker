@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
-import { userFetch } from "@/lib/authentication";
+import { userFetch } from "@/lib/user";
 
 const Profile = () => {
     const [user, setUser] = useState<any>(null);
