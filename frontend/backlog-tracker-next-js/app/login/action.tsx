@@ -1,4 +1,4 @@
-"use server";
+"use client";
 import { apiFetch } from "@/lib/api";
 
 export async function loginAction(formData: FormData) {
@@ -8,12 +8,13 @@ export async function loginAction(formData: FormData) {
         throw new Error("Email and password are required!")
     }
     try {
-        await apiFetch("/accounts/login/", {
+        const loginResponse = await apiFetch("/authentication/login/", {
             method: "POST",
             body: JSON.stringify({email, password}),
         });
-        const user = await apiFetch("/accounts/profile/");
-        return user;
+        localStorage.setItem("access", loginResponse.access);
+        localStorage.setItem("refresh", loginResponse.refresh);
+        return loginResponse.user;
     }
     catch (error: any) {
         throw new Error(error?.error || "Login failed!")

@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'rest_framework_simplejwt',
+    'rest_framework_simplejwt.token_blacklist',
     'rest_framework_api_key',
     'django.contrib.sites',
     'allauth',
@@ -53,8 +54,8 @@ INSTALLED_APPS = [
     'django_celery_beat',
     'corsheaders',
     'accounts',
-    'profiles',
     'games',
+    'profiles',
     'logs',
     'playlists',
     'recommendations',
@@ -127,6 +128,7 @@ SIMPLE_JWT = {
     'REFRESH_TOKEN_LIFETIME': timedelta(days = 7),
     'ROTATE_REFRESH_TOKENS': True,
     'BLACKLIST_AFTER_ROTATION': True,
+    'AUTH_HEADER_TYPES': ('Bearer',),
 }
 
 REST_FRAMEWORK['DEFAULT_THROTTLE_CLASSES'] += [
@@ -143,8 +145,9 @@ API_KEY = {
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
-    "http://127.0.0.1:3000",
 ]
+
+CORS_ALLOW_CREDENTIALS = True
 
 WSGI_APPLICATION = 'backlog_tracker_django.wsgi.application'
 
