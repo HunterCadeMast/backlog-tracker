@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import {Bebas_Neue, PT_Serif} from "next/font/google"
 import localFont from "next/font/local"
-import NavigationPanel from "./components/navigation";
 import "./globals.css";
+import ClientProvider from "./components/ClientProvider";
 
 export const metadata: Metadata = {
   title: "Gaming Logjam - Backlog Tracker",
@@ -17,8 +17,9 @@ export default function RootLayout({children}: Readonly<{children: React.ReactNo
   return (
     <html lang="en" className = { `${bebasNeue.variable} ${ptSerif.variable} ${sekuya.variable}` }>
       <body>
-        <NavigationPanel />
-        {children}
+        <ClientProvider>
+          {children}
+        </ClientProvider>
       </body>
     </html>
   );

@@ -3,6 +3,7 @@ import { useState } from "react";
 import { loginAction } from "./action";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { useAuthentication } from "@/lib/authentication";
 
 const Login = () => {
     const router = useRouter();
@@ -10,12 +11,14 @@ const Login = () => {
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
     const [success, setSuccess] = useState("");
+    const { refreshUser } = useAuthentication();
     const handleSubmit = async (exception: React.FormEvent<HTMLFormElement>) => {
         exception.preventDefault();
         setError("");
         setSuccess("")
         try {
             await loginAction(new FormData(exception.currentTarget));
+            await refreshUser();
             setSuccess("Successfully logged in!");
             router.push("/");
         }

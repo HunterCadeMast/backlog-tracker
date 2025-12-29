@@ -1,40 +1,18 @@
 "use client";
-import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { apiFetch } from "@/lib/api";
-import { userFetch } from "@/lib/user";
 import Link from "next/link"
 import Logjam from "./logjam-logo"
+import { useAuthentication } from "@/lib/authentication";
 
 type NavbarProps = {
     navigationToggle: () => void;
 };
 
 const Navbar = ({navigationToggle}: NavbarProps) => {
-    const [user, setUser] = useState<any>(null);
-    const [loading, setLoading] = useState(true);
+    const {user, loading, logout} = useAuthentication();
     const router = useRouter();
-    useEffect(() => {
-        async function loadUser() {
-            const account = await userFetch();
-            setUser(account);
-            setLoading(false);
-        }
-        loadUser();
-    }, []);
-    const handleLogout = async () => {
-        try {
-            await apiFetch("/authentication/logout/", {
-                method: "POST",
-                body: JSON.stringify({
-                    refresh: localStorage.getItem("refresh"),
-                }),
-            });
-        }
-        catch {}
-        localStorage.removeItem("access");
-        localStorage.removeItem("refresh");
-        setUser(null);
+    const handleLogout = () => {
+        logout();
         router.push("/");
     };
     if (loading) {
