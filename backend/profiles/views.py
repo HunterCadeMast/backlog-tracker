@@ -1,10 +1,12 @@
 from rest_framework import viewsets
+from rest_framework.views import APIView
 from rest_framework.decorators import action
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework_api_key.models import APIKey
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from django.utils import timezone
+from django.shortcuts import get_object_or_404
 from datetime import timedelta
 from accounts.permissions import IsAccountOwner, APIKeyAuthenticated, APIKeyThrottle
 from profiles.models import Profiles, APIKeys
@@ -13,15 +15,22 @@ from profiles.serializers import ProfilesSerializer, APIKeysSerializer
 class ProfilesViewSet(viewsets.ModelViewSet):
     serializer_class = ProfilesSerializer
     authentication_classes = [JWTAuthentication]
-    permission_classes = [IsAuthenticated, IsAccountOwner]
+    permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
         return Profiles.objects.filter(user = self.request.user)
 
-    def perform_create(self, serializer):
-        serializer.save(user = self.request.user)
+    def personal(self, request):
+        profile, _ = Profiles.objects.get_or_create(user = request.user)
+        if request.method == 'GET':
+            return Response(self.get_serializer(profile).data)
+        else:
+            serializer = self.get_serializer(profile, data = request.data, partial = True)
+            serializer.is_valid(raise_exception = True)
+            serializer.save()
+            return Response(serializer.data)
 
-    @action(detail = True, methods = ['patch'])
+    @action(detail = False, methods = ['patch'])
     def update_profile_photo(self, request, pk = None):
         profile = self.get_object()
         profile_photo = request.FILES.get('profile_photo')
@@ -31,20 +40,28 @@ class ProfilesViewSet(viewsets.ModelViewSet):
         profile.save()
         return Response({'message': 'Profile photo updated!'})
     
-    @action(detail = True, methods = ['patch'])
+    @action(detail = False, methods = ['patch'])
     def toggle_visibility(self, request, pk = None):
         profile = self.get_object()
         profile.private_profile = not profile.private_profile
         profile.save()
         return Response({'message': 'Profile visibility inverted!'}, status = 200)
     
-    @action(detail = True, methods = ['patch'])
+    @action(detail = False, methods = ['patch'])
     def change_profile_info(self, request, pk = None):
         profile = self.get_object()
         profile_serializer = self.get_serializer(profile, data = request.data, partial = True)
         profile_serializer.is_valid(raise_exception = True)
         profile_serializer.save()
         return Response({'message': 'Updated profile!'}, status = 200)
+    
+class UsersViewSet(APIView):
+    authentication_classes = []
+    permission_classes = [AllowAny]
+
+    def get(self, request, username):
+        profile = get_object_or_404(Profiles, user__username = username, private_profile = False)
+        return Response(ProfilesSerializer(profile).data)
     
 class APIKeysViewSet(viewsets.ModelViewSet):
     serializer_class = APIKeysSerializer

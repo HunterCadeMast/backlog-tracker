@@ -25,6 +25,7 @@ urlpatterns = [
     path('api/authentication/', include('accounts.urls')),
     path('accounts/', include('allauth.urls')),
     path('api/', include((router.urls, 'core_api'), namespace = 'core_api')),
+    path('', include('profiles.urls')),
     path('api/token/', TokenObtainPairView.as_view(), name = 'token_obtain_pair'),
     path('api/token/refresh/', TokenRefreshView.as_view(), name = 'token_refresh'),
     path('api/steam/', include('steam.urls'), name = 'steam'),

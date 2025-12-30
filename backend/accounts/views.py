@@ -67,7 +67,7 @@ class RefreshViewSet(APIView):
                 return Response({'error', 'Token invalid!'}, status = 401)
             return Response({'message': 'Token refreshed!', 'access': str(access_token), 'refresh': str(new_token),}, status = 200)
     
-class ProfileViewSet(APIView):
+class PersonalViewSet(APIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
 
@@ -76,7 +76,7 @@ class ProfileViewSet(APIView):
         return Response(serializer.data)
     
     def patch(self, request):
-        serializer = CustomUserSerializer(request.user)
+        serializer = CustomUserSerializer(request.user, data = request.data, partial = True)
         serializer.is_valid(raise_exception = True)
         serializer.save()
         return Response(serializer.data)

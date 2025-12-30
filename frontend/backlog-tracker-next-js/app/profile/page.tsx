@@ -1,23 +1,21 @@
 "use client";
 import { useEffect, useState } from "react";
-import { userFetch } from "@/lib/user";
+import { apiFetch } from "@/lib/api";
 
 const Profile = () => {
-    const [user, setUser] = useState<any>(null);
+    const [profile, setProfile] = useState<any>(null);
     useEffect(() => {
-        async function user() {
-            const account = await userFetch();
-            setUser(account);
-        }
-        user();
+        apiFetch("/authentication/profile/").then(setProfile);
     }, []);
-    if (!user) {
+    if (!profile) {
         return <h1>Loading...</h1>
     }
     else {
         return (
             <div>
-                Profile
+                <h1>Name: {profile.username}</h1>
+                <p>Bio: {profile.bio}</p>
+                <p>Visibility: {profile.private_profile ? "Private" : "Public"}</p>
             </div>
         );
     }

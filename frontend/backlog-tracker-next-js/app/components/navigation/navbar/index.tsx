@@ -26,16 +26,20 @@ const Navbar = ({navigationToggle}: NavbarProps) => {
                         <div className = "flex items-center p-2">
                             <Logjam />
                             <ul className = "hidden md:flex gap-x-7 pl-5 font-main-title  text-gray-800">
-                                <li>
-                                    <Link href = "/profile">
-                                        <p>Profile</p>
-                                    </Link>
-                                </li>
-                                <li>
-                                    <Link href = "/backlog">
-                                        <p>Backlog</p>
-                                    </Link>
-                                </li>
+                                {user ? (
+                                    <>
+                                        <li>
+                                            <Link href = "/profile">
+                                                <p>Profile</p>
+                                            </Link>
+                                        </li>
+                                        <li>
+                                            <Link href = "/backlog">
+                                                <p>Backlog</p>
+                                            </Link>
+                                        </li>
+                                    </>
+                                ) : (<></>)}
                             </ul>
                         </div>
                         <div className = "flex items-center p-2">
