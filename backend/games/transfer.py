@@ -24,7 +24,7 @@ def games_database_transfer(data):
     for igdb_platform in data.get('platforms', []):
         platform, _ = Platforms.objects.get_or_create(label = igdb_platform['name'])
         GameSpecificPlatforms.objects.get_or_create(game_id = game, platform_id = platform)
-    for igdb_franchise in data.get('franchies', []):
+    for igdb_franchise in data.get('franchises', []):
         franchise, _ = Franchises.objects.get_or_create(label = igdb_franchise['name'])
         GameSpecificFranchises.objects.get_or_create(game_id = game, franchise_id = franchise)
     for igdb_series in data.get('collections', []):

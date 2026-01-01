@@ -17,11 +17,29 @@ class RegisterViewSet(APIView):
 
     def post(self, request):
         serializer = CustomUserSerializer(data = request.data)
-        if not serializer.is_valid():
-            return Response({'error': serializer.errors}, status = status.HTTP_400_BAD_REQUEST)
+        serializer.is_valid(raise_exception = True)
         user = serializer.save()
-        refresh_token = RefreshToken.for_user(user)
-        return Response({'message': 'Account created!', 'access': str(refresh_token.access_token), 'refresh': str(refresh_token), 'user': serializer.data,}, status = 201)
+        token = token_generator.make_token(user)
+        # Add email verification here
+        # verification_url = 
+        return Response({'message': 'Account created!'}, status = 201)
+    
+class EmailVerificationViewSet(APIView):
+    authentication_classes = []
+    permission_classes = [AllowAny]
+
+    def get(self, request, id, token):
+        try:
+            user = CustomUser.objects.get(id = id)
+        except CustomUser.DoesNotExist:
+            return Response({'error': 'User invalid!'}, status = 400)
+        if not token_generator.check_token(user, token):
+            return Response({'error': 'Tokens invalid!'}, status = 400)
+        if user.is_email_verified:
+            return Response({'message': 'Email already verified!'}, status = 200)
+        user.is_email_verified = True
+        user.save(update_fields = ['is_email_verified'])
+        return Response({'message': 'Email verified!'}, status = 200)
     
 class LoginViewSet(APIView):
     authentication_classes = []
@@ -31,7 +49,9 @@ class LoginViewSet(APIView):
         user = authenticate(email = request.data.get('email'), password = request.data.get('password'))
         if not user:
             return Response({'error': 'Invalid credentials!'}, status = 401)
-        elif not user.has_usable_password():
+        # if not user.is_email_verified:
+        #    return Response({'error': 'Email needs to be verified!'}, status = 403)
+        if not user.has_usable_password():
             return Response({'error': 'OAuthentication users cannot login with password!'}, status = 403)
         else:
             refresh_token = RefreshToken.for_user(user)
@@ -114,7 +134,7 @@ class PasswordResetViewSet(APIView):
     def post(self, request):
         email = request.data.get('email')
         try:
-            user = CustomUser.objects.get(email = email)
+            user = CustomUser.objects.get(email = email).first()
         except CustomUser.DoesNotExist:
             return Response({'error': 'Could not find user!'}, status = 404)
         token = token_generator.make_token(user)
