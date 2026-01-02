@@ -28,20 +28,29 @@ const SearchBar = () => {
             setResults([]);
             return;
         }
+        const controller = new AbortController();
         const timer = setTimeout(async () => {
-            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/games/?search=${encodeURIComponent(query)}`);
-            const data = await response.json();
-            if (Array.isArray(data)) {
-                setResults(data);
+            try {
+                const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/games/?search=${encodeURIComponent(query)}`, { signal: controller.signal });
+                if (!response.ok) {
+                    const text = await response.text();
+                    console.error("Non-JSON response:", text);
+                    return;
+                }
+                const data = await response.json();
+                setResults(Array.isArray(data) ? data: Array.isArray(data.results) ? data.results: []);
             }
-            if (data.results && Array.isArray(data.results)) {
-                setResults(data.results);
+            catch (error: any) {
+                if (error.name === "AbortError") {
+                    return
+                }
+                console.error(error);
             }
-            else {
-                setResults([]);
-            }
-        }, 300);
-        return () => clearTimeout(timer);
+        }, 300)
+        return () => {
+            controller.abort();
+            clearTimeout(timer);
+        };
     }, [query]);
     function handleSelect(game: GameTypes) {
         setOpen(false);
@@ -54,8 +63,8 @@ const SearchBar = () => {
             {open && (
                 <div className = "fixed top-15 left-5 right-5 z-50 mt-20 rounded-md bg-gray-800 text-white min-h-100 overflow-y-auto shadow-lg">
                     {results.length === 0 && query && (<p className = "px-4 py-2 text-sm text-white">Hmm... Nothing to see here...</p>)}
-                    {results.map((game) => (
-                        <button key = {game.id} onClick = {() => handleSelect(game)} className = "flex w-full items-center gap-3 px-4 py-2 hover:bg-gray-600 text-left">
+                    {results.map((game, idx) => (
+                        <button key = {`${game.id}-${idx}`} onClick = {() => handleSelect(game)} className = "flex w-full items-center gap-3 px-4 py-2 hover:bg-gray-600 text-left">
                             {game.cover_artwork_link && (<img src = {game.cover_artwork_link} alt = {game.game_title} className = "h-10 w-7 rounded object-cover"/>)}
                             <span>{game.game_title}</span>
                         </button>
