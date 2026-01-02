@@ -20,6 +20,9 @@ export default function RootLayout({children}: Readonly<{children: React.ReactNo
         <ClientProvider>
           {children}
         </ClientProvider>
+        <div className = "flex items-center justify-between bg-cream">
+          <h1 className = "ml-10 font-main-title text-3xl text-gray-800">Database from IGDB</h1>
+        </div>
       </body>
     </html>
   );

@@ -3,6 +3,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link"
 import Logjam from "./logjam-logo"
 import { useAuthentication } from "@/lib/authentication";
+import SearchBar from "../../search/searchbar";
 
 type NavbarProps = {
     navigationToggle: () => void;
@@ -26,16 +27,20 @@ const Navbar = ({navigationToggle}: NavbarProps) => {
                         <div className = "flex items-center p-2">
                             <Logjam />
                             <ul className = "hidden md:flex gap-x-7 pl-5 font-main-title  text-gray-800">
-                                <li>
-                                    <Link href = "/profile">
-                                        <p>Profile</p>
-                                    </Link>
-                                </li>
-                                <li>
-                                    <Link href = "/backlog">
-                                        <p>Backlog</p>
-                                    </Link>
-                                </li>
+                                {user ? (
+                                    <>
+                                        <li>
+                                            <Link href = "/profile">
+                                                <p>Profile</p>
+                                            </Link>
+                                        </li>
+                                        <li>
+                                            <Link href = "/backlog">
+                                                <p>Backlog</p>
+                                            </Link>
+                                        </li>
+                                    </>
+                                ) : (<></>)}
                             </ul>
                         </div>
                         <div className = "flex items-center p-2">
@@ -61,6 +66,7 @@ const Navbar = ({navigationToggle}: NavbarProps) => {
                                     </>
                                 )}
                             </ul>
+                            <SearchBar />
                             <button className = "md:hidden justify-right p-2" onClick = {navigationToggle}>
                                 <div className = "container">
                                     <div className = "w-10 h-1 bg-gray-800 m-1.5"></div>

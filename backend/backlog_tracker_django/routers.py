@@ -1,5 +1,6 @@
 from rest_framework import routers
 from profiles.views import ProfilesViewSet, APIKeysViewSet
+from games.views import GamesViewSet
 from logs.views import LogsViewSet, LogSessionsViewSet, LogTagsViewSet
 from playlists.views import PlaylistsViewSet, PlaylistLogsViewSet
 from recommendations.views import RecommendationsViewSet
@@ -11,6 +12,7 @@ router.register(r'profile', ProfilesViewSet, basename = "profile")
 router.register(r'api_keys', APIKeysViewSet, basename = "api_keys")
 
 # Logs Routing
+router.register(r'games', GamesViewSet, basename='games')
 router.register(r'logs', LogsViewSet, basename = "logs")
 router.register(r'log_sessions', LogSessionsViewSet, basename = "log_sessions")
 router.register(r'log_tags', LogTagsViewSet, basename = "log_tags")

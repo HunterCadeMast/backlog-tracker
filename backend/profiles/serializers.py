@@ -16,6 +16,13 @@ class ProfilesSerializer(serializers.ModelSerializer):
         fields = ['id', 'user', 'display_name', 'profile_photo', 'private_profile', 'website_theme', 'bio', 'favorite_game', 'favorite_developer', 'favorite_publisher', 'favorite_genre', 'favorite_platform', 'favorite_franchise', 'favorite_series', 'playstyle']
         read_only_fields = ['id', 'user']
 
+class PublicProfileSerializer(serializers.ModelSerializer):
+    username = serializers.CharField(source = 'user.username')
+
+    class Meta:
+        model = Profiles
+        fields = ['username', 'profile_photo', 'bio']
+
 class APIKeysSerializer(serializers.ModelSerializer):
     class Meta:
         model = APIKeys
