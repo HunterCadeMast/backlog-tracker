@@ -33,8 +33,7 @@ const SearchBar = () => {
             try {
                 const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/games/?search=${encodeURIComponent(query)}`, { signal: controller.signal });
                 if (!response.ok) {
-                    const text = await response.text();
-                    console.error("Non-JSON response:", text);
+                    router.push("/not-found/");
                     return;
                 }
                 const data = await response.json();
