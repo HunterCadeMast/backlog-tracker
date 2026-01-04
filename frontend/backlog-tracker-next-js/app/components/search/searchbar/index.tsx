@@ -9,11 +9,12 @@ type GameTypes = {
 };
 
 const SearchBar = () => {
+    const router = useRouter();
+    const userStatus = Boolean(localStorage.getItem("access"));
     const [open, setOpen] = useState(false);
     const [query, setQuery] = useState("");
     const [results, setResults] = useState<GameTypes[]>([]);
     const containerReference = useRef<HTMLDivElement>(null);
-    const router = useRouter();
     useEffect(() => {
         function handleClick(event: MouseEvent) {
             if (containerReference.current && !containerReference.current.contains(event.target as Node)) {
@@ -56,14 +57,31 @@ const SearchBar = () => {
         setQuery("");
         router.push(`/games/${game.id}`);
     };
+    async function log(game: GameTypes) {
+        try {
+            const token = localStorage.getItem("access");
+            if (!token) {
+                router.push("/login");
+                return;
+            }
+            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/backlog/`, {method: "POST", headers: {"Content-Type": "application/json", Authorization: `Bearer ${token}`,}, body: JSON.stringify({game_id: game.id, user_status: "backlog", }), });
+            if (!response.ok) {
+                throw new Error("Failed to log!");
+            }
+            setResults(prev => prev.map(game_log => game_log.id === game.id ? {...game_log, is_in_backlog:true} : game_log));
+        }
+        catch (error) {
+            console.error(error);
+        }
+    };
     return (
         <div ref = {containerReference} className = "relative w-72">
             <input type = "text" placeholder = "Search games..." onFocus = {() => setOpen(true)} value = {query} onChange = {(x) => setQuery(x.target.value)} className = "w-full rounded-md border px-3 py-2 bg-gray-800 text-white"/>
             {open && (
                 <div className = "fixed top-15 left-5 right-5 z-50 mt-20 rounded-md bg-gray-800 text-white min-h-100 overflow-y-auto shadow-lg">
                     {results.length === 0 && query && (<p className = "px-4 py-2 text-sm text-white">Hmm... Nothing to see here...</p>)}
-                    {results.map((game, idx) => (
-                        <button key = {`${game.id}-${idx}`} onClick = {() => handleSelect(game)} className = "flex w-full items-center gap-3 px-4 py-2 hover:bg-gray-600 text-left">
+                    {results.map((game, index) => (
+                        <button key = {`${game.id}-${index}`} onClick = {() => handleSelect(game)} className = "flex w-full items-center gap-3 px-4 py-2 hover:bg-gray-600 text-left">
                             {game.cover_artwork_link && (<img src = {game.cover_artwork_link} alt = {game.game_title} className = "h-10 w-7 rounded object-cover"/>)}
                             <span>{game.game_title}</span>
                         </button>

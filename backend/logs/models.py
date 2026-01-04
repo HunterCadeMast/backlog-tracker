@@ -11,14 +11,14 @@ class Logs(models.Model):
     user = models.ForeignKey(CustomUser, on_delete = models.CASCADE, null = False, blank = False)
     profile_id = models.ForeignKey(Profiles, on_delete = models.CASCADE, null = False, blank = False)
     game_id = models.ForeignKey(Games, on_delete = models.CASCADE, null = False, blank = False)
-    platform_id = models.ForeignKey(Platforms, on_delete = models.CASCADE, null = False, blank = False)
-    user_status = models.CharField(max_length = 12, choices = STATUS_TYPES, default = 'backlog', null = False, blank = False)
+    platform_id = models.ForeignKey(Platforms, on_delete = models.CASCADE, null = True, blank = True)
+    user_status = models.CharField(max_length = 12, choices = STATUS_TYPES, default = 'backlog', null = True, blank = True)
     user_rating = models.IntegerField(null = True, blank = True)
     user_review = models.TextField(max_length = 255, null = True, blank = True)
     user_playtime = models.IntegerField(default = 0, null = True, blank = True)
     start_date = models.DateField(null = True, blank = True)
     completion_date = models.DateField(null = True, blank = True)
-    full_completion = models.BooleanField(default = False, null = False, blank = False)
+    full_completion = models.BooleanField(default = False, null = True, blank = True)
     creation_timestamp = models.DateTimeField(default = timezone.now, null = False, blank = False)
 
     class Meta:

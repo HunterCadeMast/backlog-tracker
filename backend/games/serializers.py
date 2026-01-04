@@ -2,6 +2,7 @@ from rest_framework import serializers
 from games.models import Games
 
 class GamesSerializer(serializers.ModelSerializer):
+    id = serializers.IntegerField(source = "igdb_id")
     developers = serializers.SerializerMethodField()
     publishers = serializers.SerializerMethodField()
     genres = serializers.SerializerMethodField()
@@ -11,7 +12,8 @@ class GamesSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Games
-        fields = '__all__'
+        fields = ['id', 'game_title', 'cover_artwork_link', 'release_date', 'completion_time', 'completionist_completion_time', 'average_rating', 'developers', 'publishers', 'genres', 'platforms', 'franchises', 'series',]
+        read_only_fields = ['id']
 
     def get_developers(self, obj):
         return [x.developer_id.label for x in obj.gamespecificdevelopers_set.all()]

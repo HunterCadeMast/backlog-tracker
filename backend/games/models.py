@@ -4,7 +4,7 @@ import uuid
 class Games(models.Model):
     id = models.UUIDField(primary_key = True, default = uuid.uuid4, editable = False, null = False, blank = False)
     igdb_id = models.IntegerField(unique = True, null = True, blank = True)
-    game_title = models.CharField(max_length = 255, unique = True, null = False, blank = False)
+    game_title = models.CharField(max_length = 255, null = False, blank = False)
     cover_artwork_link = models.TextField(null = True, blank = True)
     release_date = models.DateField(null = True, blank = True)
     completion_time = models.IntegerField(null = True, blank = True)

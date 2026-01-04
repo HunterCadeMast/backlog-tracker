@@ -4,6 +4,7 @@ from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from accounts.permissions import IsAccountOwner
+from games.models import Games, Platforms
 from logs.models import Logs, LogSessions, LogTags
 from logs.serializers import LogsSerializer, LogSessionsSerializer, LogTagsSerializer
 
@@ -50,10 +51,37 @@ class LogsViewSet(viewsets.ModelViewSet):
         elif sort_decision == 'status_descending':
             user_logs = list(user_logs)
             user_logs = sorted(user_logs, key = lambda x: status_order.index(x.user_status), reverse = True)
+        if igdb_id := self.request.query_params.get('igdb_id'):
+            user_logs = user_logs.filter(game_id__igdb_id = igdb_id)
         return user_logs
     
-    def perform_create(self, serializer):
-        serializer.save(user = self.request.user)
+    @action(detail = False, methods = ['post'], url_path = 'backlog')
+    def log_game(self, request):
+        game_id = request.data.get('game_id')
+        if not game_id:
+            return Response({'error': 'game_id is required!'}, status=400)
+        user_status = request.data.get('user_status', 'backlog')
+        platform_id = request.data.get('platform_id')
+        user_rating = request.data.get('user_rating')
+        user_review = request.data.get('user_review')
+        user_playtime = request.data.get('user_playtime', 0)
+        start_date = request.data.get('start_date')
+        completion_date = request.data.get('completion_date')
+        try:
+            game = Games.objects.get(igdb_id=game_id)
+        except Games.DoesNotExist:
+            return Response({'error': 'Game not found!'}, status=404)
+        platform = None
+        if platform_id:
+            try:
+                platform = Platforms.objects.get(id=platform_id)
+            except Platforms.DoesNotExist:
+                return Response({'error': 'Platform not found!'}, status=404)
+        if Logs.objects.filter(user = request.user, game_id = game, platform_id = platform).exists():
+            return Response({'error': 'Log already added!'}, status=400)
+        log = Logs.objects.create(user = request.user, profile_id = getattr(request.user, 'profiles', None), game_id = game, platform_id = platform, user_status = user_status, user_rating = user_rating, user_review = user_review, user_playtime = user_playtime, start_date = start_date, completion_date = completion_date,)
+        serializer = self.get_serializer(log)
+        return Response(serializer.data, status=201)
 
 class LogSessionsViewSet(viewsets.ModelViewSet):
     serializer_class = LogSessionsSerializer

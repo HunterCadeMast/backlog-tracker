@@ -29,6 +29,30 @@ def request_game_info(endpoint: str, body: str):
     response.raise_for_status()
     return response.json()
 
+def fetch_game_info(id: int):
+    body = f'''
+        fields
+            id,
+            name,
+            cover.url,
+            first_release_date,
+            rating,
+            genres.name,
+            platforms.name,
+            involved_companies.developer,
+            involved_companies.publisher,
+            involved_companies.company.name,
+            franchises.name,
+            collections.name;
+        where id = {id};
+        limit 1;
+    '''
+    results = request_game_info("games", body)
+    if results:
+        return results[0]
+    else:
+        return None
+
 def specific_game_search(title: str):
     title = title.replace('"', '\\"')
     body = f'''
