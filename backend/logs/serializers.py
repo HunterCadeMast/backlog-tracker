@@ -1,11 +1,14 @@
 from rest_framework import serializers
 from logs.models import Logs, LogSessions, LogTags
+from games.serializers import GamesSerializer
 
 class LogsSerializer(serializers.ModelSerializer):
+    game = GamesSerializer(source = 'game_id', read_only = True)
+
     class Meta:
         model = Logs
-        fields = ['id', 'user', 'profile_id', 'game_id', 'platform_id', 'user_status', 'user_rating', 'user_review', 'user_playtime', 'start_date', 'completion_date', 'full_completion', 'creation_timestamp',]
-        read_only_fields = ['id', 'user', 'profile_id', 'game_id', 'platform_id', 'creation_timestamp']
+        fields = ['id', 'user', 'profile_id', 'game_id', 'platform_id', 'game', 'user_status', 'user_rating', 'user_review', 'user_playtime', 'start_date', 'completion_date', 'full_completion', 'creation_timestamp',]
+        read_only_fields = ['id', 'creation_timestamp']
 
 class LogSessionsSerializer(serializers.ModelSerializer):
     class Meta:
