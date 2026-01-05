@@ -24,7 +24,7 @@ const GameInfo = () => {
             console.error(error);
             setGame(null);
        });
-   }, [igdbId]);
+    }, [igdbId]);
     useEffect(() => {
         const token = localStorage.getItem("access");
         if (!token || !igdbId) return;
@@ -36,7 +36,7 @@ const GameInfo = () => {
             setEditFields({user_status: data[0].user_status || "backlog", user_rating: data[0].user_rating ?? "", user_review: data[0].user_review ?? "", user_playtime: data[0].user_playtime ?? "", start_date: data[0].start_date ?? "", completion_date: data[0].completion_date ?? "", full_completion: data[0].full_completion ?? false,});
            }
        });
-   }, [igdbId]);
+    }, [igdbId]);
     const addLog = async () => {
         const token = localStorage.getItem("access");
         const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/logs/backlog/`, {method: "POST", headers: {"Content-Type": "application/json", Authorization: `Bearer ${token}`,}, body: JSON.stringify({game_id: igdbId, user_status: "backlog"}),});
@@ -45,7 +45,7 @@ const GameInfo = () => {
         setLog(data);
         setEditFields({user_status: "backlog", user_rating: "", user_review: "", user_playtime: "", start_date: "", completion_date: "", full_completion: false,});
        }
-   };
+    };
     const saveLog = async () => {
         if (!log?.id) return;
         const token = localStorage.getItem("access");
@@ -83,7 +83,7 @@ const GameInfo = () => {
         catch (error) {
             console.error("Network error:", error);
        }
-   };
+    };
     if (!game) return <p>Loading...</p>;
     return (
         <div className = "p-6 text-white">

@@ -8,9 +8,10 @@ from rest_framework.response import Response
 from django.utils import timezone
 from django.shortcuts import get_object_or_404
 from datetime import timedelta
-from accounts.permissions import IsAccountOwner, APIKeyAuthenticated, APIKeyThrottle
+from accounts.permissions import APIKeyAuthenticated, APIKeyThrottle
 from profiles.models import Profiles, APIKeys
 from profiles.serializers import ProfilesSerializer, APIKeysSerializer
+
 
 class ProfilesViewSet(viewsets.ModelViewSet):
     serializer_class = ProfilesSerializer
@@ -20,6 +21,7 @@ class ProfilesViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         return Profiles.objects.filter(user = self.request.user)
 
+    @action(detail = False, methods = ['get', 'patch'], permission_classes = [IsAuthenticated])
     def personal(self, request):
         profile, _ = Profiles.objects.get_or_create(user = request.user)
         if request.method == 'GET':
@@ -30,31 +32,6 @@ class ProfilesViewSet(viewsets.ModelViewSet):
             serializer.save()
             return Response(serializer.data)
 
-    @action(detail = False, methods = ['patch'])
-    def update_profile_photo(self, request, pk = None):
-        profile = self.get_object()
-        profile_photo = request.FILES.get('profile_photo')
-        if not profile_photo:
-            return Response({'error': 'No profile photo found!'}, status = 400)
-        profile.profile_photo = profile_photo
-        profile.save()
-        return Response({'message': 'Profile photo updated!'})
-    
-    @action(detail = False, methods = ['patch'])
-    def toggle_visibility(self, request, pk = None):
-        profile = self.get_object()
-        profile.private_profile = not profile.private_profile
-        profile.save()
-        return Response({'message': 'Profile visibility inverted!'}, status = 200)
-    
-    @action(detail = False, methods = ['patch'])
-    def change_profile_info(self, request, pk = None):
-        profile = self.get_object()
-        profile_serializer = self.get_serializer(profile, data = request.data, partial = True)
-        profile_serializer.is_valid(raise_exception = True)
-        profile_serializer.save()
-        return Response({'message': 'Updated profile!'}, status = 200)
-    
 class UsersViewSet(APIView):
     authentication_classes = []
     permission_classes = [AllowAny]
