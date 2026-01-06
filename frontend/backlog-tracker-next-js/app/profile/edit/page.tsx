@@ -9,6 +9,17 @@ const ProfileEdit = () => {
     useEffect(() => {
         apiFetch("/authentication/profile/").then(setProfile);
     }, []);
+    async function passwordChange(currentPassword: string, newPassword: string, confirmPassword: string) {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/authentication/password/change/`, {method: "POST", headers: { "Content-Type": "application/json", Authorization: `Bearer ${localStorage.getItem("access")}` }, body: JSON.stringify({ current_password: currentPassword, new_password: newPassword, new_password_confirm: confirmPassword }),});
+        const data = await response.json();
+        alert(data.message || data.error);
+    };
+    async function deleteAccount() {
+        if (!confirm("Are you sure you want to delete your Gaming Logjam account?")) return;
+        await fetch(`${process.env.NEXT_PUBLIC_API_URL}/authentication/account/`, {method: "DELETE", headers: { Authorization: `Bearer ${localStorage.getItem("access")}` },});
+        localStorage.clear();
+        router.push("/");
+    };
     async function save() {
         await apiFetch("/authentication/profile/", {
             method: "PATCH",

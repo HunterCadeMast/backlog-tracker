@@ -177,6 +177,15 @@ class PasswordResetConfirmationCompleteViewSet(APIView):
     def get(self, request):
         return Response({'message': 'Password reset!', 'status': 'password_reset'}, status = 200)
     
+class AccountDeletionViewSet(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def delete(self, request):
+        user = request.user
+        user.delete()
+        return Response({'message': 'Deleted account successfully!'}, status = 204)
+    
 class OAuthenticationViewSet(APIView):
     authentication_classes = []
     permission_classes = [IsAuthenticated]

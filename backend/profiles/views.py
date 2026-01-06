@@ -12,7 +12,6 @@ from accounts.permissions import APIKeyAuthenticated, APIKeyThrottle
 from profiles.models import Profiles, APIKeys
 from profiles.serializers import ProfilesSerializer, APIKeysSerializer
 
-
 class ProfilesViewSet(viewsets.ModelViewSet):
     serializer_class = ProfilesSerializer
     authentication_classes = [JWTAuthentication]

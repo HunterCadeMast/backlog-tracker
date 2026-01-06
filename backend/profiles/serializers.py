@@ -2,18 +2,21 @@ from rest_framework import serializers
 from django.db.models import Sum
 from collections import defaultdict
 from profiles.models import Profiles, APIKeys
-from games.models import Games, Developers, Publishers, Genres, Platforms, Franchises, Series
 from logs.models import Logs
 
 class ProfileStatisticsMixin:
-    def get_statistics(self, profile):
+    def statistics(self, profile):
         logs = Logs.objects.filter(user = profile.user)
         completed_games = logs.filter(user_status = 'completed')
+        playing_games = logs.filter(user_status = 'playing')
+        backlog_games = logs.filter(user_status = 'backlog')
+        dropped_games = logs.filter(user_status = 'dropped')
+        paused_games = logs.filter(user_status = 'paused')
         yearly_games = defaultdict(int)
         for log in completed_games.exclude(completion_date = None):
             year = log.completion_date.year
             yearly_games[year] = yearly_games.get(year, 0) + 1
-        data = {'total_games': logs.count(), 'completed_games': completed_games.count(), 'total_playtime': logs.aggregate(total = Sum('user_playtime'))['total'] or 0, 'yearly_completed_games': dict(yearly_games), 'favorite_genres': list(profile.favorite_genre.values_list('label', flat = True)),}
+        data = {'total_games': logs.count(), 'completed_games': completed_games.count(), 'playing_games': playing_games.count(), 'backlog_games': backlog_games.count(), 'dropped_games': dropped_games.count(), 'paused_games': paused_games.count(), 'total_playtime': logs.aggregate(total = Sum('user_playtime'))['total'] or 0, 'yearly_completed_games': dict(yearly_games), 'favorite_genres': list(profile.favorite_genre.values_list('label', flat = True)),}
         return data
 
 class ProfilesSerializer(ProfileStatisticsMixin, serializers.ModelSerializer):
@@ -25,7 +28,7 @@ class ProfilesSerializer(ProfileStatisticsMixin, serializers.ModelSerializer):
         read_only_fields = ['id', 'user']
 
     def get_statistics(self, obj):
-        return self.get_statistics(obj)
+        return self.statistics(obj)
 
 class UsersSerializer(ProfileStatisticsMixin, serializers.ModelSerializer):
     username = serializers.CharField(source = 'user.username')
@@ -36,7 +39,7 @@ class UsersSerializer(ProfileStatisticsMixin, serializers.ModelSerializer):
         fields = ['username', 'profile_photo', 'bio', 'statistics']
 
     def get_statistics(self, obj):
-        return self.get_statistics(obj)
+        return self.statistics(obj)
 
 class APIKeysSerializer(serializers.ModelSerializer):
     class Meta:
