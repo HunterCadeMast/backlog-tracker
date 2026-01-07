@@ -4,12 +4,15 @@ import { useRouter } from "next/navigation";
 import { apiFetch } from "@/lib/api";
 
 const ProfileEdit = () => {
-    const [profile, setProfile] = useState<any>(null);
     const router = useRouter();
+    const [profile, setProfile] = useState<any>(null);
+    const [currentPassword, setCurrentPassword] = useState("");
+    const [newPassword, setNewPassword] = useState("");
+    const [confirmPassword, setConfirmPassword] = useState("");
     useEffect(() => {
         apiFetch("/authentication/profile/").then(setProfile);
     }, []);
-    async function passwordChange(currentPassword: string, newPassword: string, confirmPassword: string) {
+    async function passwordChange() {
         const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/authentication/password/change/`, {method: "POST", headers: { "Content-Type": "application/json", Authorization: `Bearer ${localStorage.getItem("access")}` }, body: JSON.stringify({ current_password: currentPassword, new_password: newPassword, new_password_confirm: confirmPassword }),});
         const data = await response.json();
         alert(data.message || data.error);
@@ -37,14 +40,26 @@ const ProfileEdit = () => {
     else {
         return (
             <div>
-                <h1>Edit Profile</h1>
-                <input value = {profile.display_name} onChange = {x => setProfile({...profile, display_name: x.target.value})} />
-                <textarea value = {profile.bio} onChange = {x => setProfile({...profile, bio: x.target.value})}></textarea>
-                <label>
-                    <input type = "checkbox" checked = {!profile.private_profile} onChange = {x => setProfile({...profile, private_profile: !profile.private_profile})} />Public Profile
-                </label>
-                <button onClick = {save}>Save Changes</button>
-                <button onClick = {cancel}>Cancel Changes</button>
+                <section>
+                    <h1>Edit Profile</h1>
+                    <input placeholder = "Display Name" value = {profile.display_name} onChange = {x => setProfile({...profile, display_name: x.target.value})} />
+                    <textarea placeholder = "Bio" value = {profile.bio} onChange = {x => setProfile({...profile, bio: x.target.value})}></textarea>
+                    <label>
+                        <input type = "checkbox" checked = {!profile.private_profile} onChange = {x => setProfile({...profile, private_profile: !profile.private_profile})} />Public Profile
+                    </label>
+                    <button onClick = {save}>Save Changes</button>
+                    <button onClick = {cancel}>Cancel Changes</button>
+                </section>
+                <section>
+                    <h1>Change Password</h1>
+                    <input type = "password" placeholder = "Current Password" value = {currentPassword} onChange = {event => setCurrentPassword(event.target.value)} />
+                    <input type = "password" placeholder = "New Password" value = {newPassword} onChange = {event => setNewPassword(event.target.value)} />
+                    <input type = "password" placeholder = "Confirm new password" value = {confirmPassword} onChange = {event => setConfirmPassword(event.target.value)} />
+                    <button onClick = {passwordChange}>Change Password</button>
+                </section>
+                <section>
+                    <button onClick = {deleteAccount}>Delete Account</button>
+                </section>
             </div>
         );
     }
