@@ -16,6 +16,9 @@ const ProfileEdit = () => {
         const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/authentication/password/change/`, {method: "POST", headers: { "Content-Type": "application/json", Authorization: `Bearer ${localStorage.getItem("access")}` }, body: JSON.stringify({ current_password: currentPassword, new_password: newPassword, new_password_confirm: confirmPassword }),});
         const data = await response.json();
         alert(data.message || data.error);
+        localStorage.removeItem("access");
+        localStorage.removeItem("refresh");
+        router.push("/login");
     };
     async function deleteAccount() {
         if (!confirm("Are you sure you want to delete your Gaming Logjam account?")) return;
