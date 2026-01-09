@@ -10,7 +10,6 @@ type GameTypes = {
 
 const SearchBar = () => {
     const router = useRouter();
-    const userStatus = Boolean(localStorage.getItem("access"));
     const [open, setOpen] = useState(false);
     const [query, setQuery] = useState("");
     const [results, setResults] = useState<GameTypes[]>([]);

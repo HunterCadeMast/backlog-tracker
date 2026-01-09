@@ -8,7 +8,7 @@ from recommendations.views import RecommendationsViewSet
 router = routers.SimpleRouter()
 
 # Profiles Routing
-router.register(r'profile', ProfilesViewSet, basename = "profile")
+router.register(r'profiles', ProfilesViewSet, basename = "profiles")
 router.register(r'api_keys', APIKeysViewSet, basename = "api_keys")
 
 # Logs Routing

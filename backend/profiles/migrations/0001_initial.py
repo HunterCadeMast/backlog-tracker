@@ -35,7 +35,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False)),
                 ('display_name', models.CharField(blank=True, max_length=32, null=True)),
-                ('profile_photo', models.ImageField(default='profile_pictures/default.jpg', upload_to='profile_pictures')),
+                ('profile_picture', models.ImageField(default='profile_pictures/default.jpg', upload_to='profile_pictures')),
                 ('private_profile', models.BooleanField(default=False)),
                 ('website_theme', models.CharField(choices=[('dark', 'Dark'), ('light', 'Light'), ('orange', 'Orange'), ('lemon', 'Lemon'), ('strawberry', 'Strawberry'), ('blueberry', 'Blueberry')], default='dark', max_length=20)),
                 ('bio', models.TextField(blank=True, max_length=255, null=True)),

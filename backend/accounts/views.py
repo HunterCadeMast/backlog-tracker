@@ -96,7 +96,7 @@ class PersonalViewSet(APIView):
         return Response(serializer.data)
     
     def patch(self, request):
-        serializer = CustomUserSerializer(request.user, data = request.data, partial = True)
+        serializer = CustomUserSerializer(request.user, context = {'request': request}, data = request.data, partial = True)
         serializer.is_valid(raise_exception = True)
         serializer.save()
         return Response(serializer.data)
@@ -126,6 +126,25 @@ class PasswordChangeCompleteViewSet(APIView):
 
     def get(self, request):
         return Response({'message': 'Password changed!', 'status': 'password_changed'}, status = 200)
+    
+class EmailChangeViewSet(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        new_email = request.data.get("email")
+        current_password = request.data.get("current_password")
+        if not new_email or not current_password:
+            return Response({"error": "Need both password and email!"}, status = 400)
+        if not request.user.check_password(current_password):
+            return Response({"error": "Incorrect password!"}, status = 400)
+        if CustomUser.objects.filter(email = new_email).exclude(id = request.user.id).exists():
+            return Response({"error": "Already using that email address!"}, status = 400)
+        request.user.email = new_email
+        request.user.is_email_verified = False
+        request.user.save(update_fields=["email", "is_email_verified"])
+        # Verify email again?
+        return Response({"message": "Email updated successfully!"}, status = 200)
     
 class PasswordResetViewSet(APIView):
     authentication_classes = []
@@ -176,6 +195,15 @@ class PasswordResetConfirmationCompleteViewSet(APIView):
 
     def get(self, request):
         return Response({'message': 'Password reset!', 'status': 'password_reset'}, status = 200)
+    
+class AccountDeletionViewSet(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def delete(self, request):
+        user = request.user
+        user.delete()
+        return Response({'message': 'Deleted account successfully!'}, status = 204)
     
 class OAuthenticationViewSet(APIView):
     authentication_classes = []
