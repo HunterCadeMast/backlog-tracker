@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import { apiFetch } from "@/lib/api";
 import { PieChart, Pie, Tooltip, ResponsiveContainer } from "recharts";
+import { useRouter } from "next/navigation";
 
 type ProfileStatisticsTypes = {
     completed_games: number;
@@ -21,6 +22,7 @@ type ProfileTypes = {
 };
 
 const Profile = () => {
+    const router = useRouter();
     const [profile, setProfile] = useState<ProfileTypes>({
         username: "",
         display_name: "",
@@ -30,6 +32,11 @@ const Profile = () => {
         statistics: null,
     });
     useEffect(() => {
+        const token = localStorage.getItem("access");
+        if (!token) {
+            router.push("/not-found");
+            return;
+        }
         Promise.all([
             apiFetch("/authentication/profile/"),
             apiFetch("/profiles/personal/"),

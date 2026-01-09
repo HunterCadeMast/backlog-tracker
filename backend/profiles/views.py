@@ -20,7 +20,7 @@ class ProfilesViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         return Profiles.objects.filter(user = self.request.user)
 
-    @action(detail = False, methods = ['get', 'patch'], permission_classes = [IsAuthenticated])
+    @action(detail = False, methods = ['get', 'patch'])
     def personal(self, request):
         profile, _ = Profiles.objects.get_or_create(user = request.user)
         if request.method == 'GET':

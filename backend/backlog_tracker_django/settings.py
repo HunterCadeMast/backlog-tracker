@@ -192,6 +192,8 @@ AUTH_PASSWORD_VALIDATORS = [
 
 SOCIALACCOUNT_PROVIDERS = {}
 
+FRONTEND_URL = 'http://localhost:3000'
+
 EMAIL_BACKEND = 'django.core.mail.backends.sntp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
