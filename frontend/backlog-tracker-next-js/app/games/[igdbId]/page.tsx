@@ -14,8 +14,8 @@ const GameInfo = () => {
         fetch(`${process.env.NEXT_PUBLIC_API_URL}/games/${igdbId}/`)
         .then((response) => {
             if (!response.ok) {
-            router.push(" /not-found");
-            return;
+                router.push(" /not-found");
+                return;
            }
             return response.json();
        })
@@ -32,8 +32,8 @@ const GameInfo = () => {
         .then((response) => response.json())
         .then((data) => {
             if (data.length > 0) {
-            setLog(data[0]);
-            setEditFields({user_status: data[0].user_status || "backlog", user_rating: data[0].user_rating ?? "", user_review: data[0].user_review ?? "", user_playtime: data[0].user_playtime ?? "", start_date: data[0].start_date ?? "", completion_date: data[0].completion_date ?? "", full_completion: data[0].full_completion ?? false,});
+                setLog(data[0]);
+                setEditFields({user_status: data[0].user_status || "backlog", user_rating: data[0].user_rating ?? "", user_review: data[0].user_review ?? "", user_playtime: data[0].user_playtime ?? "", start_date: data[0].start_date ?? "", completion_date: data[0].completion_date ?? "", full_completion: data[0].full_completion ?? false,});
            }
        });
     }, [igdbId]);
@@ -41,10 +41,34 @@ const GameInfo = () => {
         const token = localStorage.getItem("access");
         const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/logs/backlog/`, {method: "POST", headers: {"Content-Type": "application/json", Authorization: `Bearer ${token}`,}, body: JSON.stringify({game_id: igdbId, user_status: "backlog"}),});
         if (response.ok) {
-        const data = await response.json();
-        setLog(data);
-        setEditFields({user_status: "backlog", user_rating: "", user_review: "", user_playtime: "", start_date: "", completion_date: "", full_completion: false,});
+            const data = await response.json();
+            setLog(data);
+            setEditFields({user_status: "backlog", user_rating: "", user_review: "", user_playtime: "", start_date: "", completion_date: "", full_completion: false,});
        }
+    };
+    const removeLog = async () => {
+        if (!log) {
+            return;
+        }
+        const token = localStorage.getItem("access");
+        if (!token) {
+            return;
+        }
+        try {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/logs/backlog/remove/?game_id=${igdbId}`, {method: "DELETE", headers: {"Content-Type": "application/json", Authorization: `Bearer ${token}`},});
+            if (response.status === 204) {
+                alert("Removed log!");
+                setLog(null);
+                setEditFields({});
+            }
+            else {
+                const data = await response.json();
+                alert(data.error || "Remove log failed!");
+            }
+        }
+        catch (error) {
+            console.error("Cannot remove log!", error);
+        }
     };
     const saveLog = async () => {
         if (!log?.id) return;
@@ -123,6 +147,7 @@ const GameInfo = () => {
                             </div>
                         </>
                     )}
+                    <button className = "mt-2 bg-grey-800 px-4 py-2 rounded text-white" onClick = {removeLog}>Remove from Backlog</button>
                 </div>
             ) : (
                 <button className = "mt-6 bg-navbar px-4 py-2 rounded text-gray-800" onClick = {addLog}>Add to Backlog</button>

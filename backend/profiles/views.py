@@ -24,9 +24,9 @@ class ProfilesViewSet(viewsets.ModelViewSet):
     def personal(self, request):
         profile, _ = Profiles.objects.get_or_create(user = request.user)
         if request.method == 'GET':
-            return Response(self.get_serializer(profile).data)
+            return Response(self.get_serializer(profile, context = {'request': request}).data)
         else:
-            serializer = self.get_serializer(profile, data = request.data, partial = True)
+            serializer = self.get_serializer(profile, data = request.data, context = {'request': request}, partial = True)
             serializer.is_valid(raise_exception = True)
             serializer.save()
             return Response(serializer.data)
@@ -37,7 +37,7 @@ class UsersViewSet(APIView):
 
     def get(self, request, username):
         profile = get_object_or_404(Profiles, user__username = username, private_profile = False)
-        return Response(ProfilesSerializer(profile).data)
+        return Response(ProfilesSerializer(profile, context = {'request': request}).data)
     
 class APIKeysViewSet(viewsets.ModelViewSet):
     serializer_class = APIKeysSerializer

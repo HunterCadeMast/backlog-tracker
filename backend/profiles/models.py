@@ -12,7 +12,7 @@ class Profiles(models.Model):
     private_profile = models.BooleanField(default = False, null = False, blank = False)
     THEME_TYPES = [('dark', 'Dark'), ('light', 'Light'), ('orange', 'Orange'), ('lemon', 'Lemon'), ('strawberry', 'Strawberry'), ('blueberry', 'Blueberry')]
     website_theme = models.CharField(max_length = 20, choices = THEME_TYPES, default = 'dark', null = False, blank = False)
-    bio = models.TextField(max_length = 255, null = True, blank = True)
+    bio = models.TextField(default = '', max_length = 255, null = True, blank = True)
     favorite_game = models.ManyToManyField('games.Games', blank = True)
     favorite_developer = models.ManyToManyField('games.Developers', blank = True)
     favorite_publisher = models.ManyToManyField('games.Publishers', blank = True)
@@ -27,6 +27,8 @@ class Profiles(models.Model):
         return self.user.username
     
     def save(self, *args, **kwargs):
+        if not self.display_name and self.user:
+            self.display_name = self.user.username
         super().save(*args, **kwargs)
         if self.profile_photo:
             image = Image.open(self.profile_photo.path)

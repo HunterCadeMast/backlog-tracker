@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import RegisterViewSet, LoginViewSet, LogoutViewSet, RefreshViewSet, PersonalViewSet, PasswordChangeViewSet, PasswordChangeCompleteViewSet, PasswordResetViewSet, PasswordResetCompleteViewSet, PasswordResetConfirmatonViewSet, PasswordResetConfirmationCompleteViewSet, OAuthenticationViewSet, UnlinkAccountViewSet
+from .views import RegisterViewSet, LoginViewSet, LogoutViewSet, RefreshViewSet, PersonalViewSet, PasswordChangeViewSet, PasswordChangeCompleteViewSet, EmailChangeViewSet, PasswordResetViewSet, PasswordResetCompleteViewSet, PasswordResetConfirmatonViewSet, PasswordResetConfirmationCompleteViewSet, OAuthenticationViewSet, UnlinkAccountViewSet
 
 # Include /accounts/[PROVIDER NAME]/login/?process=connect as endpoint in front-end for linking.
 
@@ -10,6 +10,7 @@ urlpatterns = [
     path('refresh/', RefreshViewSet.as_view(), name = 'refresh'),
     path('profile/', PersonalViewSet.as_view(), name = 'profile'),
     path('password/change/', PasswordChangeViewSet.as_view(), name = 'password_change'),
+    path('email/change/', EmailChangeViewSet.as_view(), name = 'email_change'),
     path('password/change/complete/', PasswordChangeCompleteViewSet.as_view(), name = 'password_change_complete'),
     path('password/reset/', PasswordResetViewSet.as_view(), name = 'password_reset'),
     path('password/reset/complete/', PasswordResetCompleteViewSet.as_view(), name = 'password_reset_complete'),

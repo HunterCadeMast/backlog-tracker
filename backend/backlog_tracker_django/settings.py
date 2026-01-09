@@ -151,6 +151,9 @@ CORS_ALLOW_CREDENTIALS = True
 
 WSGI_APPLICATION = 'backlog_tracker_django.wsgi.application'
 
+MEDIA_URL = "/media/"
+MEDIA_ROOT = BASE_DIR / "media"
+
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 

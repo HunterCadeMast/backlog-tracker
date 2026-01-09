@@ -20,12 +20,20 @@ class ProfileStatisticsMixin:
         return data
 
 class ProfilesSerializer(ProfileStatisticsMixin, serializers.ModelSerializer):
+    profile_photo = serializers.ImageField(use_url = True)
+    profile_photo_url = serializers.SerializerMethodField()
     statistics = serializers.SerializerMethodField()
 
     class Meta:
         model = Profiles
-        fields = ['id', 'user', 'display_name', 'profile_photo', 'private_profile', 'website_theme', 'bio', 'favorite_game', 'favorite_developer', 'favorite_publisher', 'favorite_genre', 'favorite_platform', 'favorite_franchise', 'favorite_series', 'playstyle', 'statistics']
+        fields = ['id', 'user', 'display_name', 'profile_photo', 'profile_photo_url', 'private_profile', 'website_theme', 'bio', 'favorite_game', 'favorite_developer', 'favorite_publisher', 'favorite_genre', 'favorite_platform', 'favorite_franchise', 'favorite_series', 'playstyle', 'statistics']
         read_only_fields = ['id', 'user']
+
+    def get_profile_photo_url(self, obj):
+        request = self.context.get("request")
+        if obj.profile_photo and request:
+            return request.build_absolute_uri(obj.profile_photo.url)
+        return None
 
     def get_statistics(self, obj):
         return self.statistics(obj)

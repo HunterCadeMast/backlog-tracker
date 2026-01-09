@@ -59,7 +59,7 @@ class LogsViewSet(viewsets.ModelViewSet):
     def log_game(self, request):
         game_id = request.data.get('game_id')
         if not game_id:
-            return Response({'error': 'game_id is required!'}, status=400)
+            return Response({'error': 'game_id is required!'}, status = 400)
         user_status = request.data.get('user_status', 'backlog')
         platform_id = request.data.get('platform_id')
         user_rating = request.data.get('user_rating')
@@ -68,20 +68,32 @@ class LogsViewSet(viewsets.ModelViewSet):
         start_date = request.data.get('start_date')
         completion_date = request.data.get('completion_date')
         try:
-            game = Games.objects.get(igdb_id=game_id)
+            game = Games.objects.get(igdb_id = game_id)
         except Games.DoesNotExist:
-            return Response({'error': 'Game not found!'}, status=404)
+            return Response({'error': 'Game not found!'}, status = 404)
         platform = None
         if platform_id:
             try:
-                platform = Platforms.objects.get(id=platform_id)
+                platform = Platforms.objects.get(id = platform_id)
             except Platforms.DoesNotExist:
-                return Response({'error': 'Platform not found!'}, status=404)
+                return Response({'error': 'Platform not found!'}, status = 404)
         if Logs.objects.filter(user = request.user, game_id = game, platform_id = platform).exists():
             return Response({'error': 'Log already added!'}, status=400)
         log = Logs.objects.create(user = request.user, profile_id = getattr(request.user, 'profiles', None), game_id = game, platform_id = platform, user_status = user_status, user_rating = user_rating, user_review = user_review, user_playtime = user_playtime, start_date = start_date, completion_date = completion_date,)
         serializer = self.get_serializer(log)
-        return Response(serializer.data, status=201)
+        return Response(serializer.data, status = 201)
+    
+    @action(detail = False, methods = ['delete'], url_path = 'backlog/remove')
+    def log_remove(self, request):
+        game_id = request.query_params.get('game_id')
+        if not game_id:
+            return Response({'error': 'game_id is required!'}, status = 400)
+        try:
+            log = Logs.objects.get(user = request.user, game_id__igdb_id = game_id)
+            log.delete()
+            return Response({'message': 'Log removed!'}, status = 204)
+        except Logs.DoesNotExist:
+            return Response({'error': 'Log not found!'}, status = 404)
 
 class LogSessionsViewSet(viewsets.ModelViewSet):
     serializer_class = LogSessionsSerializer
