@@ -3,7 +3,6 @@ import { useState } from "react";
 import { loginAction } from "./action";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { useAuthentication } from "@/lib/authentication";
 
 const Login = () => {
     const router = useRouter();
