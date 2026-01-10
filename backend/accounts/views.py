@@ -1,4 +1,3 @@
-from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny, IsAuthenticated
@@ -7,6 +6,8 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from allauth.socialaccount.models import SocialAccount
 from django.contrib.auth import authenticate
 from django.contrib.auth.tokens import default_token_generator as token_generator
+from django.core.mail import send_mail
+from django.conf import settings
 from accounts.models import CustomUser
 from accounts.serializers import CustomUserSerializer
 from profiles.models import Profiles
@@ -20,26 +21,9 @@ class RegisterViewSet(APIView):
         serializer.is_valid(raise_exception = True)
         user = serializer.save()
         token = token_generator.make_token(user)
-        # Add email verification here
-        # verification_url = 
+        verification_url = f'{settings.FRONTEND_URL}/email/verification/{user.id}/{token}'
+        send_mail(subject = 'Verify your Email - Gaming Logjam', message = f'Verify your email using this link:\n{verification_url}', from_email = settings.DEFAULT_FROM_EMAIL, recipient_list = [user.email],)
         return Response({'message': 'Account created!'}, status = 201)
-    
-class EmailVerificationViewSet(APIView):
-    authentication_classes = []
-    permission_classes = [AllowAny]
-
-    def get(self, request, id, token):
-        try:
-            user = CustomUser.objects.get(id = id)
-        except CustomUser.DoesNotExist:
-            return Response({'error': 'User invalid!'}, status = 400)
-        if not token_generator.check_token(user, token):
-            return Response({'error': 'Tokens invalid!'}, status = 400)
-        if user.is_email_verified:
-            return Response({'message': 'Email already verified!'}, status = 200)
-        user.is_email_verified = True
-        user.save(update_fields = ['is_email_verified'])
-        return Response({'message': 'Email verified!'}, status = 200)
     
 class LoginViewSet(APIView):
     authentication_classes = []
@@ -49,8 +33,8 @@ class LoginViewSet(APIView):
         user = authenticate(email = request.data.get('email'), password = request.data.get('password'))
         if not user:
             return Response({'error': 'Invalid credentials!'}, status = 401)
-        # if not user.is_email_verified:
-        #    return Response({'error': 'Email needs to be verified!'}, status = 403)
+        if not user.is_email_verified:
+            return Response({'error': 'Email needs to be verified!'}, status = 403)
         if not user.has_usable_password():
             return Response({'error': 'OAuthentication users cannot login with password!'}, status = 403)
         else:
@@ -134,16 +118,19 @@ class EmailChangeViewSet(APIView):
     def post(self, request):
         new_email = request.data.get("email")
         current_password = request.data.get("current_password")
+        user = request.user
         if not new_email or not current_password:
             return Response({"error": "Need both password and email!"}, status = 400)
-        if not request.user.check_password(current_password):
+        if not user.check_password(current_password):
             return Response({"error": "Incorrect password!"}, status = 400)
-        if CustomUser.objects.filter(email = new_email).exclude(id = request.user.id).exists():
+        if CustomUser.objects.filter(email = new_email).exclude(id = user.id).exists():
             return Response({"error": "Already using that email address!"}, status = 400)
-        request.user.email = new_email
-        request.user.is_email_verified = False
-        request.user.save(update_fields=["email", "is_email_verified"])
-        # Verify email again?
+        user.email = new_email
+        user.is_email_verified = False
+        user.save(update_fields=["email", "is_email_verified"])
+        token = token_generator.make_token(user)
+        verification_url = f'{settings.FRONTEND_URL}/email/verification/{user.id}/{token}'
+        send_mail(subject = 'Verify your Email - Gaming Logjam', message = f'Verify your email using this link:\n{verification_url}', from_email = settings.DEFAULT_FROM_EMAIL, recipient_list = [user.email],)
         return Response({"message": "Email updated successfully!"}, status = 200)
     
 class PasswordResetViewSet(APIView):
@@ -157,16 +144,9 @@ class PasswordResetViewSet(APIView):
         except CustomUser.DoesNotExist:
             return Response({'error': 'Could not find user!'}, status = 404)
         token = token_generator.make_token(user)
-        # Add confirmation email after front-end
-        password_reset_url = f"http://127.0.0.1:8000/password/reset/{user.id}/{token}"
+        password_reset_url = f'{settings.FRONTEND_URL}/password/reset/{user.id}/{token}'
+        send_mail(subject = 'Reset Password - Gaming Logjam', message = f'Reset your password using this link:\n{password_reset_url}', from_email = settings.DEFAULT_FROM_EMAIL, recipient_list = [user.email],)
         return Response({'message': 'Password reset email sent!', 'password_reset_url': password_reset_url}, status = 200)
-    
-class PasswordResetCompleteViewSet(APIView):
-    authentication_classes = []
-    permission_classes = [AllowAny]
-
-    def get(self, request):
-        return Response({'message': 'Password reset link sent!', 'status': 'email_sent'}, status = 200)
     
 class PasswordResetConfirmatonViewSet(APIView):
     authentication_classes = []
@@ -189,12 +169,22 @@ class PasswordResetConfirmatonViewSet(APIView):
                 user.save()
                 return Response({'message': 'Password reset!'}, status = 202)
     
-class PasswordResetConfirmationCompleteViewSet(APIView):
+class EmailVerificationViewSet(APIView):
     authentication_classes = []
     permission_classes = [AllowAny]
 
-    def get(self, request):
-        return Response({'message': 'Password reset!', 'status': 'password_reset'}, status = 200)
+    def get(self, request, id, token):
+        try:
+            user = CustomUser.objects.get(id = id)
+        except CustomUser.DoesNotExist:
+            return Response({'error': 'User invalid!'}, status = 400)
+        if not token_generator.check_token(user, token):
+            return Response({'error': 'Tokens invalid!'}, status = 400)
+        if user.is_email_verified:
+            return Response({'message': 'Email already verified!'}, status = 200)
+        user.is_email_verified = True
+        user.save(update_fields = ['is_email_verified'])
+        return Response({'message': 'Email verified!'}, status = 200)
     
 class AccountDeletionViewSet(APIView):
     authentication_classes = [JWTAuthentication]

@@ -1,7 +1,5 @@
 from django.urls import path
-from .views import RegisterViewSet, LoginViewSet, LogoutViewSet, RefreshViewSet, PersonalViewSet, PasswordChangeViewSet, PasswordChangeCompleteViewSet, EmailChangeViewSet, PasswordResetViewSet, PasswordResetCompleteViewSet, PasswordResetConfirmatonViewSet, PasswordResetConfirmationCompleteViewSet, OAuthenticationViewSet, UnlinkAccountViewSet
-
-# Include /accounts/[PROVIDER NAME]/login/?process=connect as endpoint in front-end for linking.
+from .views import RegisterViewSet, LoginViewSet, LogoutViewSet, RefreshViewSet, PersonalViewSet, PasswordChangeViewSet, EmailChangeViewSet, PasswordResetViewSet, PasswordResetConfirmatonViewSet, EmailVerificationViewSet, OAuthenticationViewSet, UnlinkAccountViewSet
 
 urlpatterns = [
     path('register/', RegisterViewSet.as_view(), name = 'register'),
@@ -11,11 +9,9 @@ urlpatterns = [
     path('profile/', PersonalViewSet.as_view(), name = 'profile'),
     path('password/change/', PasswordChangeViewSet.as_view(), name = 'password_change'),
     path('email/change/', EmailChangeViewSet.as_view(), name = 'email_change'),
-    path('password/change/complete/', PasswordChangeCompleteViewSet.as_view(), name = 'password_change_complete'),
     path('password/reset/', PasswordResetViewSet.as_view(), name = 'password_reset'),
-    path('password/reset/complete/', PasswordResetCompleteViewSet.as_view(), name = 'password_reset_complete'),
-    path('password/reset/confirmation/<uuid:id>/<token>', PasswordResetConfirmatonViewSet.as_view(), name = 'password_reset_confirmation'),
-    path('password/reset/confirmation/complete/', PasswordResetConfirmationCompleteViewSet.as_view(), name = 'password_reset_confirmation_complete'),
+    path('password/reset/<int:id>/<str:token>/', PasswordResetConfirmatonViewSet.as_view(), name = 'password_reset_confirmation'),
+    path('email/verification/<int:id>/<str:token>/', EmailVerificationViewSet.as_view(), name = 'email_verification'),
     path('oauthentication/completed/', OAuthenticationViewSet.as_view(), name = 'oauthentication_complete'),
     path('oauthentication/unlinked/', UnlinkAccountViewSet.as_view(), name = 'unlinked_account'),
 ]
