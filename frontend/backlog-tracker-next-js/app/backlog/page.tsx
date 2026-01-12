@@ -18,7 +18,7 @@ const Backlog = () => {
         });
         fetch(`${process.env.NEXT_PUBLIC_API_URL}/logs/?${params.toString()}`, {headers: { Authorization: `Bearer ${token}` },})
             .then(response => response.json())
-            .then(data => setLogs(data))
+            .then(data => setLogs(Array.isArray(data) ? data : data.logs || []))
             .catch(error => console.error("Cannot get logs!", error));
     }, [filters]);
     const handleFilterChange = (event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {

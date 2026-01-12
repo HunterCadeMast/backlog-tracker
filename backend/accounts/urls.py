@@ -12,6 +12,6 @@ urlpatterns = [
     path('password/reset/', PasswordResetViewSet.as_view(), name = 'password_reset'),
     path('password/reset/<int:id>/<str:token>/', PasswordResetConfirmatonViewSet.as_view(), name = 'password_reset_confirmation'),
     path('email/verification/<int:id>/<str:token>/', EmailVerificationViewSet.as_view(), name = 'email_verification'),
-    path('oauthentication/completed/', OAuthenticationViewSet.as_view(), name = 'oauthentication_complete'),
+    path('oauthentication/', OAuthenticationViewSet.as_view(), name = 'oauthentication'),
     path('oauthentication/unlinked/', UnlinkAccountViewSet.as_view(), name = 'unlinked_account'),
 ]

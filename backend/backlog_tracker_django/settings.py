@@ -41,11 +41,11 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.sites',
     'rest_framework',
     'rest_framework_simplejwt',
     'rest_framework_simplejwt.token_blacklist',
     'rest_framework_api_key',
-    'django.contrib.sites',
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
@@ -65,9 +65,8 @@ INSTALLED_APPS = [
 
 AUTH_USER_MODEL = 'accounts.CustomUser'
 
-LOGIN_URL = '/api/authentication/login/'
-LOGIN_REDIRECT_URL = '/'
-LOGOUT_REDIRECT_URL = '/'
+LOGIN_REDIRECT_URL = 'http://localhost:3000/login/'
+LOGOUT_REDIRECT_URL = 'http://localhost:3000/'
 
 SITE_ID = 1
 
@@ -88,7 +87,7 @@ ROOT_URLCONF = 'backlog_tracker_django.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -190,11 +189,24 @@ AUTH_PASSWORD_VALIDATORS = [
 # https://docs.allauth.org/en/dev/socialaccount/providers/google.html
 # https://docs.allauth.org/en/dev/socialaccount/providers/github.html
 
-SOCIALACCOUNT_PROVIDERS = {}
+SOCIALACCOUNT_PROVIDERS = {
+    "google": {
+        "SCOPE": ["profile", "email"],
+        "AUTH_PARAMS": {"prompt": "select_account"},
+    },
+    "github": {
+        "SCOPE": ["user:email"],
+    },
+}
+
+SOCIALACCOUNT_AUTO_SIGNUP = True
+SOCIALACCOUNT_LOGIN_ON_GET = True
+SOCIALACCOUNT_EMAIL_VERIFICATION = "none"
+SOCIALACCOUNT_ADAPTER = "accounts.adapters.AllAuthAdapter"
 
 FRONTEND_URL = 'http://localhost:3000'
 
-EMAIL_BACKEND = 'django.core.mail.backends.sntp.EmailBackend'
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
@@ -202,12 +214,16 @@ EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
 EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
 DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL')
 
+LOGIN_ON_EMAIL_CONFIRMATION = False
 ACCOUNT_AUTHENTICATION_METHOD = 'email'
-ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
+ACCOUNT_EMAIL_VERIFICATION = 'none'
 ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_USERNAME_REQUIRED = False
 ACCOUNT_CONFIRM_EMAIL_ON_GET = False
-LOGIN_ON_EMAIL_CONFIRMATION = False
+ACCOUNT_LOGIN_BY_CODE_ENABLED = False
+ACCOUNT_PASSWORD_INPUT_RENDER_VALUE = False
+ACCOUNT_SIGNUP_PASSWORD_ENTER_TWICE = False
+ACCOUNT_ADAPTER = "accounts.adapters.AccountAdapter"
 
 IGDB_CLIENT_ID = os.getenv('IGDB_CLIENT_ID')
 IGDB_CLIENT_SECRET = os.getenv('IGDB_CLIENT_SECRET')

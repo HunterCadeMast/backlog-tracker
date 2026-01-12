@@ -33,8 +33,6 @@ class LoginViewSet(APIView):
         user = authenticate(email = request.data.get('email'), password = request.data.get('password'))
         if not user:
             return Response({'error': 'Invalid credentials!'}, status = 401)
-        if not user.is_email_verified:
-            return Response({'error': 'Email needs to be verified!'}, status = 403)
         if not user.has_usable_password():
             return Response({'error': 'OAuthentication users cannot login with password!'}, status = 403)
         else:
@@ -197,10 +195,10 @@ class AccountDeletionViewSet(APIView):
     
 class OAuthenticationViewSet(APIView):
     authentication_classes = []
-    permission_classes = [IsAuthenticated]
+    permission_classes = [AllowAny]
 
     def get(self, request):
-        profile = Profiles.objects.get(user = request.user)
+        profile = Profiles.objects.get_or_create(user = request.user)
         user_info = CustomUserSerializer(request.user).data
         refresh_token = RefreshToken.for_user(request.user)
         return Response({'message': 'OAuthentication account created successfully!', 'user': user_info, 'profile_id': profile.id, 'providers': list(request.user.socialaccount_set.values_list('provider', flat = True)), 'access': str(refresh_token.access_token), 'refresh': str(refresh_token), }, status = 200,)
