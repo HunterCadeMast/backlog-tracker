@@ -3,6 +3,7 @@ import {Bebas_Neue, PT_Serif} from "next/font/google"
 import localFont from "next/font/local"
 import "./globals.css";
 import ClientProvider from "./components/ClientProvider";
+import RandomColor from "./components/RandomColor";
 
 export const metadata: Metadata = {
   title: "Gaming Logjam - Backlog Tracker",
@@ -18,11 +19,15 @@ export default function RootLayout({children}: Readonly<{children: React.ReactNo
     <html lang="en" className = { `${bebasNeue.variable} ${ptSerif.variable} ${sekuya.variable}` }>
       <body>
         <ClientProvider>
-          {children}
+        <main className = "pt-16 h-screen flex flex-col">
+          <div className = "flex-1">
+            {children}
+          </div>
+          <footer className = "pl-10 pb-5 flex items-center justify-between text-center bg-main-compliment">
+            <h1 className = "font-main-title text-3xl text-white"><RandomColor>Database from IGDB</RandomColor></h1>
+          </footer>
+        </main>
         </ClientProvider>
-        <div className = "flex items-center justify-between bg-cream">
-          <h1 className = "ml-10 font-main-title text-3xl text-gray-800">Database from IGDB</h1>
-        </div>
       </body>
     </html>
   );

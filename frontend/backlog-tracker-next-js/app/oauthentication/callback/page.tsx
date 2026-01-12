@@ -1,9 +1,11 @@
 "use client";
 import { useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import { useAuthentication } from "@/lib/authentication";
 
-export default function OAuthCallback() {
+const OAuthCallback = () => {
     const router = useRouter();
+    const {refreshUser} = useAuthentication();
     const params = useSearchParams();
     useEffect(() => {
         const access = params.get("access");
@@ -14,7 +16,9 @@ export default function OAuthCallback() {
         }
         localStorage.setItem("access", access);
         localStorage.setItem("refresh", refresh);
-        router.push("/");
+        refreshUser().then(() => {router.push("/");});
     }, [params, router]);
     return <p>Signing in…</p>;
-}
+};
+
+export default OAuthCallback;

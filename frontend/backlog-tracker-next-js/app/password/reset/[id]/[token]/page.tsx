@@ -27,8 +27,8 @@ const PasswordResetConfirmPassword = () => {
         }
     };
     return (
-        <div className = "min-h-screen flex items-center justify-center bg-cream">
-            <form onSubmit = {handleSubmit} className = "w-90 p-8 rounded-2xl shadow-2xl bg-navbar">
+        <div className = "min-h-screen flex items-center justify-center bg-main-compliment">
+            <form onSubmit = {handleSubmit} className = "w-90 p-8 rounded-2xl shadow-2xl bg-ui">
                 <h1 className = "text-6xl font-log-title mb-4">New Password</h1>
                 {message && <p className = "text-3xl text-gray-800">{message}</p>}
                 {error && <p className = "text-3xl text-red-500">{error}</p>}

@@ -142,7 +142,7 @@ const GameInfo = () => {
                             <input type = "date" value = {editFields.completion_date} onChange = {(x) => setEditFields({...editFields, completion_date: x.target.value})} className = "rounded-md border px-3 py-2 bg-gray-800 text-white" />
                             <label className = "flex items-center gap-2 mt-2"><input type = "checkbox" checked = {editFields.full_completion} onChange = {(x) => setEditFields({...editFields, full_completion: x.target.checked})} className = "w-4 h-4" />100% Completion</label>
                             <div className = "flex gap-2 mt-2">
-                                <button className = "bg-navbar px-4 py-2 rounded text-gray-800" onClick = {saveLog}>Save Edits</button>
+                                <button className = "bg-ui px-4 py-2 rounded text-gray-800" onClick = {saveLog}>Save Edits</button>
                                 <button className = "bg-gray-600 px-4 py-2 rounded" onClick = {() => setEditing(false)}>Cancel Edits</button>
                             </div>
                         </>
@@ -150,7 +150,7 @@ const GameInfo = () => {
                     <button className = "mt-2 bg-grey-800 px-4 py-2 rounded text-white" onClick = {removeLog}>Remove from Backlog</button>
                 </div>
             ) : (
-                <button className = "mt-6 bg-navbar px-4 py-2 rounded text-gray-800" onClick = {addLog}>Add to Backlog</button>
+                <button className = "mt-6 bg-ui px-4 py-2 rounded text-gray-800" onClick = {addLog}>Add to Backlog</button>
             )}
         </div>
     );
