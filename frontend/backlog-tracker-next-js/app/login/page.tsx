@@ -3,6 +3,7 @@ import { useState } from "react";
 import { loginAction } from "./action";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import OAuthenticationButtons from "../components/oauthentication/";
 
 const Login = () => {
     const router = useRouter();
@@ -35,6 +36,10 @@ const Login = () => {
                     <Link href= {"/password/reset"} className = "text-2xl text-gray-800 font-log-title">Forgot Password?</Link>
                     <button type = "submit" className = "ml-16.5 p-3 text-3xl text-white font-log-title rounded-2xl bg-gray-800">Login</button>
                 </form>
+                <div className = "flex flex-col gap-3 mb-4">
+                    <OAuthenticationButtons provider = "google" />
+                    <OAuthenticationButtons provider = "github" />
+                </div>
             </div>
         </>
     );

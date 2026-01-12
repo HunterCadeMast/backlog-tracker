@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
 import { registerAction } from "./action";
+import OAuthenticationButtons from "../components/oauthentication/";
 
 const Register = () => {
     const [username, setUsername] = useState("");
@@ -30,6 +31,10 @@ const Register = () => {
                     <input type = "password" name = "password2" value = {password2} onChange = {exception => setPassword2(exception.target.value)} placeholder = "Verify Password" className = "mb-3 p-3 text-3xl text-gray-800 font-log-title outline-3 outline-gray-800 rounded-2xl" required/>
                     <button type = "submit" className = "ml-45 p-3 text-3xl text-white font-log-title rounded-2xl bg-gray-800">Register</button>
                 </form>
+                <div className = "flex flex-col gap-3 mb-4">
+                    <OAuthenticationButtons provider = "google" />
+                    <OAuthenticationButtons provider = "github" />
+                </div>
             </div>
         </>
     );
