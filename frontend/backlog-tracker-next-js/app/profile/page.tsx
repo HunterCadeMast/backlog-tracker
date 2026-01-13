@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { apiFetch } from "@/lib/api";
 import { PieChart, Pie, Tooltip, ResponsiveContainer } from "recharts";
 import { useRouter } from "next/navigation";
+import RandomColor from "../components/RandomColor";
 
 type ProfileStatisticsTypes = {
     completed_games: number;
@@ -18,6 +19,7 @@ type ProfileTypes = {
     bio: string;
     private_profile: boolean;
     profile_photo: string | null;
+    favorite_game: string | null,
     statistics: ProfileStatisticsTypes | null;
 };
 
@@ -29,6 +31,7 @@ const Profile = () => {
         bio: "",
         private_profile: false,
         profile_photo: null,
+        favorite_game: null,
         statistics: null,
     });
     useEffect(() => {
@@ -37,19 +40,20 @@ const Profile = () => {
             router.push("/not-found");
             return;
         }
-        Promise.all([
-            apiFetch("/authentication/profile/"),
-            apiFetch("/profiles/personal/"),
-        ]).then(([auth, profile]) => {
+        const fetchProfile = async () => {
+            const authentication = await apiFetch("/authentication/profile/");
+            const personal = await apiFetch("/profiles/personal/");
             setProfile({
-                username: auth.username,
-                display_name: profile?.display_name ?? auth.username,
-                bio: profile?.bio ?? "",
-                private_profile: profile?.private_profile ?? false,
-                profile_photo: profile?.profile_photo ?? null,
-                statistics: profile?.statistics ?? null,
+                username: authentication.username,
+                display_name: personal?.display_name ?? authentication.username,
+                bio: personal?.bio ?? "",
+                private_profile: personal?.private_profile ?? false,
+                profile_photo: personal?.profile_photo ?? null,
+                favorite_game: personal?.favorite_game ?? "No favorite game...",
+                statistics: personal?.statistics ?? null,
             });
-        });
+        };
+        fetchProfile();
     }, []);
     const data = profile.statistics
         ? [
@@ -60,16 +64,26 @@ const Profile = () => {
             { name: "Paused", value: profile.statistics.paused_games },
         ]
         : [];
+    const statisticColors = ["#EC4E20", "#FF9505", "#FC60A8", "#65DD65"];
     if (!profile) {
         return <h1>Loading...</h1>
     }
     else {
         return (
-            <div>
-                <h1>Name: {profile.display_name || profile.username}</h1>
-                {profile.bio && <p>Bio: {profile.bio}</p>}
-                <p>Visibility: {profile.private_profile ? "Private" : "Public"}</p>
-                {profile.profile_photo && (<img src = {profile.profile_photo} alt = "Profile Photo" className = "w-32 h-32 rounded-full object-cover" />)}
+            <div className = "base-background pl-30">
+                <h1 className="text-6xl font-main-title">
+                    <RandomColor>{profile.display_name || profile.username}</RandomColor>
+                </h1>
+                <div className="flex flex-col md:flex-row gap-10 items-start">
+                    {profile.profile_photo && (<img src = {profile.profile_photo} alt = "Profile Photo" className = "w-48 h-48 rounded-full object-cover" />)}
+                    <div className="flex flex-col gap-4">
+                        {profile.bio && (<p className = "text-2xl"><RandomColor><span className = "">Bio: </span></RandomColor>{profile.bio}</p>)}
+                        {profile.favorite_game && <p className = "text-2xl"><RandomColor><span className = "">Favorite Game: </span></RandomColor>{profile.favorite_game}</p>}
+                    </div>
+                </div>
+                <div className = "flex items-center gap-4 mt-4 mb-4">
+                    <RandomColor element = "bg"><button onClick = {() => router.push("/profile/edit")} className = "px-4 py-2 btn">Edit Profile</button></RandomColor>
+                </div>
                 {profile.statistics && (
                     <ResponsiveContainer width = "100%" height = {300}>
                         <PieChart>

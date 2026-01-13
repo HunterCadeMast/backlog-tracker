@@ -5,11 +5,11 @@ const colors = ["var(--text1)", "var(--text2)", "var(--text3)", "var(--text4)",]
 
 type RandomColorProps = {
   children: ReactElement<React.HTMLAttributes<HTMLElement>> | string;
-  consant?: boolean;
+  constant?: boolean;
   element?: "text" | "bg";
 };
 
-const RandomColor = ({children, consant = false, element = "text"}: RandomColorProps)  => {
+const RandomColor = ({children, constant = false, element = "text"}: RandomColorProps)  => {
   const [color, setColor] = useState<string | undefined>();
   const randomizeColor = () => {
     const availableColors = colors.filter((c) => c !== color);
@@ -17,7 +17,7 @@ const RandomColor = ({children, consant = false, element = "text"}: RandomColorP
     setColor(nextColor);
   };
   const resetColor = () => {
-    if (!consant) setColor(undefined);
+    if (!constant) setColor(undefined);
   };
   const changeElement = element === "bg" ? {backgroundColor: color} : {color: color};
   const animation = "transition-colors duration-150";

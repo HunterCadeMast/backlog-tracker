@@ -4,9 +4,9 @@ import RandomColor from "./components/RandomColor";
 const Home = () => {
   return (
     <>
-      <div className = "container max-w-screen h-full mx-auto flex items-center justify-center bg-main-compliment">
-        <h1 className = "font-main-title text-9xl text-white"><RandomColor consant>Gaming</RandomColor></h1>
-        <h1 className = "pl-10 font-main-title text-9xl text-white"><RandomColor consant>Logjam</RandomColor></h1>
+      <div className = "base-background">
+        <h1 className = "font-main-title text-[clamp(4rem,12vw,12rem)] text-white scale-y-180 origin-center pl-12 animate-fade-left"><RandomColor constant>Gaming</RandomColor></h1>
+        <h1 className = "font-main-title text-[clamp(4rem,12vw,12rem)] text-white scale-y-180 origin-center pr-12 self-end animate-fade-right"><RandomColor constant>Logjam</RandomColor></h1>
       </div>
     </>
   );

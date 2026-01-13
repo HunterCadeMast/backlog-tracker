@@ -7,6 +7,7 @@ const GameInfo = () => {
     const {igdbId} = useParams();
     const [game, setGame] = useState<any>(null);
     const [log, setLog] = useState<any>(null);
+    const [favorite, setFavorite] = useState(false);
     const [editing, setEditing] = useState(false);
     const [editFields, setEditFields] = useState<any>({});
     useEffect(() => {
@@ -37,6 +38,25 @@ const GameInfo = () => {
            }
        });
     }, [igdbId]);
+    useEffect(() => {
+        const token = localStorage.getItem("access");
+        if (!token || !game) return;
+        fetch(`${process.env.NEXT_PUBLIC_API_URL}/authentication/profile/`, {headers: { Authorization: `Bearer ${token}` },})
+        .then(response => response.json())
+        .then(profile => {setFavorite(profile.favorite_game === game.game_title);});
+    }, [game]);
+    const toggleFavorite = async () => {
+        const token = localStorage.getItem("access");
+        if (!token || !game?.game_title) return;
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/authentication/profile/`, {method: "PATCH", headers: {"Content-Type": "application/json", Authorization: `Bearer ${token}`,}, body: JSON.stringify({favorite_game: game.game_title}),});
+        if (response.ok) {
+            setFavorite(true);
+            alert(`${game.game_title} is now your favorite!`);
+        } 
+        else {
+            alert("Failed to set as favorite!");
+        }
+    };
     const addLog = async () => {
         const token = localStorage.getItem("access");
         const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/logs/backlog/`, {method: "POST", headers: {"Content-Type": "application/json", Authorization: `Bearer ${token}`,}, body: JSON.stringify({game_id: igdbId, user_status: "backlog"}),});
@@ -141,6 +161,10 @@ const GameInfo = () => {
                             <input type = "date" value = {editFields.start_date} onChange = {(x) => setEditFields({...editFields, start_date: x.target.value})} className = "rounded-md border px-3 py-2 bg-gray-800 text-white" />
                             <input type = "date" value = {editFields.completion_date} onChange = {(x) => setEditFields({...editFields, completion_date: x.target.value})} className = "rounded-md border px-3 py-2 bg-gray-800 text-white" />
                             <label className = "flex items-center gap-2 mt-2"><input type = "checkbox" checked = {editFields.full_completion} onChange = {(x) => setEditFields({...editFields, full_completion: x.target.checked})} className = "w-4 h-4" />100% Completion</label>
+                            <div className = "mt-4 flex gap-2">
+                                {log && !favorite && (<button onClick = {toggleFavorite} className = "bg-ui px-4 py-2 rounded text-white">Set as Favorite</button>)}
+                                {favorite && (<span className="px-4 py-2 rounded bg-ui text-white">Favorite Game</span>)}
+                            </div>
                             <div className = "flex gap-2 mt-2">
                                 <button className = "bg-ui px-4 py-2 rounded text-gray-800" onClick = {saveLog}>Save Edits</button>
                                 <button className = "bg-gray-600 px-4 py-2 rounded" onClick = {() => setEditing(false)}>Cancel Edits</button>
