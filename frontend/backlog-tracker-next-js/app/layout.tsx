@@ -16,7 +16,7 @@ const sekuya = localFont({src: "./fonts/Sekuya-Regular.ttf", weight: "400", vari
 
 export default function RootLayout({children}: Readonly<{children: React.ReactNode;}>) {
   return (
-    <html lang="en" className = { `${bebasNeue.variable} ${ptSerif.variable} ${sekuya.variable}` }>
+    <html lang = "en" className = {`${bebasNeue.variable} ${ptSerif.variable} ${sekuya.variable}`}>
       <body>
         <ClientProvider>
         <main className = "pt-16 h-screen flex flex-col">

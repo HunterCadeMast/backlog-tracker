@@ -12,7 +12,7 @@ class GamesSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Games
-        fields = ['id', 'game_title', 'cover_artwork_link', 'release_date', 'completion_time', 'completionist_completion_time', 'average_rating', 'developers', 'publishers', 'genres', 'platforms', 'franchises', 'series',]
+        fields = ['id', 'game_title', 'cover_artwork_link', 'summary', 'release_date', 'completion_time', 'completionist_completion_time', 'average_rating', 'developers', 'publishers', 'genres', 'platforms', 'franchises', 'series',]
         read_only_fields = ['id']
 
     def get_developers(self, obj):

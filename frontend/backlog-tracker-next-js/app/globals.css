@@ -96,4 +96,7 @@ input::placeholder {
   .input-element {
     @apply mb-5 p-3 text-3xl text-white font-log-title outline-4 outline-white rounded-2xl items-center justify-center flex;
   }
+  .break-up-line {
+    @apply border-b border-white text-xl pb-2;
+  }
 }

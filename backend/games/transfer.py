@@ -19,6 +19,7 @@ def games_database_transfer(data):
             'cover_artwork_link': cover_url,
             'release_date': release_date, 
             'average_rating': rating, 
+            'summary': data.get('summary', ''),
         }
     )
     for igdb_involved_companies in data.get('involved_companies', []):
