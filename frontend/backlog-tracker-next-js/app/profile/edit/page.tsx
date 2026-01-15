@@ -51,7 +51,7 @@ const ProfileEdit = () => {
     };
     async function deleteAccount() {
         if (!confirm("Are you sure you want to delete your Gaming Logjam account?")) return;
-        await fetch(`${process.env.NEXT_PUBLIC_API_URL}/authentication/account/`, {method: "DELETE", headers: { Authorization: `Bearer ${localStorage.getItem("access")}` },});
+        await fetch(`${process.env.NEXT_PUBLIC_API_URL}/authentication/delete-account/`, {method: "DELETE", headers: { Authorization: `Bearer ${localStorage.getItem("access")}` },});
         localStorage.clear();
         router.push("/");
     };

@@ -6,7 +6,9 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from allauth.socialaccount.models import SocialAccount
 from django.contrib.auth import authenticate
 from django.contrib.auth.tokens import default_token_generator as token_generator
+from django.contrib.auth.password_validation import validate_password
 from django.core.mail import send_mail
+from django.db import transaction
 from django.conf import settings
 from accounts.models import CustomUser
 from accounts.serializers import CustomUserSerializer
@@ -137,35 +139,44 @@ class PasswordResetViewSet(APIView):
 
     def post(self, request):
         email = request.data.get('email')
-        try:
-            user = CustomUser.objects.get(email = email).first()
-        except CustomUser.DoesNotExist:
-            return Response({'error': 'Could not find user!'}, status = 404)
+        if not email:
+            return Response({'error': 'Email required!'}, status = 400)
+        user = CustomUser.objects.filter(email = email).first()
+        if not user:
+            return Response({'error': 'User not found!'}, status = 404)
         token = token_generator.make_token(user)
         password_reset_url = f'{settings.FRONTEND_URL}/password/reset/{user.id}/{token}'
-        send_mail(subject = 'Reset Password - Gaming Logjam', message = f'Reset your password using this link:\n{password_reset_url}', from_email = settings.DEFAULT_FROM_EMAIL, recipient_list = [user.email],)
-        return Response({'message': 'Password reset email sent!', 'password_reset_url': password_reset_url}, status = 200)
+        send_mail(
+            subject = 'Reset Password - Gaming Logjam',
+            message = f'Reset your password using this link:\n{password_reset_url}',
+            from_email = settings.DEFAULT_FROM_EMAIL,
+            recipient_list = [user.email],
+        )
+        return Response({'message': 'If the email exists, password reset email sent!'}, status = 200)
     
-class PasswordResetConfirmatonViewSet(APIView):
+
+class PasswordResetConfirmationViewSet(APIView):
     authentication_classes = []
     permission_classes = [AllowAny]
 
     def post(self, request, id, token):
         new_password = request.data.get('new_password')
         new_password_confirm = request.data.get('new_password_confirm')
+        if not new_password or not new_password_confirm:
+            return Response({'error': 'Password fields are required!'}, status = 400)
         if new_password != new_password_confirm:
             return Response({'error': 'New password does not match!'}, status = 400)
-        else:
-            try:
-                user = CustomUser.objects.get(id = id)
-            except CustomUser.DoesNotExist:
-                return Response({'error': 'Password reset link invalid!'}, status = 400)
-            if not token_generator.check_token(user, token):
-                return Response({'error': 'Token invalid!'})
-            else:
-                user.set_password(new_password)
-                user.save()
-                return Response({'message': 'Password reset!'}, status = 202)
+        try:
+            user = CustomUser.objects.get(id = id)
+        except CustomUser.DoesNotExist:
+            return Response({'error': 'Password reset link invalid!'}, status = 400)
+        if not token_generator.check_token(user, token):
+            return Response(
+                {'error': 'Token invalid or expired!'}, status = 400)
+        validate_password(new_password, user)
+        user.set_password(new_password)
+        user.save()
+        return Response({'message': 'Password reset successfully!'}, status = 200)
     
 class EmailVerificationViewSet(APIView):
     authentication_classes = []
@@ -184,14 +195,17 @@ class EmailVerificationViewSet(APIView):
         user.save(update_fields = ['is_email_verified'])
         return Response({'message': 'Email verified!'}, status = 200)
     
+
 class AccountDeletionViewSet(APIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
 
     def delete(self, request):
         user = request.user
-        user.delete()
-        return Response({'message': 'Deleted account successfully!'}, status = 204)
+        with transaction.atomic():
+            RefreshToken.for_user(user).blacklist()
+            user.delete()
+        return Response({'message': 'Account deleted successfully!',}, status = 204)
     
 class OAuthenticationViewSet(APIView):
     authentication_classes = []
@@ -201,7 +215,7 @@ class OAuthenticationViewSet(APIView):
         profile = Profiles.objects.get_or_create(user = request.user)
         user_info = CustomUserSerializer(request.user).data
         refresh_token = RefreshToken.for_user(request.user)
-        return Response({'message': 'OAuthentication account created successfully!', 'user': user_info, 'profile_id': profile.id, 'providers': list(request.user.socialaccount_set.values_list('provider', flat = True)), 'access': str(refresh_token.access_token), 'refresh': str(refresh_token), }, status = 200,)
+        return Response({'message': 'OAuthentication account created successfully!', 'user': user_info, 'profile_id': profile.id, 'providers': list(request.user.socialaccount_set.values_list('provider', flat = True)), 'access': str(refresh_token.access_token), 'refresh': str(refresh_token),}, status = 200,)
     
 class UnlinkAccountViewSet(APIView):
     authentication_classes = []

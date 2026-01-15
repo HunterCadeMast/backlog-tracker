@@ -52,10 +52,16 @@ const GameInfo = () => {
     const toggleFavorite = async () => {
         const token = localStorage.getItem("access");
         if (!token || !game?.game_title) return;
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/authentication/profile/`, {method: "PATCH", headers: {"Content-Type": "application/json", Authorization: `Bearer ${token}`,}, body: JSON.stringify({favorite_game: game.game_title}),});
+        const newValue = favorite ? null : game.game_title;
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/authentication/profile/`, {method: "PATCH", headers: {"Content-Type": "application/json", Authorization: `Bearer ${token}`,}, body: JSON.stringify({favorite_game: newValue}),});
         if (response.ok) {
-            setFavorite(true);
-            alert(`${game.game_title} is now your favorite!`);
+            setFavorite(!favorite);
+            if (favorite) {
+                alert(`Unfavorited ${game.game_title}!`);
+            }
+            else {
+                alert(`${game.game_title} is now your favorite!`);
+            }            
         } 
         else {
             alert("Failed to set as favorite!");
@@ -135,11 +141,15 @@ const GameInfo = () => {
     if (!game) return <p>Loading...</p>;
     return (
         <div className = "base-background">
-            <div className = "flex-1 p-6">
+            <div className = "flex-1 p-6 overflow-y-auto">
                 <div className = "grid grid-cols-[200px_1fr] gap-8 pt-12">
                     <div className = "space-y-4 pt-4 items-center">
                         <RandomColor constant><h1 className = "text-3xl font-main-title">{game.game_title}</h1></RandomColor>
-                        {game.cover_artwork_link && (<img src = {game.cover_artwork_link} className = "w-48 mt-4 rounded-lg outline-4 outline-white" />)}
+                        {game.cover_artwork_link ? (
+                            <img src = {game.cover_artwork_link} alt = {game.game_title} className = "w-48 mt-4 rounded-lg outline-4 outline-white"/>
+                        ) : (
+                            <img src = "/images/missing.jpg" alt = "Missing" className = "w-48 mt-4 rounded-lg outline-4 outline-white"/>
+                        )}
                         {!log && (<RandomColor element = "bg"><button className = "btn mt-6 bg-ui" onClick = {addLog}>Add to Backlog</button></RandomColor>)}
                     </div>
                     <div className = "space-y-4">
@@ -174,42 +184,56 @@ const GameInfo = () => {
                 </div>
             </div>
             {log && (
-                    <div className = "h-[20vh] border-t rounded-lg outline-4 outline-white font-log-title text-white bg-ui p-6 ml-10 mr-10 mb-5">
-                        {!editing ? (
-                            <>
-                                <p>Status: {log.user_status}</p>
-                                {log.user_rating !== null && <p>Rating: {log.user_rating}/10</p>}
-                                {log.user_review && <p>Review: {log.user_review}</p>}
-                                {log.user_playtime !== null && <p>Playtime: {log.user_playtime}h</p>}
-                                {log.start_date && <p>Start date: {log.start_date}</p>}
-                                {log.completion_date && <p>Completion date: {log.completion_date}</p>}
-                                <p>100% Completion: {log.full_completion ? "Yes" : "No"}</p>
-                                <button className = "btn bg-ui" onClick = {() => setEditing(true)}>Edit Log</button>
-                                <button className = "btn bg-ui" onClick = {removeLog}>Remove from Backlog</button>
-                            </>
-                        ) : (
-                            <div className="grid grid-cols-6 gap-4">
-                                <select value = {editFields.user_status} onChange = {(x) => setEditFields({...editFields, user_status: x.target.value})} className = "btn bg-ui w-50">
-                                    <option value = "playing">Playing</option>
-                                    <option value = "paused">Paused</option>
-                                    <option value = "completed">Completed</option>
-                                    <option value = "backlog">Backlog</option>
-                                    <option value = "dropped">Dropped</option>
-                                </select>
-                                <input type = "number" min = {0} max = {10} placeholder = "Rating (1 - 10)" value = {editFields.user_rating} onChange = {(x) => setEditFields({...editFields, user_rating: x.target.value})} className = "btn w-45 bg-ui" />
-                                <input type = "number" min = {0} placeholder = "Hours of Playtime" value = {editFields.user_playtime} onChange = {(x) => setEditFields({...editFields, user_playtime: x.target.value})} className = "btn w-65 bg-ui" />
-                                <label className = "flex items-center gap-2 mt-2"><input type = "checkbox" checked = {editFields.full_completion} onChange = {(x) => setEditFields({...editFields, full_completion: x.target.checked})} className = "w-4 h-4" />100% Completion</label>
-                                <input type = "date" value = {editFields.start_date} onChange = {(x) => setEditFields({...editFields, start_date: x.target.value})} className = "btn bg-ui" />
-                                <input type = "date" value = {editFields.completion_date} onChange = {(x) => setEditFields({...editFields, completion_date: x.target.value})} className = "btn bg-ui" />
-                                <textarea placeholder = "Review" value = {editFields.user_review} onChange = {(x) => setEditFields({...editFields, user_review: x.target.value})} className = "btn  text-whitew-full" />
-                                {log && !favorite && (<button onClick = {toggleFavorite} className = "btn bg-ui">Set as Favorite</button>)}
-                                {favorite && (<span className="px-4 py-2 rounded bg-ui text-white">Favorite Game</span>)}
-                                <button className = "btn bg-ui" onClick = {saveLog}>Save Edits</button>
-                                <button className = "btn bg-ui" onClick = {() => setEditing(false)}>Cancel Edits</button>
+                <div className="border-t rounded-lg outline-4 outline-white font-log-title text-white bg-ui p-6 ml-10 mr-10 mb-5">
+                    {!editing ? (
+                        <>
+                            <div className="grid grid-cols-2 gap-x-8 gap-y-4">
+                                <div className="space-y-3">
+                                    <RandomColor constant><h1 className = "text-xl font-main-title">Status:</h1></RandomColor><p className = "indent-5"> {log.user_status}</p>
+                                    {log.user_rating !== null && (<><RandomColor constant><h1 className = "text-xl font-main-title">Rating:</h1></RandomColor><p className = "indent-5"> {log.user_rating}/10</p></>)}
+                                    {log.user_playtime !== null && (<><RandomColor constant><h1 className = "text-xl font-main-title">Playtime:</h1></RandomColor><p className = "indent-5"> {log.user_playtime} Hours</p></>)}
+                                </div>
+                                <div className="space-y-3">
+                                    {log.start_date && (<><RandomColor constant><h1 className = "text-xl font-main-title">Start Date:</h1></RandomColor><p className = "indent-5"> {log.start_date}</p></>)}
+                                    {log.completion_date && (<><RandomColor constant><h1 className = "text-xl font-main-title">Completion Date:</h1></RandomColor><p className = "indent-5"> {log.completion_date}</p></>)}
+                                    <><RandomColor constant><h1 className = "text-xl font-main-title">100% Completion:{" "}</h1></RandomColor><p className = "indent-5">{log.full_completion ? "Yes" : "No"}</p></>
+                                </div>
                             </div>
-                        )}
-                    </div>
-                )}
+                            {log.user_review && (<><RandomColor constant><h1 className = "text-xl font-main-title">Review:</h1></RandomColor><p className = "mt-3 whitespace-pre-line indent-5"> {log.user_review}</p></>)}
+                            <div className = "flex gap-4 mt-4">
+                                <RandomColor element = "bg"><button className = "btn bg-ui" onClick = {() => setEditing(true)}>Edit Log</button></RandomColor>
+                                <RandomColor element = "bg"><button className = "btn bg-ui" onClick = {removeLog}>Remove from Backlog</button></RandomColor>
+                            </div>
+                        </>
+                    ) : (
+                        <div className = "grid grid-cols-6 gap-4">
+                            <select value = {editFields.user_status} onChange = {(x) => setEditFields({ ...editFields, user_status: x.target.value })} className = "btn bg-ui col-span-2">
+                                <option value = "playing">Playing</option>
+                                <option value = "paused">Paused</option>
+                                <option value = "completed">Completed</option>
+                                <option value = "backlog">Backlog</option>
+                                <option value = "dropped">Dropped</option>
+                            </select>
+                            <input type = "number" min = {0} max = {10} placeholder = "Rating (1 - 10)" value = {editFields.user_rating} onChange = {(x) => setEditFields({ ...editFields, user_rating: x.target.value })} className = "btn bg-ui col-span-2" />
+                            <input type = "number" min = {0} placeholder = "Total Hours Played" value = {editFields.user_playtime} onChange = {(x) => setEditFields({ ...editFields, user_playtime: x.target.value })} className = "btn bg-ui col-span-2" />
+                            <input type = "date" value = {editFields.start_date} onChange = {(x) => setEditFields({ ...editFields, start_date: x.target.value })} className = "btn bg-ui col-span-2" />
+                            <input type = "date" value = {editFields.completion_date} onChange = {(x) => setEditFields({ ...editFields, completion_date: x.target.value })} className = "btn bg-ui col-span-2" />
+                            <label className = "flex items-center gap-2 col-span-2 text-white">
+                                <input type = "checkbox" checked = {editFields.full_completion} onChange = {(x) => setEditFields({ ...editFields, full_completion: x.target.checked })} className = "w-4 h-4" />
+                                100% Completion
+                            </label>
+                            <textarea placeholder = "Review" value = {editFields.user_review} onChange = {(x) => setEditFields({ ...editFields, user_review: x.target.value })} className = "btn bg-ui col-span-6 min-h-37.5 resize-y" />
+                            <div className = "col-span-6 flex justify-between items-center mt-2">
+                                <RandomColor element = "bg"><button onClick = {toggleFavorite} className = "btn bg-ui">{favorite ? "Unfavorite Game" : "Set as Favorite"}</button></RandomColor>
+                                <div className = "flex gap-3">
+                                    <RandomColor element = "bg"><button className = "btn bg-ui" onClick = {saveLog}>Save Edits</button></RandomColor>
+                                    <RandomColor element = "bg"><button className = "btn bg-ui" onClick = {() => setEditing(false)}>Cancel Edits</button></RandomColor>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+                </div>
+            )}
         </div>
     );
 };

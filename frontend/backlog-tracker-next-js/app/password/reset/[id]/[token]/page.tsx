@@ -2,6 +2,7 @@
 import { apiFetch } from "@/lib/api";
 import { useState } from "react";
 import { useParams, useRouter } from "next/navigation";
+import RandomColor from "../../../../components/RandomColor";
 
 const PasswordResetConfirmPassword = () => {
     const router = useRouter();
@@ -28,13 +29,15 @@ const PasswordResetConfirmPassword = () => {
     };
     return (
         <div className = "min-h-screen flex items-center justify-center bg-main-compliment">
-            <form onSubmit = {handleSubmit} className = "w-90 p-8 rounded-2xl shadow-2xl bg-ui">
-                <h1 className = "text-6xl font-log-title mb-4">New Password</h1>
-                {message && <p className = "text-3xl text-gray-800">{message}</p>}
-                {error && <p className = "text-3xl text-red-500">{error}</p>}
-                <input type = "password" value = {newPassword} placeholder = "New Password" onChange = {x => setNewPassword(x.target.value)} className = "mb-3 p-3 text-3xl rounded-2xl" required />
-                <input type = "password" value = {confirmPassword} placeholder = "Confirm New Password" onChange = {x => setConfirmPassword(x.target.value)} className = "mb-3 p-3 text-3xl rounded-2xl" required />
-                <button className = "p-3 text-3xl text-white bg-gray-800 rounded-2xl">Reset Password</button>
+            <form onSubmit = {handleSubmit} className = "w-100 p-8 rounded-2xl shadow-2xl bg-ui">
+                <h1 className = "text-6xl font-log-title mb-4">Reset Password</h1>
+                {message && <p className = "text-3xl text-white mb-5">{message}</p>}
+                {error && <p className = "text-3xl text-red-500 mb-5">{error}</p>}
+                <input type = "password" value = {newPassword} placeholder = "New Password" onChange = {x => setNewPassword(x.target.value)} className = "btn w-81.5 mb-5 p-3" required />
+                <input type = "password" value = {confirmPassword} placeholder = "Confirm Password" onChange = {x => setConfirmPassword(x.target.value)} className = "btn w-81.5 mb-5 p-3" required />
+                <div className="flex justify-end mt-4">
+                    <RandomColor element="bg"><button type="submit" className="btn mr-2">Reset Password</button></RandomColor>
+                </div>
             </form>
         </div>
     );

@@ -11,6 +11,9 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     is_active = models.BooleanField(default = True)
     is_staff = models.BooleanField(default = False)
     is_email_verified = models.BooleanField(default = False)
+    accepted_privacy = models.BooleanField(default = False)
+    accepted_terms = models.BooleanField(default = False)
+    accepted_terms_and_privacy_timestamp = models.DateTimeField(null = True, blank = True)
     creation_timestamp = models.DateTimeField(default = timezone.now, null = False, blank = False)
 
     USERNAME_FIELD = "email"

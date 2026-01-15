@@ -34,7 +34,7 @@ const SearchBar = () => {
             try {
                 const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/games/?search=${encodeURIComponent(query)}`, { signal: controller.signal });
                 if (!response.ok) {
-                    router.push("/not-found/");
+                    router.push("/not-found");
                     return;
                 }
                 const data = await response.json();
@@ -84,9 +84,9 @@ const SearchBar = () => {
                         <RandomColor key = {`${game.id}-${index}`} element = "bg">
                             <button onClick = {() => handleSelect(game)} className = "flex w-full items-center gap-3 px-4 py-2 text-left text-white font-log-title">
                                 {game.cover_artwork_link ? (
-                                    <img src = {game.cover_artwork_link} alt = {game.game_title} className = "h-20 w-16 rounded object-cover"/>
+                                    <img src = {game.cover_artwork_link} alt = {game.game_title} className = "h-20 w-16 rounded-lg outline-4 outline-white object-cover"/>
                                 ) : (
-                                    <img src = "/images/missing.jpg" alt = "Missing" className = "h-20 w-16 rounded object-cover"/>
+                                    <img src = "/images/missing.jpg" alt = "Missing" className = "w-16 rounded-lg outline-4 outline-white object-cover"/>
                                 )}
                                 <span className = "text-2xl">{game.game_title}</span>
                             </button>
