@@ -1,6 +1,7 @@
 from django.db import models
 from django.utils import timezone
 from accounts.models import CustomUser
+from games.models import Games
 from PIL import Image
 import uuid
 
@@ -13,7 +14,7 @@ class Profiles(models.Model):
     THEME_TYPES = [('dark', 'Dark'), ('light', 'Light'), ('orange', 'Orange'), ('lemon', 'Lemon'), ('strawberry', 'Strawberry'), ('blueberry', 'Blueberry')]
     website_theme = models.CharField(max_length = 20, choices = THEME_TYPES, default = 'dark', null = False, blank = False)
     bio = models.TextField(default = '', max_length = 255, null = True, blank = True)
-    favorite_game = models.ManyToManyField('games.Games', blank = True)
+    favorite_game = models.ForeignKey(Games, on_delete = models.SET_NULL, null = True, blank = True)
     favorite_developer = models.ManyToManyField('games.Developers', blank = True)
     favorite_publisher = models.ManyToManyField('games.Publishers', blank = True)
     favorite_genre = models.ManyToManyField('games.Genres', blank = True)

@@ -45,26 +45,19 @@ const GameInfo = () => {
     useEffect(() => {
         const token = localStorage.getItem("access");
         if (!token || !game) return;
-        fetch(`${process.env.NEXT_PUBLIC_API_URL}/authentication/profile/`, {headers: { Authorization: `Bearer ${token}` },})
+        fetch(`${process.env.NEXT_PUBLIC_API_URL}/profiles/personal/`, {headers: { Authorization: `Bearer ${token}` },})
         .then(response => response.json())
-        .then(profile => {setFavorite(profile.favorite_game === game.game_title);});
+        .then(profile => {setFavorite(profile.favorite_game?.igdb_id === game.id);});
     }, [game]);
     const toggleFavorite = async () => {
         const token = localStorage.getItem("access");
         if (!token || !game?.game_title) return;
-        const newValue = favorite ? null : game.game_title;
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/authentication/profile/`, {method: "PATCH", headers: {"Content-Type": "application/json", Authorization: `Bearer ${token}`,}, body: JSON.stringify({favorite_game: newValue}),});
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/profiles/personal/`, {method: "PATCH", headers: {"Content-Type": "application/json", Authorization: `Bearer ${token}`,}, body: JSON.stringify({favorite_game_id: favorite ? null : game.id}),});
         if (response.ok) {
             setFavorite(!favorite);
-            if (favorite) {
-                alert(`Unfavorited ${game.game_title}!`);
-            }
-            else {
-                alert(`${game.game_title} is now your favorite!`);
-            }            
-        } 
-        else {
-            alert("Failed to set as favorite!");
+            alert(`${game.game_title} ${!favorite ? "is now your favorite!" : "was unfavorited!"}`);
+        } else {
+            alert("Failed to set favorite!");
         }
     };
     const addLog = async () => {

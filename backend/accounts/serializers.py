@@ -4,8 +4,8 @@ from django.utils import timezone
 from .models import CustomUser
 
 class CustomUserSerializer(serializers.ModelSerializer):
-    accepted_privacy = serializers.BooleanField(write_only = True, required = True)
-    accepted_terms = serializers.BooleanField(write_only = True, required = True)
+    accepted_privacy = serializers.BooleanField(required = True)
+    accepted_terms = serializers.BooleanField(required = True)
 
     class Meta:
         model = CustomUser
@@ -15,11 +15,6 @@ class CustomUserSerializer(serializers.ModelSerializer):
             'password': {'write_only': True},
         }
 
-    def validate(self, data):
-        if not data.get('accepted_terms') or not data.get('accepted_privacy'):
-            raise serializers.ValidationError("You must accept the Terms and Privacy Policy to create an account!")
-        return data
-
     def create(self, validated_data):
         password = validated_data.pop('password')
         accepted_terms = validated_data.pop('accepted_terms')
@@ -28,6 +23,8 @@ class CustomUserSerializer(serializers.ModelSerializer):
         user.set_password(password)
         user.accepted_terms = accepted_terms
         user.accepted_privacy = accepted_privacy
+        if not accepted_terms or not accepted_privacy:
+            raise serializers.ValidationError('You must accept the Terms and Privacy Policy to create an account!')
         if accepted_terms and accepted_privacy:
             user.accepted_terms_and_privacy_timestamp = timezone.now()
         user.save()

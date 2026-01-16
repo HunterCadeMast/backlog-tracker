@@ -13,13 +13,20 @@ type ProfileStatisticsTypes = {
     paused_games: number;
 };
 
+type FavoriteGameTypes = {
+    id: number;
+    igdb_id: number;
+    game_title: string;
+    cover_artwork_link: string | null;
+};
+
 type ProfileTypes = {
     username: string;
     display_name: string;
     bio: string;
     private_profile: boolean;
     profile_photo: string | null;
-    favorite_game: string | null,
+    favorite_game: FavoriteGameTypes | null,
     statistics: ProfileStatisticsTypes | null;
 };
 
@@ -49,7 +56,7 @@ const Profile = () => {
                 bio: personal?.bio ?? "",
                 private_profile: personal?.private_profile ?? false,
                 profile_photo: personal?.profile_photo ?? null,
-                favorite_game: personal?.favorite_game ?? "No favorite game...",
+                favorite_game: personal?.favorite_game ?? null,
                 statistics: personal?.statistics ?? null,
             });
         };
@@ -78,7 +85,11 @@ const Profile = () => {
                     {profile.profile_photo && (<img src = {profile.profile_photo} alt = "Profile Photo" className = "w-48 h-48 rounded-full object-cover" />)}
                     <div className="flex flex-col gap-4">
                         {profile.bio && (<p className = "text-2xl"><RandomColor><span className = "">Bio: </span></RandomColor>{profile.bio}</p>)}
-                        {profile.favorite_game && <p className = "text-2xl"><RandomColor><span className = "">Favorite Game: </span></RandomColor>{profile.favorite_game}</p>}
+                        {profile.favorite_game ? (
+                            <p className = "text-2xl"><RandomColor>Favorite Game: </RandomColor>{profile.favorite_game.game_title}</p>
+                        ) : (
+                            <p className = "text-2xl text-white">No favorite game...</p>
+                        )}
                     </div>
                 </div>
                 <div className = "flex items-center gap-4 mt-4 mb-4">
