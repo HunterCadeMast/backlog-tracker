@@ -45,6 +45,7 @@ const Register = () => {
                                 <input type = "checkbox" checked = {acceptedTerms} onChange = {(e) => setAcceptedTerms(e.target.checked)} required />
                                 I agree to the <a href = "/terms-of-service.html" target = "_blank" className = "underline">Terms of Service</a>
                             </label>
+                            <p>By signing up, you confirm that you are at least 13 years of age.</p>
                         </div>
                         <div className="flex justify-end mt-4">
                             <RandomColor element="bg"><button type="submit" className="text-2xl btn mr-2">Submit</button></RandomColor>

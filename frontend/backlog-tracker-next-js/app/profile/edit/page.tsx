@@ -86,7 +86,7 @@ const ProfileEdit = () => {
                             </div>
                             <div className = "space-y-2">
                                 <label className = "text-xl font-main-title">Bio</label>
-                                <textarea placeholder = "Bio" value = {profile.bio} onChange = {(x) => setProfile({...profile, bio: x.target.value})} rows = {4} className = "btn w-full mt-3"></textarea>
+                                <textarea placeholder = "Bio" value = {profile.bio} onChange = {(x) => setProfile({...profile, bio: x.target.value})} rows = {4} className = "btn w-full mt-3 min-h-20 max-h-80"></textarea>
                             </div>
                             <label className = "inline-flex items-center space-x-2">
                                 <input type="checkbox" checked = {!profile.private_profile} onChange = {() => setProfile({...profile, private_profile: !profile.private_profile})} className = "form-checkbox" />
@@ -107,7 +107,7 @@ const ProfileEdit = () => {
                             <RandomColor constant><h1 className = "text-xl font-main-title">Change Email</h1></RandomColor>
                             <input type = "email" placeholder = "New Email" value = {profile.email} onChange = {(x) => setProfile({...profile, email: x.target.value})} className = "btn w-full mt-3" />
                             <input type = "password" placeholder = "Current Password" value = {currentPassword} onChange = {(x) => setCurrentPassword(x.target.value)} className = "btn w-full mt-3" />
-                            <RandomColor element = "bg"><button onClick = {emailChange} className = "px-4 py-2 rounded text-white">Change Email</button></RandomColor>
+                            <RandomColor element = "bg"><button onClick = {emailChange} className = "btn px-4 py-2">Change Email</button></RandomColor>
                         </section>
                         <section className="bg-ui p-6 rounded-lg shadow-md space-y-4">
                             <RandomColor constant><h1 className="text-xl font-main-title">Change Password</h1></RandomColor>
@@ -117,7 +117,7 @@ const ProfileEdit = () => {
                                 <input type = "password" placeholder = "Confirm New Password" value = {confirmPassword} onChange = {(x) => setConfirmPassword(x.target.value)} className = "btn w-full" />
                             </div>
                             <RandomColor element = "bg">
-                                <button onClick = {passwordChange} className = "px-4 py-2 rounded text-white">Change Password</button>
+                                <button onClick = {passwordChange} className = "btn px-4 py-2">Change Password</button>
                             </RandomColor>
                         </section>
                         <section>

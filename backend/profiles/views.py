@@ -10,7 +10,7 @@ from django.shortcuts import get_object_or_404
 from datetime import timedelta
 from accounts.permissions import APIKeyAuthenticated, APIKeyThrottle
 from profiles.models import Profiles, APIKeys
-from profiles.serializers import ProfilesSerializer, APIKeysSerializer
+from profiles.serializers import ProfilesSerializer, UsersSerializer, APIKeysSerializer
 
 class ProfilesViewSet(viewsets.ModelViewSet):
     serializer_class = ProfilesSerializer
@@ -37,7 +37,8 @@ class UsersViewSet(APIView):
 
     def get(self, request, username):
         profile = get_object_or_404(Profiles, user__username = username, private_profile = False)
-        return Response(ProfilesSerializer(profile, context = {'request': request}).data)
+        serializer = UsersSerializer(profile, context = {'request': request})
+        return Response(serializer.data)
     
 class APIKeysViewSet(viewsets.ModelViewSet):
     serializer_class = APIKeysSerializer

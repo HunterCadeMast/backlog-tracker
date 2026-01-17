@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type {Metadata} from "next";
 import {Bebas_Neue, PT_Serif} from "next/font/google"
 import localFont from "next/font/local"
 import "./globals.css";
@@ -23,8 +23,9 @@ export default function RootLayout({children}: Readonly<{children: React.ReactNo
           <div className = "flex-1">
             {children}
           </div>
-          <footer className = "pl-10 pb-5 flex items-center justify-between text-center bg-main-compliment">
+          <footer className = "pl-10 pr-10 pb-5 flex items-center justify-between text-center bg-main-compliment">
             <h1 className = "font-main-title text-3xl text-white"><RandomColor>Database from IGDB</RandomColor></h1>
+            <h1 className = "font-main-title text-xl text-white">Contact: <a href = "mailto:gaming.logjam@gmail.com" className = "underline"><RandomColor>gaming.logjam@gmail.com</RandomColor></a></h1>
           </footer>
         </main>
         </ClientProvider>
