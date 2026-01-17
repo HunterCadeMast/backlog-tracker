@@ -22,7 +22,6 @@ const GameInfo = () => {
             return response.json();
         })
         .then((data) => {
-            console.log("GAME:", data);
             setGame(data);
         })
         .catch((error) => {

@@ -81,7 +81,7 @@ input::placeholder {
     @apply h-full flex flex-col justify-center flex-1 bg-main-compliment;
   }
   .btn {
-    @apply h-10 rounded-lg outline-4 outline-white font-main-title text-white items-center justify-center flex;
+    @apply h-10 rounded-lg outline-4 outline-white font-main-title text-white items-center justify-center flex bg-ui;
   }
   .navbar {
     @apply fixed top-0 left-0 w-full z-50 bg-ui shadow-2xl;

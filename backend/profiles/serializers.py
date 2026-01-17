@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from django.db.models import Sum
-from collections import defaultdict
+from collections import Counter, defaultdict
 from profiles.models import Profiles, APIKeys
 from games.models import Games
 from logs.models import Logs
@@ -16,8 +16,58 @@ class ProfileStatisticsMixin:
         yearly_games = defaultdict(int)
         for log in completed_games.exclude(completion_date = None):
             year = log.completion_date.year
-            yearly_games[year] = yearly_games.get(year, 0) + 1
-        data = {'total_games': logs.count(), 'completed_games': completed_games.count(), 'playing_games': playing_games.count(), 'backlog_games': backlog_games.count(), 'dropped_games': dropped_games.count(), 'paused_games': paused_games.count(), 'total_playtime': logs.aggregate(total = Sum('user_playtime'))['total'] or 0, 'yearly_completed_games': dict(yearly_games), 'favorite_genres': list(profile.favorite_genre.values_list('label', flat = True)),}
+            yearly_games[year] += 1
+
+        def top_favorites(objects_list, top_few = 3):
+            if not objects_list:
+                return []
+            counts = Counter(objects_list)
+            most_common = counts.most_common(top_few)
+            if not most_common:
+                return []
+            max_count = most_common[0][1]
+            tie_count = sum(1 for v in counts.values() if v == max_count)
+            if tie_count > top_few:
+                return []
+            return [{'id': obj.id, 'label': getattr(obj, 'label', getattr(obj, 'name', ''))} for obj, _ in most_common]
+        all_developers = []
+        all_publishers = []
+        all_genres = []
+        all_platforms = []
+        all_franchises = []
+        all_series = []
+        for log in logs:
+            game = log.game_id
+            if not game:
+                continue
+            all_developers.extend(related.developer_id for related in game.gamespecificdevelopers_set.all())
+            all_publishers.extend(related.publisher_id for related in game.gamespecificpublishers_set.all())
+            all_genres.extend(related.genre_id for related in game.gamespecificgenres_set.all())
+            all_platforms.extend(related.platform_id for related in game.gamespecificplatforms_set.all())
+            all_franchises.extend(related.franchise_id for related in game.gamespecificfranchises_set.all())
+            all_series.extend(related.series_id for related in game.gamespecificseries_set.all())
+        favorite_developers = top_favorites(all_developers)
+        favorite_publishers = top_favorites(all_publishers)
+        favorite_genres = top_favorites(all_genres)
+        favorite_platforms = top_favorites(all_platforms)
+        favorite_franchises = top_favorites(all_franchises)
+        favorite_series = top_favorites(all_series)
+        data = {
+            'total_games': logs.count(),
+            'completed_games': completed_games.count(),
+            'playing_games': playing_games.count(),
+            'backlog_games': backlog_games.count(),
+            'dropped_games': dropped_games.count(),
+            'paused_games': paused_games.count(),
+            'total_playtime': logs.aggregate(total = Sum('user_playtime'))['total'] or 0,
+            'yearly_completed_games': dict(yearly_games),
+            'favorite_developers': favorite_developers,
+            'favorite_publishers': favorite_publishers,
+            'favorite_genres': favorite_genres,
+            'favorite_platforms': favorite_platforms,
+            'favorite_franchises': favorite_franchises,
+            'favorite_series': favorite_series,
+        }
         return data
     
 class FavoriteGameSerializer(serializers.ModelSerializer):
