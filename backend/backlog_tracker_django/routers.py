@@ -1,5 +1,5 @@
 from rest_framework import routers
-from profiles.views import ProfilesViewSet, APIKeysViewSet
+from profiles.views import ProfilesViewSet, UsersViewSet, APIKeysViewSet
 from games.views import GamesViewSet
 from logs.views import LogsViewSet, LogSessionsViewSet, LogTagsViewSet
 from playlists.views import PlaylistsViewSet, PlaylistLogsViewSet

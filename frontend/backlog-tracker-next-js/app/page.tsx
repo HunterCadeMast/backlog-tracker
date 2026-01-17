@@ -1,13 +1,15 @@
 "use client";
-import { useEffect, useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import RandomColor from "./components/RandomColor";
 
-export default function Home() {
+const Home = () => {
   return (
     <>
-      <div className = "container max-w-screen min-h-screen mx-auto flex items-center justify-center bg-cream">
-        <h1 className = "font-main-title text-9xl">Gaming Logjam</h1>
+      <div className = "base-background overflow-hidden">
+        <h1 className = "font-main-title text-[clamp(4rem,12vw,12rem)] text-white scale-y-180 origin-center pl-12 animate-fade-left"><RandomColor constant>Gaming</RandomColor></h1>
+        <h1 className = "font-main-title text-[clamp(4rem,12vw,12rem)] text-white scale-y-180 origin-center pr-12 self-end animate-fade-right"><RandomColor constant>Logjam</RandomColor></h1>
       </div>
     </>
   );
-}
+};
+
+export default Home;

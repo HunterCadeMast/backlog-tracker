@@ -35,6 +35,7 @@ def fetch_game_info(id: int):
             id,
             name,
             cover.url,
+            summary,
             first_release_date,
             rating,
             genres.name,
@@ -61,6 +62,7 @@ def specific_game_search(title: str):
             id,
             name,
             cover.url,
+            summary,
             first_release_date,
             rating,
             genres.name,
@@ -81,6 +83,7 @@ def broad_game_search(title: str):
             id,
             name,
             cover.url,
+            summary,
             first_release_date,
             rating,
             genres.name,
@@ -126,8 +129,17 @@ def request_game_info_by_name(title: str):
     title = title.strip()
     if len(title) < 2:
         return []
-    local_games = list(Games.objects.filter(game_title__icontains = title).values('igdb_id', 'game_title', 'average_rating', 'cover_artwork_link')[:50])
-    local_results = [{'id': game['igdb_id'], 'name': game['game_title'], 'rating': game['average_rating'], 'cover': {'url': game['cover_artwork_link']} if game['cover_artwork_link'] else None,} for game in local_games]
+    local_games = list(Games.objects.filter(game_title__icontains = title).values('igdb_id', 'game_title', 'average_rating', 'cover_artwork_link', 'summary')[:50])
+    local_results = [
+        {
+            'id': game['igdb_id'],
+            'name': game['game_title'],
+            'rating': game['average_rating'],
+            'cover': {'url': game['cover_artwork_link']} if game['cover_artwork_link'] else None,
+            'summary': game['summary'],
+        }
+        for game in local_games
+    ]
     igdb_results = []
     try:
         igdb_results += specific_game_search(title)

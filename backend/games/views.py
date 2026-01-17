@@ -6,6 +6,7 @@ from rest_framework.response import Response
 from games.models import Games
 from games.serializers import GamesSerializer
 from games.services import request_game_info_by_name, fetch_game_info
+from games.transfer import games_database_transfer
 import requests
 
 class GamePagination(PageNumberPagination):
@@ -51,18 +52,32 @@ class GamesViewSet(viewsets.ViewSet):
         serializer = GamesSerializer(page, many = True)
         return paginator.get_paginated_response(serializer.data)
     
-    @action(detail = False, methods = ['get'], url_path = r"(?P<igdb_id>\d+)")
+    @action(detail = False, methods = ['get'], url_path = r'(?P<igdb_id>\d+)')
     def fetch(self, request, igdb_id = None):
-        game = Games.objects.filter(igdb_id = igdb_id).first()
-        if not game:
-            igdb_data = fetch_game_info(int(igdb_id))
-            if not igdb_data:
-                return Response({'error': 'Game not found!'}, status = 404)
-            cover_url = None
-            if igdb_data.get('cover'):
-                cover_url = igdb_data["cover"]["url"].replace("t_thumb", "t_cover_big")
-            rating = None
-            if igdb_data.get('rating'):
-                rating = int(igdb_data['rating'])
-            game = Games.objects.create(igdb_id = igdb_data['id'], game_title = igdb_data['name'], cover_artwork_link = cover_url, average_rating = rating)
+        igdb_data = fetch_game_info(int(igdb_id))
+        if not igdb_data:
+            return Response({'error': 'Game not found!'}, status = 404)
+        cover_url = igdb_data.get('cover', {}).get('url')
+        if cover_url:
+            cover_url = cover_url.replace('t_thumb', 't_cover_big')
+        rating = int(igdb_data['rating']) if igdb_data.get('rating') else None
+        game, created = Games.objects.update_or_create(
+            igdb_id = igdb_data['id'],
+            defaults = {
+                'game_title': igdb_data['name'],
+                'cover_artwork_link': cover_url,
+                'average_rating': rating,
+                'summary': igdb_data.get('summary', ''),
+            }
+        )
+        needs_details_update = (
+            not game.gamespecificdevelopers_set.exists() or
+            not game.gamespecificpublishers_set.exists() or
+            not game.gamespecificgenres_set.exists() or
+            not game.gamespecificplatforms_set.exists() or
+            not game.gamespecificfranchises_set.exists() or
+            not game.gamespecificseries_set.exists()
+        )
+        if needs_details_update:
+            games_database_transfer(igdb_data)
         return Response(GamesSerializer(game).data)

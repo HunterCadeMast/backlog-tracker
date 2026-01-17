@@ -2,9 +2,9 @@
 import { useEffect, useState } from "react";
 import { apiFetch } from "@/lib/api";
 import { ResponsiveContainer, Tooltip, Cell, Pie, PieChart, Bar, BarChart, XAxis, YAxis, CartesianGrid, Radar, RadarChart, PolarGrid, PolarAngleAxis, Line, LineChart } from "recharts";
-import { useRouter } from "next/navigation";
+import { useRouter, useParams } from "next/navigation";
 import Link from "next/link";
-import RandomColor from "../components/RandomColor";
+import RandomColor from "../../components/RandomColor";
 
 type FavoriteTypes = {
     id: number;
@@ -76,8 +76,9 @@ type ProfileTypes = {
     logs?: LogType[];
 };
 
-const Profile = () => {
+const Users = () => {
     const router = useRouter();
+    const { username } = useParams();
     const [profile, setProfile] = useState<ProfileTypes>({
         username: "",
         display_name: "",
@@ -88,32 +89,38 @@ const Profile = () => {
         statistics: null,
     });
     useEffect(() => {
-        const token = localStorage.getItem("access");
-        if (!token) {
-            router.push("/not-found");
-            return;
-        }
         const fetchProfile = async () => {
-            const authentication = await apiFetch("/authentication/profile/");
-            const personal = await apiFetch("/profiles/personal/");
-            setProfile({
-                username: authentication.username,
-                display_name: personal?.display_name ?? authentication.username,
-                bio: personal?.bio ?? "",
-                private_profile: personal?.private_profile ?? false,
-                profile_photo: personal?.profile_photo ?? null,
-                favorite_game: personal?.favorite_game ?? null,
-                statistics: personal?.statistics ?? null,
-                logs: personal?.logs ?? [],
-            });
+            try {
+                const data = await apiFetch(`/user/${username}/`);
+                setProfile({
+                    username: data.username,
+                    display_name: data.display_name ?? data.username,
+                    bio: data.bio ?? "",
+                    private_profile: data.private_profile ?? false,
+                    profile_photo: data.profile_photo ?? null,
+                    favorite_game: data.favorite_game ?? null,
+                    statistics: data.statistics ?? null,
+                    logs: data.logs ?? [],
+                });
+            } catch (error) {
+                router.push("/not-found");
+            }
         };
         fetchProfile();
-    }, []);
+    }, [username]);
+    const statusData = profile.statistics
+        ? [
+            { name: "Completed", value: profile.statistics.completed_games },
+            { name: "Playing", value: profile.statistics.playing_games },
+            { name: "Backlog", value: profile.statistics.backlog_games },
+            { name: "Dropped", value: profile.statistics.dropped_games },
+            { name: "Paused", value: profile.statistics.paused_games },
+        ]
+        : [];
     const favoriteGameLog = profile.favorite_game ? (profile.logs ?? []).find(log => log.game.id === profile.favorite_game!.igdb_id) : null;
-    const statusData = profile.statistics ? [{name: "Completed", value: profile.statistics.completed_games}, {name: "Playing", value: profile.statistics.playing_games}, {name: "Backlog", value: profile.statistics.backlog_games}, {name: "Dropped", value: profile.statistics.dropped_games}, {name: "Paused", value: profile.statistics.paused_games},] : [];
     const statisticColors = ["#EC4E20", "#FF9505", "#FC60A8", "#65DD65", "#5466EB"];
     const completionRate = profile.statistics ? Math.round((profile.statistics.completed_games / Math.max(profile.statistics.total_games, 1)) * 100) : 0;
-    const playstyleRadarData = profile.statistics ? Object.entries(profile.statistics.playstyle.scores).map(([key, value]) => ({metric: key.replace("_", " "),value,})) : [];
+    const playstyleRadarData = profile.statistics ? Object.entries(profile.statistics.playstyle.scores).map(([key, value]) => ({metric: key.replace("_", " "), value,})) : [];
     const radarColor = statisticColors[playstyleRadarData.length % statisticColors.length];
     const commitmentData = profile.statistics ? Object.entries(profile.statistics.commitment_chart).map(([label, count]) => ({label, count,})) : [];
     const commitmentColor = statisticColors[commitmentData.length % statisticColors.length];
@@ -125,7 +132,7 @@ const Profile = () => {
         })
         .map(([year, count]) => ({year, count})) : [];
     const oneYearAgo = new Date(); oneYearAgo.setFullYear(now.getFullYear() - 1);
-    const timelineData = (profile.logs ?? []).filter(log => log.start_date).map(log => ({gameTitle: profile.favorite_game?.game_title ?? "Unknown", y: log.user_playtime ?? 0, start: new Date(log.start_date).getTime(), end: log.completion_date ? new Date(log.completion_date).getTime() : null,})).filter(log => log.start >= oneYearAgo.getTime());
+    const timelineData = (profile.logs ?? []).filter(log => log.start_date).map(log => ({gameTitle: log.game?.game_title ?? "Unknown", y: log.user_playtime ?? 0, start: new Date(log.start_date).getTime(), end: log.completion_date ? new Date(log.completion_date).getTime() : null,})).filter(log => log.start >= oneYearAgo.getTime());
     const SectionHeader = ({title}: {title: string}) => (
         <>
             <RandomColor constant><h1 className = "text-xl font-main-title">{title}</h1></RandomColor>
@@ -162,7 +169,6 @@ const Profile = () => {
                     <div className = "space-y-6 items-center flex flex-col">
                         <RandomColor constant><h1 className="text-3xl font-main-title">{profile.display_name || profile.username}</h1></RandomColor>
                         {profile.profile_photo && (<img src = {profile.profile_photo} alt = "Profile Photo" className = "w-48 h-48 rounded-full outline-4 outline-white object-cover" />)}
-                        <RandomColor element = "bg"><button onClick={() => router.push("/profile/edit")} className = "btn bg-ui mt-4">Edit Profile</button></RandomColor>
                     </div>
                     <div className = "space-y-4">
                         <SectionHeader title = "Bio" /><p className = "indent-5 text-xl">{profile.bio || "No bio provided..."}</p>
@@ -216,9 +222,9 @@ const Profile = () => {
                                         </div>
                                     </Link>
                                 </RandomColor>
+                                <p className = "break-up-line mb-10"></p>
                             </>
                         )}
-                        <p className = "break-up-line mb-10"></p>
                         <SectionHeader title = "Favorites" />
                         <div className = "grid grid-cols-2 gap-6 indent-5">
                             <div className = "space-y-2">
@@ -392,4 +398,4 @@ const Profile = () => {
     }
 };
 
-export default Profile;
+export default Users;

@@ -3,19 +3,23 @@
 :root {
   --background: #e1f1ce;
   --foreground: #171717;
-  --cream: #eed070;
-  --navbar: hsl(120, 53%, 70%);
-  --button: #74563b;
-  --button-border: #d4bca3;
+  --main-compliment: #394648;
+  --ui: #21242b;
+  --text1: #EC4E20;
+  --text2: #FF9505;
+  --text3: #FC60A8;
+  --text4: #65DD65;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --color-cream: var(--cream);
-  --color-navbar: var(--navbar);
-  --color-button: var(--button);
-  --color-button-border: var(--button-border);
+  --color-main-compliment: var(--main-compliment);
+  --color-ui: var(--ui);
+  --color-text1: var(--text1);
+  --color-text2: var(--text2);
+  --color-text3: var(--text3);
+  --color-text4: var(--text4);
   --font-log-title: var(--font-bebasneue);
   --font-log-body: var(--font-ptserif);
   --font-main-title: var(--font-sekuya);
@@ -32,4 +36,66 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-log-title), var(--font-log-body), var(--font-main-title);
+  height: 100dvh;
+}
+
+input::placeholder {
+  font-family: var(--font-main-title);
+  color: #d1d1d1;
+  font-size: 1rem;
+  font-style: italic;
+}
+
+@keyframes fade-in-left {
+  from {
+    opacity: 0;
+    transform: translateX(-150px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.animate-fade-left {
+  animation: fade-in-left 2s ease-out forwards;
+}
+
+@keyframes fade-in-right {
+  from {
+    opacity: 0;
+    transform: translateX(150px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.animate-fade-right {
+  animation: fade-in-right 2s ease-out forwards;
+}
+
+@layer components {
+  .base-background {
+    @apply h-full flex flex-col justify-center flex-1 bg-main-compliment;
+  }
+  .btn {
+    @apply h-10 rounded-lg outline-4 outline-white font-main-title text-white items-center justify-center flex bg-ui;
+  }
+  .navbar {
+    @apply fixed top-0 left-0 w-full z-50 bg-ui shadow-2xl;
+  }
+  .navbar-container {
+    @apply container flex items-center justify-between max-w-screen mx-auto px-4;
+  }
+  .sideline {
+    @apply w-10 h-1 bg-gray-800 m-1.5;
+  }
+  .input-element {
+    @apply mb-5 p-3 text-3xl text-white font-log-title outline-4 outline-white rounded-2xl items-center justify-center flex;
+  }
+  .break-up-line {
+    @apply border-b border-white text-xl pb-2;
+  }
 }

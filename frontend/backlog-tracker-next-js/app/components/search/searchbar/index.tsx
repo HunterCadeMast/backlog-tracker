@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import RandomColor from "../../RandomColor";
 
 type GameTypes = {
     id: string;
@@ -33,7 +34,7 @@ const SearchBar = () => {
             try {
                 const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/games/?search=${encodeURIComponent(query)}`, { signal: controller.signal });
                 if (!response.ok) {
-                    router.push("/not-found/");
+                    router.push("/not-found");
                     return;
                 }
                 const data = await response.json();
@@ -74,16 +75,22 @@ const SearchBar = () => {
         }
     };
     return (
-        <div ref = {containerReference} className = "relative w-72">
-            <input type = "text" placeholder = "Search games..." onFocus = {() => setOpen(true)} value = {query} onChange = {(x) => setQuery(x.target.value)} className = "w-full rounded-md border px-3 py-2 bg-gray-800 text-white"/>
+        <div ref = {containerReference} className = "relative w-96">
+            <input type = "text" placeholder = "Search games..." onFocus = {() => setOpen(true)} value = {query} onChange = {(x) => setQuery(x.target.value)} spellCheck = {false} className = "w-full btn px-4 py-3 placeholder:placehold"/>
             {open && (
-                <div className = "fixed top-15 left-5 right-5 z-50 mt-20 rounded-md bg-gray-800 text-white min-h-100 overflow-y-auto shadow-lg">
-                    {results.length === 0 && query && (<p className = "px-4 py-2 text-sm text-white">Hmm... Nothing to see here...</p>)}
+                <div className = "absolute mt-5 w-full max-h-96 min-h-12 overflow-y-auto rounded-lg bg-ui shadow-lg z-50 outline-4 outline-button-border">
+                    {results.length === 0 && query && (<p className = "px-4 py-2 text-2xl text-white font-log-title">Hmm... Nothing to see here...</p>)}
                     {results.map((game, index) => (
-                        <button key = {`${game.id}-${index}`} onClick = {() => handleSelect(game)} className = "flex w-full items-center gap-3 px-4 py-2 hover:bg-gray-600 text-left">
-                            {game.cover_artwork_link && (<img src = {game.cover_artwork_link} alt = {game.game_title} className = "h-10 w-7 rounded object-cover"/>)}
-                            <span>{game.game_title}</span>
-                        </button>
+                        <RandomColor key = {`${game.id}-${index}`} element = "bg">
+                            <button onClick = {() => handleSelect(game)} className = "flex w-full items-center gap-3 px-4 py-2 text-left text-white font-log-title">
+                                {game.cover_artwork_link ? (
+                                    <img src = {game.cover_artwork_link} alt = {game.game_title} className = "h-20 w-16 rounded-lg outline-4 outline-white object-cover"/>
+                                ) : (
+                                    <img src = "/images/missing.jpg" alt = "Missing" className = "w-16 rounded-lg outline-4 outline-white object-cover"/>
+                                )}
+                                <span className = "text-2xl">{game.game_title}</span>
+                            </button>
+                        </RandomColor>
                     ))}
                 </div>
             )}

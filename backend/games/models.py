@@ -6,6 +6,7 @@ class Games(models.Model):
     igdb_id = models.IntegerField(unique = True, null = True, blank = True)
     game_title = models.CharField(max_length = 255, null = False, blank = False)
     cover_artwork_link = models.TextField(null = True, blank = True)
+    summary = models.TextField(null = True, blank = True)
     release_date = models.DateField(null = True, blank = True)
     completion_time = models.IntegerField(null = True, blank = True)
     completionist_completion_time = models.IntegerField(null = True, blank = True)
