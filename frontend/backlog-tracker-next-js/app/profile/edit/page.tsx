@@ -58,9 +58,9 @@ const ProfileEdit = () => {
     };
     async function save() {
         const formData = new FormData();
-        formData.append("display_name", profile.display_name);
-        formData.append("bio", profile.bio);
-        formData.append("private_profile", profile.private_profile);
+        formData.append("display_name", profile.display_name || "");
+        formData.append("bio", profile.bio || "");
+        formData.append("private_profile", profile.private_profile ? "true" : "false");
         if (profilePhoto) {
             formData.append("profile_photo", profilePhoto);
         }
@@ -97,8 +97,8 @@ const ProfileEdit = () => {
                                 <input type = "file" accept = "image/*" onChange = {(x) => setProfilePhoto(x.target.files?.[0] ?? null)} />
                             </div>
                             <div className = "flex gap-4 mt-4">
-                                <RandomColor element = "bg"><button onClick = {save} className = "btn px-4 py-2">Save Edits</button></RandomColor>
-                                <RandomColor element = "bg"><button onClick = {() => router.push("/profile/")} className = "btn px-4 py-2">Cancel Edits</button></RandomColor>
+                                <RandomColor element = "bg"><button onClick = {save} className = "btn">Save Edits</button></RandomColor>
+                                <RandomColor element = "bg"><button onClick = {() => router.push("/profile/")} className = "btn">Cancel Edits</button></RandomColor>
                             </div>
                         </section>
                     </div>
@@ -107,7 +107,7 @@ const ProfileEdit = () => {
                             <RandomColor constant><h1 className = "text-xl font-main-title">Change Email</h1></RandomColor>
                             <input type = "email" placeholder = "New Email" value = {profile.email} onChange = {(x) => setProfile({...profile, email: x.target.value})} className = "btn w-full mt-3" />
                             <input type = "password" placeholder = "Current Password" value = {currentPassword} onChange = {(x) => setCurrentPassword(x.target.value)} className = "btn w-full mt-3" />
-                            <RandomColor element = "bg"><button onClick = {emailChange} className = "btn px-4 py-2">Change Email</button></RandomColor>
+                            <RandomColor element = "bg"><button onClick = {emailChange} className = "btn">Change Email</button></RandomColor>
                         </section>
                         <section className="bg-ui p-6 rounded-lg shadow-md space-y-4">
                             <RandomColor constant><h1 className="text-xl font-main-title">Change Password</h1></RandomColor>
@@ -117,7 +117,7 @@ const ProfileEdit = () => {
                                 <input type = "password" placeholder = "Confirm New Password" value = {confirmPassword} onChange = {(x) => setConfirmPassword(x.target.value)} className = "btn w-full" />
                             </div>
                             <RandomColor element = "bg">
-                                <button onClick = {passwordChange} className = "btn px-4 py-2">Change Password</button>
+                                <button onClick = {passwordChange} className = "btn">Change Password</button>
                             </RandomColor>
                         </section>
                         <section>

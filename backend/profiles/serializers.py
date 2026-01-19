@@ -174,12 +174,13 @@ class ProfilesSerializer(ProfileStatisticsMixin, serializers.ModelSerializer):
         return {'id': obj.favorite_game.id, 'igdb_id': obj.favorite_game.igdb_id, 'game_title': obj.favorite_game.game_title, 'cover_artwork_link': obj.favorite_game.cover_artwork_link,}
     
     def update(self, instance, validated_data):
-        favorite_game_id = validated_data.pop('favorite_game_id', object())
-        if favorite_game_id is not object():
-            if favorite_game_id:
-                instance.favorite_game = Games.objects.get(igdb_id = favorite_game_id)
-            else:
-                instance.favorite_game = None
+        favorite_game_id = validated_data.pop('favorite_game_id', None)
+        if favorite_game_id is None:
+            instance.favorite_game = None
+        elif isinstance(favorite_game_id, int):
+            instance.favorite_game = Games.objects.get(igdb_id = favorite_game_id)
+        else:
+            raise serializers.ValidationError({"favorite_game_id": "Must be an integer or null"})
         instance.save()
         return super().update(instance, validated_data)
 

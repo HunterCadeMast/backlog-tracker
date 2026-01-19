@@ -216,9 +216,9 @@ const Profile = () => {
                                         </div>
                                     </Link>
                                 </RandomColor>
+                                <p className = "break-up-line mb-10"></p>
                             </>
                         )}
-                        <p className = "break-up-line mb-10"></p>
                         <SectionHeader title = "Favorites" />
                         <div className = "grid grid-cols-2 gap-6 indent-5">
                             <div className = "space-y-2">
