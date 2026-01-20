@@ -12,11 +12,11 @@ const Login = () => {
     const {refreshUser} = useAuthentication();
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
-    const [error, setError] = useState("");
+    const [error, setError] = useState<Record<string, string[]>>({});
     const [success, setSuccess] = useState("");
     const handleSubmit = async (exception: React.FormEvent<HTMLFormElement>) => {
         exception.preventDefault();
-        setError("");
+        setError({});
         setSuccess("")
         try {
             await loginAction(new FormData(exception.currentTarget));
@@ -25,7 +25,7 @@ const Login = () => {
             router.push("/");
         }
         catch (caughtError: any) {
-            setError(caughtError.message);
+            setError(caughtError);
         }
     };
     return (
@@ -37,8 +37,8 @@ const Login = () => {
                         <div className="flex justify-left mb-5">
                             <Link href= {"/password/reset"} className = "text-2xl text-white font-log-title">Forgot Password?</Link>
                         </div>
-                        {error && <p className = "text-3xl text-red-500 font-log-title mb-5">{error}</p>}
-                        {success && <p className = "text-3xl text-gray-800 font-log-title mb-3">{success}</p>}
+                        {error.non_field_errors && <p className = "text-3xl text-red-500 font-log-title mb-5">{error.non_field_errors[0]}</p>}
+                        {success && <p className = "text-3xl text-white font-log-title mb-5">{success}</p>}
                         <input type = "email" name = "email" value = {email} onChange = {exception => setEmail(exception.target.value)} placeholder = "Email" className = "input-element" required/>
                         <input type = "password" name = "password" value = {password} onChange = {exception => setPassword(exception.target.value)} placeholder = "Password" className = "input-element" required/>
                         <div className="flex justify-end mt-2">

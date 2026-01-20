@@ -150,12 +150,12 @@ const GameInfo = () => {
     if (!game) return <p>Loading...</p>;
     return (
         <div className = "base-background">
-            <div className = "flex-1 p-6 overflow-y-auto">
-                <div className = "grid grid-cols-[200px_1fr] gap-8 pt-12">
+            <div className = "flex-1 p-6 overflow-y-auto ml-5 mr-5">
+                <div className = "grid grid-cols-[275px_1fr] gap-10 pt-12">
                     <div className = "space-y-4 pt-4 items-center">
                         <RandomColor constant><h1 className = "text-3xl font-main-title">{game.game_title}</h1></RandomColor>
                         {game.cover_artwork_link ? (
-                            <img src = {game.cover_artwork_link} alt = {game.game_title} className = "w-48 mt-4 rounded-lg outline-4 outline-white"/>
+                            <img src = {game.cover_artwork_link} alt = {game.game_title} className = "w-70 mt-4 rounded-lg outline-4 outline-white"/>
                         ) : (
                             <img src = "/images/missing.jpg" alt = "Missing" className = "w-48 mt-4 rounded-lg outline-4 outline-white"/>
                         )}

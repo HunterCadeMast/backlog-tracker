@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from django.db.models import Sum
 from collections import Counter, defaultdict
+from accounts.models import CustomUser
 from profiles.models import Profiles, APIKeys
 from games.models import Games
 from logs.models import Logs
@@ -144,6 +145,7 @@ class FavoriteGameSerializer(serializers.ModelSerializer):
         fields = ['id', 'igdb_id', 'game_title', 'cover_artwork_link',]
 
 class ProfilesSerializer(ProfileStatisticsMixin, serializers.ModelSerializer):
+    username = serializers.CharField(source = 'user.username')
     profile_photo = serializers.ImageField(use_url = True)
     profile_photo_url = serializers.SerializerMethodField()
     logs = serializers.SerializerMethodField()
@@ -153,7 +155,7 @@ class ProfilesSerializer(ProfileStatisticsMixin, serializers.ModelSerializer):
 
     class Meta:
         model = Profiles
-        fields = ['id', 'user', 'display_name', 'profile_photo', 'profile_photo_url', 'private_profile', 'website_theme', 'bio', 'logs', 'favorite_game', 'favorite_game_id', 'favorite_developer', 'favorite_publisher', 'favorite_genre', 'favorite_platform', 'favorite_franchise', 'favorite_series', 'playstyle', 'statistics']
+        fields = ['id', 'user', 'username', 'profile_photo', 'profile_photo_url', 'private_profile', 'website_theme', 'bio', 'logs', 'favorite_game', 'favorite_game_id', 'favorite_developer', 'favorite_publisher', 'favorite_genre', 'favorite_platform', 'favorite_franchise', 'favorite_series', 'playstyle', 'statistics']
         read_only_fields = ['id', 'user']
 
     def get_profile_photo_url(self, obj):
@@ -172,16 +174,23 @@ class ProfilesSerializer(ProfileStatisticsMixin, serializers.ModelSerializer):
         if not obj.favorite_game:
             return None
         return {'id': obj.favorite_game.id, 'igdb_id': obj.favorite_game.igdb_id, 'game_title': obj.favorite_game.game_title, 'cover_artwork_link': obj.favorite_game.cover_artwork_link,}
-    
+
     def update(self, instance, validated_data):
+        user_data = validated_data.pop('user', None)
+        if user_data and 'username' in user_data:
+            new_username = user_data['username']
+            if (CustomUser.objects.exclude(id = instance.user.id).filter(username = new_username).exists()):
+                raise serializers.ValidationError({'username': 'This username is already taken!'})
+            instance.user.username = new_username
+            instance.user.save()
         favorite_game_id = validated_data.pop('favorite_game_id', None)
         if favorite_game_id is None:
             instance.favorite_game = None
         elif isinstance(favorite_game_id, int):
             instance.favorite_game = Games.objects.get(igdb_id = favorite_game_id)
         else:
-            raise serializers.ValidationError({"favorite_game_id": "Must be an integer or null"})
-        instance.save()
+            raise serializers.ValidationError({'favorite_game_id': 'Must be an integer or null!'})
+        instance.user.save()
         return super().update(instance, validated_data)
 
 class UsersSerializer(ProfileStatisticsMixin, serializers.ModelSerializer):

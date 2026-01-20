@@ -26,17 +26,19 @@ class RegisterViewSet(APIView):
         verification_url = f'{settings.FRONTEND_URL}/email/verification/{user.id}/{token}'
         send_mail(subject = 'Verify your Email - Gaming Logjam', message = f'Verify your email using this link:\n{verification_url}', from_email = settings.DEFAULT_FROM_EMAIL, recipient_list = [user.email],)
         return Response({'message': 'Account created!'}, status = 201)
-    
+
 class LoginViewSet(APIView):
     authentication_classes = []
     permission_classes = [AllowAny]
 
     def post(self, request):
-        user = authenticate(email = request.data.get('email'), password = request.data.get('password'))
+        email = request.data.get('email')
+        password = request.data.get('password')
+        if not email or not password:
+            return Response({'non_field_errors': ['Email and password are required!']}, status = 400)
+        user = authenticate(email = email, password = password)
         if not user:
-            return Response({'error': 'Invalid credentials!'}, status = 401)
-        if not user.has_usable_password():
-            return Response({'error': 'OAuthentication users cannot login with password!'}, status = 403)
+            return Response({'non_field_errors': ['Invalid email or password!']}, status = 401)
         else:
             refresh_token = RefreshToken.for_user(user)
             return Response({'message': 'User logged in!', 'access': str(refresh_token.access_token), 'refresh': str(refresh_token), 'user': CustomUserSerializer(user).data,}, status = 200)
@@ -96,9 +98,9 @@ class PasswordChangeViewSet(APIView):
         if not current_password or not new_password or not new_password_confirm:
             return Response({'error': 'All fields need filled out!'}, status = 400)
         elif not request.user.check_password(current_password):
-            return Response({'error': 'Current password is incorrect!'}, status = 400)
+            return Response({'current_password': 'Current password is incorrect!'}, status = 400)
         elif new_password != new_password_confirm:
-            return Response({'error': 'New password does not match!'}, status = 400)
+            return Response({'confirm_password': 'Passwords do not match!'}, status = 400)
         else:
             request.user.set_password(new_password)
             request.user.save()
@@ -116,22 +118,22 @@ class EmailChangeViewSet(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
-        new_email = request.data.get("email")
-        current_password = request.data.get("current_password")
+        new_email = request.data.get('email')
+        current_password = request.data.get('current_password')
         user = request.user
         if not new_email or not current_password:
-            return Response({"error": "Need both password and email!"}, status = 400)
+            return Response({'error': 'Need both password and email!'}, status = 400)
         if not user.check_password(current_password):
-            return Response({"error": "Incorrect password!"}, status = 400)
+            return Response({'current_password': 'Incorrect password!'}, status = 400)
         if CustomUser.objects.filter(email = new_email).exclude(id = user.id).exists():
-            return Response({"error": "Already using that email address!"}, status = 400)
+            return Response({'email': 'Already using that email address!'}, status = 400)
         user.email = new_email
         user.is_email_verified = False
-        user.save(update_fields=["email", "is_email_verified"])
+        user.save(update_fields = ['email', 'is_email_verified'])
         token = token_generator.make_token(user)
         verification_url = f'{settings.FRONTEND_URL}/email/verification/{user.id}/{token}'
         send_mail(subject = 'Verify your Email - Gaming Logjam', message = f'Verify your email using this link:\n{verification_url}', from_email = settings.DEFAULT_FROM_EMAIL, recipient_list = [user.email],)
-        return Response({"message": "Email updated successfully!"}, status = 200)
+        return Response({'message': 'Email updated successfully!'}, status = 200)
     
 class PasswordResetViewSet(APIView):
     authentication_classes = []

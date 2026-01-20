@@ -5,18 +5,28 @@ export async function loginAction(formData: FormData) {
     const email = formData.get('email');
     const password = formData.get('password');
     if (!email || !password) {
-        throw new Error("Email and password are required!")
+        throw {non_field_errors: ["Email and password are required!"]};
     }
     try {
-        const loginResponse = await apiFetch("/authentication/login/", {
+        const loginResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/authentication/login/`, {
             method: "POST",
+            headers: {"Content-Type": "application/json"},
             body: JSON.stringify({email, password}),
         });
-        localStorage.setItem("access", loginResponse.access);
-        localStorage.setItem("refresh", loginResponse.refresh);
-        return loginResponse.user;
+        const data = await loginResponse.json();
+        if (!loginResponse.ok) {
+            throw data
+        }
+        localStorage.setItem("access", data.access);
+        localStorage.setItem("refresh", data.refresh);
+        return data.user;
     }
     catch (error: any) {
-        throw new Error(error?.error || "Login failed!")
+        if (error.non_field_errors) {
+            throw error;
+        }
+        else {
+            throw {non_field_errors: [error.error || error.detail || "Login failed!"]};
+        }
     }
 };

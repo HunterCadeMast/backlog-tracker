@@ -67,7 +67,6 @@ type LogType = {
 
 type ProfileTypes = {
     username: string;
-    display_name: string;
     bio: string;
     private_profile: boolean;
     profile_photo: string | null;
@@ -80,7 +79,6 @@ const Profile = () => {
     const router = useRouter();
     const [profile, setProfile] = useState<ProfileTypes>({
         username: "",
-        display_name: "",
         bio: "",
         private_profile: false,
         profile_photo: null,
@@ -98,7 +96,6 @@ const Profile = () => {
             const personal = await apiFetch("/profiles/personal/");
             setProfile({
                 username: authentication.username,
-                display_name: personal?.display_name ?? authentication.username,
                 bio: personal?.bio ?? "",
                 private_profile: personal?.private_profile ?? false,
                 profile_photo: personal?.profile_photo ?? null,
@@ -160,7 +157,7 @@ const Profile = () => {
             <div className = "base-background pl-5 pr-5 pt-20 overflow-x-hidden">
                 <div className = "grid grid-cols-[250px_1fr]">
                     <div className = "space-y-6 items-center flex flex-col">
-                        <RandomColor constant><h1 className="text-3xl font-main-title">{profile.display_name || profile.username}</h1></RandomColor>
+                        <RandomColor constant><h1 className="text-3xl font-main-title">{profile.username}</h1></RandomColor>
                         {profile.profile_photo && (<img src = {profile.profile_photo} alt = "Profile Photo" className = "w-48 h-48 rounded-full outline-4 outline-white object-cover" />)}
                         <RandomColor element = "bg"><button onClick={() => router.push("/profile/edit")} className = "btn bg-ui mt-4">Edit Profile</button></RandomColor>
                     </div>
@@ -173,44 +170,44 @@ const Profile = () => {
                                 <RandomColor element = "bg">
                                     <Link href = {`/games/${profile.favorite_game.igdb_id}`} className = "p-4 bg-ui rounded-lg outline-4 outline-white flex items-center gap-5 transition">
                                         {profile.favorite_game.cover_artwork_link ? (
-                                            <img src = {profile.favorite_game.cover_artwork_link} alt = {profile.favorite_game.game_title} className="w-30 rounded-lg outline-4 outline-white" />
+                                            <img src = {profile.favorite_game.cover_artwork_link} alt = {profile.favorite_game.game_title} className="w-50 rounded-lg outline-4 outline-white" />
                                         ) : (
-                                            <img src = "/images/missing.jpg" alt = "Missing" className = "w-30 rounded-lg outline-4 outline-white" />
+                                            <img src = "/images/missing.jpg" alt = "Missing" className = "w-50 rounded-lg outline-4 outline-white" />
                                         )}
                                         <div className = "flex-1">
-                                            <p className = "text-2xl font-main-title mb-3">{profile.favorite_game.game_title}</p>
-                                            <div className = "grid grid-cols-2 gap-x-8 gap-y-4">
+                                            <p className = "text-3xl font-main-title mb-3">{profile.favorite_game.game_title}</p>
+                                            <div className = "grid grid-cols-3 gap-x-8 gap-y-4 ml-10">
                                                 <div className = "space-y-3">
-                                                    <h1 className = "text-xl font-main-title">Status:</h1>
-                                                    <p className = "indent-5">{favoriteGameLog?.user_status}</p>
+                                                    <h1 className = "text-2xl font-main-title">Status:</h1>
+                                                    <p className = "indent-5 text-xl">{favoriteGameLog?.user_status}</p>
                                                     {favoriteGameLog?.user_rating !== null && (
                                                         <>
-                                                            <h1 className = "text-xl font-main-title">Rating:</h1>
-                                                            <p className = "indent-5">{favoriteGameLog?.user_rating}/10</p>
+                                                            <h1 className = "text-2xl font-main-title">Rating:</h1>
+                                                            <p className = "indent-5 text-xl">{favoriteGameLog?.user_rating}/10</p>
                                                         </>
                                                     )}
                                                     {favoriteGameLog?.user_playtime !== null && (
                                                         <>
-                                                            <h1 className = "text-xl font-main-title">Playtime:</h1>
-                                                            <p className = "indent-5">{favoriteGameLog?.user_playtime} Hours</p>
+                                                            <h1 className = "text-2xl font-main-title">Playtime:</h1>
+                                                            <p className = "indent-5 text-xl">{favoriteGameLog?.user_playtime} Hours</p>
                                                         </>
                                                     )}
                                                 </div>
                                                 <div className = "space-y-3">
                                                     {favoriteGameLog?.start_date && (
                                                         <>
-                                                            <h1 className = "text-xl font-main-title">Start Date:</h1>
-                                                            <p className = "indent-5">{favoriteGameLog?.start_date}</p>
+                                                            <h1 className = "text-2xl font-main-title">Start Date:</h1>
+                                                            <p className = "indent-5 text-xl">{favoriteGameLog?.start_date}</p>
                                                         </>
                                                     )}
                                                     {favoriteGameLog?.completion_date && (
                                                         <>
-                                                            <h1 className = "text-xl font-main-title">Completion Date:</h1>
-                                                            <p className = "indent-5">{favoriteGameLog?.completion_date}</p>
+                                                            <h1 className = "text-2xl font-main-title">Completion Date:</h1>
+                                                            <p className = "indent-5 text-xl">{favoriteGameLog?.completion_date}</p>
                                                         </>
                                                     )}
-                                                    <h1 className = "text-xl font-main-title">100% Completion:</h1>
-                                                    <p className = "indent-5">{favoriteGameLog?.full_completion ? "Yes" : "No"}</p>
+                                                    <h1 className = "text-2xl font-main-title">100% Completion:</h1>
+                                                    <p className = "indent-5 text-xl">{favoriteGameLog?.full_completion ? "Yes" : "No"}</p>
                                                 </div>
                                             </div>
                                         </div>

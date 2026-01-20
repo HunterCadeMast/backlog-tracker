@@ -8,7 +8,6 @@ import uuid
 class Profiles(models.Model):
     id = models.UUIDField(primary_key = True, default = uuid.uuid4, editable = False, null = False, blank = False)
     user = models.OneToOneField(CustomUser, on_delete = models.CASCADE)
-    display_name = models.CharField(max_length = 32, null = True, blank = True)
     profile_photo = models.ImageField(default = 'profile_pictures/default.jpg', upload_to = 'profile_pictures')
     private_profile = models.BooleanField(default = False, null = False, blank = False)
     THEME_TYPES = [('dark', 'Dark'), ('light', 'Light'), ('orange', 'Orange'), ('lemon', 'Lemon'), ('strawberry', 'Strawberry'), ('blueberry', 'Blueberry')]
@@ -28,8 +27,6 @@ class Profiles(models.Model):
         return self.user.username
     
     def save(self, *args, **kwargs):
-        if not self.display_name and self.user:
-            self.display_name = self.user.username
         super().save(*args, **kwargs)
         if self.profile_photo:
             image = Image.open(self.profile_photo.path)
