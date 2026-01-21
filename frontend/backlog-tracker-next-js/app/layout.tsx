@@ -14,6 +14,8 @@ const bebasNeue = Bebas_Neue({subsets: ["latin"], weight: "400", variable: "--fo
 const ptSerif = PT_Serif({subsets: ["latin"], weight: "400", variable: "--font-ptserif"});
 const sekuya = localFont({src: "./fonts/Sekuya-Regular.ttf", weight: "400", variable: "--font-sekuya"})
 
+export const dynamic = "force-dynamic";
+
 export default function RootLayout({children}: Readonly<{children: React.ReactNode;}>) {
   return (
     <html lang = "en" className = {`${bebasNeue.variable} ${ptSerif.variable} ${sekuya.variable}`}>
