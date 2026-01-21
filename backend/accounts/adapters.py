@@ -25,7 +25,7 @@ class AllAuthAdapter(DefaultSocialAccountAdapter):
 
     def save_user(self, request, sociallogin, form = None):
         user = super().save_user(request, sociallogin, form)
-        Profiles.objects.get_or_create(user = user, defaults = {'display_name': user.username, 'private_profile': False,},)
+        Profiles.objects.get_or_create(user = user, defaults = {'username': user.username, 'private_profile': False,},)
         return user
     
     def get_login_redirect_url(self, request, socialaccount = None):

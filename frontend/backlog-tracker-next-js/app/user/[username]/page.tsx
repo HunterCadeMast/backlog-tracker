@@ -1,6 +1,5 @@
 "use client";
 import { useEffect, useState } from "react";
-import { apiFetch } from "@/lib/api";
 import { ResponsiveContainer, Tooltip, Cell, Pie, PieChart, Bar, BarChart, XAxis, YAxis, CartesianGrid, Radar, RadarChart, PolarGrid, PolarAngleAxis, Line, LineChart } from "recharts";
 import { useRouter, useParams } from "next/navigation";
 import Link from "next/link";
@@ -67,7 +66,6 @@ type LogType = {
 
 type ProfileTypes = {
     username: string;
-    display_name: string;
     bio: string;
     private_profile: boolean;
     profile_photo: string | null;
@@ -83,7 +81,6 @@ const Users = () => {
     const [notFound, setNotFound] = useState(false);
     const [profile, setProfile] = useState<ProfileTypes>({
         username: "",
-        display_name: "",
         bio: "",
         private_profile: false,
         profile_photo: null,
@@ -110,7 +107,6 @@ const Users = () => {
                 }
                 setProfile({
                     username: data.username,
-                    display_name: data.display_name ?? data.username,
                     bio: data.bio ?? "",
                     private_profile: data.private_profile ?? false,
                     profile_photo: data.profile_photo ?? null,
@@ -192,7 +188,7 @@ const Users = () => {
             <div className = "base-background pl-5 pr-5 pt-20 overflow-x-hidden">
                 <div className = "grid grid-cols-[250px_1fr]">
                     <div className = "space-y-6 items-center flex flex-col">
-                        <RandomColor constant><h1 className="text-3xl font-main-title">{profile.display_name || profile.username}</h1></RandomColor>
+                        <RandomColor constant><h1 className="text-3xl font-main-title">{profile.username}</h1></RandomColor>
                         {profile.profile_photo && (<img src = {profile.profile_photo} alt = "Profile Photo" className = "w-48 h-48 rounded-full outline-4 outline-white object-cover" />)}
                     </div>
                     <div className = "space-y-4">

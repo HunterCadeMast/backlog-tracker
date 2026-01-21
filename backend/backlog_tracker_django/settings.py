@@ -28,9 +28,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.getenv("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['gaminglogjam.com', 'www.gaminglogjam.com']
 
 # Application definition
 
@@ -64,8 +64,8 @@ INSTALLED_APPS = [
 
 AUTH_USER_MODEL = 'accounts.CustomUser'
 
-LOGIN_REDIRECT_URL = 'http://localhost:3000/login/'
-LOGOUT_REDIRECT_URL = 'http://localhost:3000/'
+LOGIN_REDIRECT_URL = 'https://gaminglogjam.com/login/'
+LOGOUT_REDIRECT_URL = 'https://gaminglogjam.com/'
 
 SITE_ID = 1
 
@@ -142,7 +142,7 @@ API_KEY = {
 }
 
 CORS_ALLOWED_ORIGINS = [
-    "http://localhost:3000",
+    "https://gaminglogjam.com",
 ]
 
 CORS_ALLOW_CREDENTIALS = True
@@ -205,7 +205,7 @@ SOCIALACCOUNT_EMAIL_AUTHENTICATION_AUTO_CONNECT = True
 SOCIALACCOUNT_EMAIL_VERIFICATION = "none"
 SOCIALACCOUNT_ADAPTER = "accounts.adapters.AllAuthAdapter"
 
-FRONTEND_URL = 'http://localhost:3000'
+FRONTEND_URL = 'https://gaminglogjam.com'
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
@@ -233,8 +233,8 @@ IGDB_BASE_URL = 'https://api.igdb.com/v4'
 STEAM_API_KEY = os.getenv("STEAM_API_KEY")
 STEAM_OPENID_URL = 'https://steamcommunity.com/openid'
 
-CELERY_BROKER_URL = 'redis://127.0.0.1/:6379/2'
-CELERY_RESULT_BACKEND = 'redis://127.0.0.1/:6379/3'
+CELERY_BROKER_URL = 'redis://127.0.0.1:6379/2'
+CELERY_RESULT_BACKEND = 'redis://127.0.0.1:6379/3'
 CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_TASK_SERIALIZER = 'json'
@@ -276,6 +276,9 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
 STATIC_URL = 'static/'
+
+STATIC_ROOT = BASE_DIR / "staticfiles"
+MEDIA_ROOT = BASE_DIR / "mediafiles"
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
