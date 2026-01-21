@@ -78,7 +78,9 @@ type ProfileTypes = {
 
 const Users = () => {
     const router = useRouter();
-    const { username } = useParams();
+    const {username} = useParams();
+    const [loading, setLoading] = useState(true);
+    const [notFound, setNotFound] = useState(false);
     const [profile, setProfile] = useState<ProfileTypes>({
         username: "",
         display_name: "",
@@ -91,7 +93,21 @@ const Users = () => {
     useEffect(() => {
         const fetchProfile = async () => {
             try {
-                const data = await apiFetch(`/user/${username}/`);
+                const token = localStorage.getItem("access");
+                const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/user/${username}/`, {headers: token ? {Authorization: `Bearer ${token}`} : {},});
+                if (response.status === 404) {
+                    setNotFound(true);
+                    return;
+                }
+                if (response.status === 401) {
+                    setNotFound(true);
+                    return;
+                }
+                const data = await response.json();
+                if (data.private_profile && !token) {
+                    setNotFound(true);
+                    return;
+                }
                 setProfile({
                     username: data.username,
                     display_name: data.display_name ?? data.username,
@@ -102,21 +118,30 @@ const Users = () => {
                     statistics: data.statistics ?? null,
                     logs: data.logs ?? [],
                 });
-            } catch (error) {
-                router.push("/not-found");
+            }
+            catch (error) {
+                setNotFound(true);
+            }
+            finally {
+                setLoading(false);
             }
         };
         fetchProfile();
     }, [username]);
+    if (loading) return <h1>Loading...</h1>;
+    if (notFound) {
+        router.replace("/not-found");
+        return null;
+    }
+    if (!profile) return null;
     const statusData = profile.statistics
         ? [
-            { name: "Completed", value: profile.statistics.completed_games },
-            { name: "Playing", value: profile.statistics.playing_games },
-            { name: "Backlog", value: profile.statistics.backlog_games },
-            { name: "Dropped", value: profile.statistics.dropped_games },
-            { name: "Paused", value: profile.statistics.paused_games },
-        ]
-        : [];
+            {name: "Completed", value: profile.statistics.completed_games},
+            {name: "Playing", value: profile.statistics.playing_games},
+            {name: "Backlog", value: profile.statistics.backlog_games},
+            {name: "Dropped", value: profile.statistics.dropped_games},
+            {name: "Paused", value: profile.statistics.paused_games},
+        ] : [];
     const favoriteGameLog = profile.favorite_game ? (profile.logs ?? []).find(log => log.game.id === profile.favorite_game!.igdb_id) : null;
     const statisticColors = ["#EC4E20", "#FF9505", "#FC60A8", "#65DD65", "#5466EB"];
     const completionRate = profile.statistics ? Math.round((profile.statistics.completed_games / Math.max(profile.statistics.total_games, 1)) * 100) : 0;

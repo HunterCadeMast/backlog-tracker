@@ -8,8 +8,15 @@ const EmailVerification = () => {
     const [status, setStatus] = useState<"loading" | "success" | "error">("loading");
     const [message, setMessage] = useState("");
     useEffect(() => {
+        const key = `email_verified_${id}_${token}`;
+        if (localStorage.getItem(key)) {
+            setStatus("success");
+            setMessage("Email already verified!");
+            return;
+        }
         apiFetch(`/authentication/email/verification/${id}/${token}/`)
             .then(response => {
+                localStorage.setItem(key, "true");
                 setMessage(response.message);
                 setStatus("success");
             })

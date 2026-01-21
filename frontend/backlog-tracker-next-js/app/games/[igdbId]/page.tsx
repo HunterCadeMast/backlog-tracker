@@ -6,11 +6,17 @@ import RandomColor from "../../components/RandomColor";
 const GameInfo = () => {
     const router = useRouter();
     const {igdbId} = useParams();
+    const [authenticated, setAuthenticated] = useState(false);
     const [game, setGame] = useState<any>(null);
     const [log, setLog] = useState<any>(null);
     const [favorite, setFavorite] = useState(false);
     const [editing, setEditing] = useState(false);
     const [editFields, setEditFields] = useState<any>({});
+    const today = new Date().toISOString().split("T")[0];
+    useEffect(() => {
+        const token = localStorage.getItem("access");
+        setAuthenticated(!!token);
+    }, []);
     useEffect(() => {
         if (!igdbId) return;
         fetch(`${process.env.NEXT_PUBLIC_API_URL}/games/${igdbId}/`)
@@ -61,6 +67,10 @@ const GameInfo = () => {
     };
     const addLog = async () => {
         const token = localStorage.getItem("access");
+        if (!token) {
+            router.push("/login");
+            return;
+        }
         const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/logs/backlog/`, {method: "POST", headers: {"Content-Type": "application/json", Authorization: `Bearer ${token}`,}, body: JSON.stringify({game_id: igdbId, user_status: "backlog"}),});
         if (response.ok) {
             const data = await response.json();
@@ -96,24 +106,40 @@ const GameInfo = () => {
         if (!log?.id) return;
         const token = localStorage.getItem("access");
         const updates: any = {};
+        if (editFields.start_date && editFields.start_date > today) {
+            alert("Start date cannot be in the future!");
+            return;
+        }
+        if (editFields.completion_date && editFields.completion_date > today) {
+            alert("Completion date cannot be in the future!");
+            return;
+        }
+        if (editFields.start_date && editFields.completion_date && editFields.completion_date < editFields.start_date) {
+            alert("Completion date cannot be before the start date!");
+            return;
+        }
+        if (editFields.user_rating !== "" && (editFields.user_rating < 0 || editFields.user_rating > 10)) {
+            alert("Rating must be between 0 and 10!");
+            return;
+        }
         if (editFields.user_status) {
             updates.user_status = editFields.user_status;
-       }
+        }
         if (editFields.user_rating !== "") {
-            updates.user_rating = Number(editFields.user_rating);
-       }
+            updates.user_rating = parseInt(editFields.user_rating, 10);
+        }
+        if (editFields.user_playtime !== "") {
+            updates.user_playtime = parseInt(editFields.user_playtime, 10);
+        }
         if (editFields.user_review !== "") {
             updates.user_review = editFields.user_review;
-       }
-        if (editFields.user_playtime !== "") {
-            updates.user_playtime = Number(editFields.user_playtime);
-       }
+        }
         if (editFields.start_date !== "") {
             updates.start_date = editFields.start_date;
-       }
+        }
         if (editFields.completion_date !== "") {
             updates.completion_date = editFields.completion_date;
-       }
+        }
         updates.full_completion = editFields.full_completion;
         try {
             const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/logs/${log.id}/`, {method: "PATCH", headers: {"Content-Type": "application/json", Authorization: `Bearer ${token}`,}, body: JSON.stringify(updates),});
@@ -133,16 +159,16 @@ const GameInfo = () => {
     if (!game) return <p>Loading...</p>;
     return (
         <div className = "base-background">
-            <div className = "flex-1 p-6 overflow-y-auto">
-                <div className = "grid grid-cols-[200px_1fr] gap-8 pt-12">
+            <div className = "flex-1 p-6 overflow-y-auto ml-5 mr-5">
+                <div className = "grid grid-cols-[275px_1fr] gap-10 pt-12">
                     <div className = "space-y-4 pt-4 items-center">
                         <RandomColor constant><h1 className = "text-3xl font-main-title">{game.game_title}</h1></RandomColor>
                         {game.cover_artwork_link ? (
-                            <img src = {game.cover_artwork_link} alt = {game.game_title} className = "w-48 mt-4 rounded-lg outline-4 outline-white"/>
+                            <img src = {game.cover_artwork_link} alt = {game.game_title} className = "w-70 mt-4 rounded-lg outline-4 outline-white"/>
                         ) : (
                             <img src = "/images/missing.jpg" alt = "Missing" className = "w-48 mt-4 rounded-lg outline-4 outline-white"/>
                         )}
-                        {!log && (<RandomColor element = "bg"><button className = "btn mt-6 bg-ui" onClick = {addLog}>Add to Backlog</button></RandomColor>)}
+                        {authenticated && !log && (<RandomColor element = "bg"><button className = "btn mt-6 bg-ui" onClick = {addLog}>Add to Backlog</button></RandomColor>)}
                     </div>
                     <div className = "space-y-4">
                         <p className = "break-up-line"></p>
@@ -206,15 +232,15 @@ const GameInfo = () => {
                                 <option value = "backlog">Backlog</option>
                                 <option value = "dropped">Dropped</option>
                             </select>
-                            <input type = "number" min = {0} max = {10} placeholder = "Rating (1 - 10)" value = {editFields.user_rating} onChange = {(x) => setEditFields({ ...editFields, user_rating: x.target.value })} className = "btn bg-ui col-span-2" />
-                            <input type = "number" min = {0} placeholder = "Total Hours Played" value = {editFields.user_playtime} onChange = {(x) => setEditFields({ ...editFields, user_playtime: x.target.value })} className = "btn bg-ui col-span-2" />
-                            <input type = "date" value = {editFields.start_date} onChange = {(x) => setEditFields({ ...editFields, start_date: x.target.value })} className = "btn bg-ui col-span-2" />
-                            <input type = "date" value = {editFields.completion_date} onChange = {(x) => setEditFields({ ...editFields, completion_date: x.target.value })} className = "btn bg-ui col-span-2" />
+                            <input type = "number" step = {1} inputMode = "numeric" pattern = "[0-9]*" min = {0} max = {10} placeholder = "Rating (1 - 10)" value = {editFields.user_rating} onChange = {(x) => setEditFields({...editFields, user_rating: x.target.value.replace(/\D/g, "")})} className = "btn bg-ui col-span-2" />
+                            <input type = "number" step = {1} inputMode = "numeric" pattern = "[0-9]*" min = {0} placeholder = "Total Hours Played" value = {editFields.user_playtime} onChange = {(x) => setEditFields({...editFields, user_playtime: x.target.value.replace(/\D/g, "")})} className = "btn bg-ui col-span-2" />
+                            <input type = "date" max = {today} value = {editFields.start_date} onChange = {(x) => setEditFields({...editFields, start_date: x.target.value})} className = "btn bg-ui col-span-2" />
+                            <input type = "date" max = {today} min = {editFields.start_date || undefined} value = {editFields.completion_date} onChange = {(x) => setEditFields({...editFields, completion_date: x.target.value})} className = "btn bg-ui col-span-2" />
                             <label className = "flex items-center gap-2 col-span-2 text-white">
-                                <input type = "checkbox" checked = {editFields.full_completion} onChange = {(x) => setEditFields({ ...editFields, full_completion: x.target.checked })} className = "w-4 h-4" />
+                                <input type = "checkbox" checked = {editFields.full_completion} onChange = {(x) => setEditFields({...editFields, full_completion: x.target.checked})} className = "w-4 h-4" />
                                 100% Completion
                             </label>
-                            <textarea placeholder = "Review" value = {editFields.user_review} onChange = {(x) => setEditFields({ ...editFields, user_review: x.target.value })} className = "btn bg-ui col-span-6 min-h-37.5 resize-y" />
+                            <textarea placeholder = "Review" value = {editFields.user_review} onChange = {(x) => setEditFields({...editFields, user_review: x.target.value})} className = "btn bg-ui col-span-6 min-h-37.5 resize-y" />
                             <div className = "col-span-6 flex justify-between items-center mt-2">
                                 <RandomColor element = "bg"><button onClick = {toggleFavorite} className = "btn bg-ui">{favorite ? "Unfavorite Game" : "Set as Favorite"}</button></RandomColor>
                                 <div className = "flex gap-3">

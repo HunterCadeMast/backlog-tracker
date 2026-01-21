@@ -15,18 +15,32 @@ class CustomUserSerializer(serializers.ModelSerializer):
             'password': {'write_only': True},
         }
 
+    def validate(self, data):
+        if not data.get('accepted_terms') or not data.get('accepted_privacy'):
+            raise serializers.ValidationError('You must accept the Terms and Privacy Policy to create an account.')
+        return data
+    
+    def validate_username(self, value):
+        if CustomUser.objects.filter(username = value).exists():
+            raise serializers.ValidationError("This username is already in use!")
+        return value
+    
+    def validate_email(self, value):
+        if CustomUser.objects.filter(email = value).exists():
+            raise serializers.ValidationError("This email is already in use!")
+        return value
+
     def create(self, validated_data):
         password = validated_data.pop('password')
-        accepted_terms = validated_data.pop('accepted_terms')
-        accepted_privacy = validated_data.pop('accepted_privacy')
+        username = validated_data.get('username')
+        email = validated_data.get('email')
+        if CustomUser.objects.filter(username__iexact = username).exists():
+            raise serializers.ValidationError({'username': ['This username is already in use!']})
+        if CustomUser.objects.filter(email__iexact = email).exists():
+            raise serializers.ValidationError({'email': ['This email is already in use!']})
         user = CustomUser(**validated_data)
         user.set_password(password)
-        user.accepted_terms = accepted_terms
-        user.accepted_privacy = accepted_privacy
-        if not accepted_terms or not accepted_privacy:
-            raise serializers.ValidationError('You must accept the Terms and Privacy Policy to create an account!')
-        if accepted_terms and accepted_privacy:
-            user.accepted_terms_and_privacy_timestamp = timezone.now()
+        user.accepted_terms_and_privacy_timestamp = timezone.now()
         user.save()
         return user
 

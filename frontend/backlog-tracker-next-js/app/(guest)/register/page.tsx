@@ -1,29 +1,34 @@
 "use client";
 import { useState } from "react";
 import { registerAction } from "./action";
-import OAuthenticationButtons from "../components/oauthentication/";
-import RandomColor from "../components/RandomColor";
+import { useRouter } from "next/navigation";
+import OAuthenticationButtons from "../../components/oauthentication/";
+import RandomColor from "../../components/RandomColor";
 
 const Register = () => {
+    const router = useRouter();
     const [username, setUsername] = useState("");
     const [email, setEmail] = useState("");
     const [password1, setPassword1] = useState("");
     const [password2, setPassword2] = useState("");
     const [acceptedPrivacy, setAcceptedPrivacy] = useState(false);
     const [acceptedTerms, setAcceptedTerms] = useState(false);
-    const [error, setError] = useState("");
+    const [success, setSuccess] = useState("");
+    const [error, setError] = useState<Record<string, string[]>>({});
     const handleSubmit = async (event: React.FormEvent) => {
         event.preventDefault();
-        setError("");
+        setError({});
         try {
             const formData = new FormData(event.target as HTMLFormElement);
             formData.append("accepted_privacy", acceptedPrivacy.toString());
             formData.append("accepted_terms", acceptedTerms.toString());
             await registerAction(formData);
+            setSuccess("Successfully registered! Please login...");
+            setTimeout(() => {router.push("/login");}, 1500);
         }
         catch (caughtError: any) {
-            setError(caughtError?.password1?.[0] || caughtError?.password2?.[0] || caughtError?.email?.[0] || caughtError?.username?.[0] || caughtError?.detail?.[0] || "Registration failed!");
-        }
+            setError(caughtError);
+        };
     };
     return (
         <>
@@ -31,7 +36,11 @@ const Register = () => {
                 <div className = "flex flex-col items-center gap-6">
                     <form onSubmit = {handleSubmit} className = "w-90 p-8 rounded-2xl shadow-2xl bg-ui">
                         <h1 className = "text-7xl text-white font-log-title mb-3">Register</h1>
-                        {error && <p className = "text-3xl text-red-500 font-log-title mb-5">{error}</p>}
+                        {success && (<p className = "text-3xl text-white font-log-title mb-5">{success}</p>)}
+                        {(() => {
+                            const firstErrorKey = ['non_field_errors', 'username', 'email', 'password2'].find(key => error[key] && error[key].length > 0);
+                            return firstErrorKey ? (<p className = "text-3xl text-red-500 font-log-title mb-5">{error[firstErrorKey][0]}</p>) : null;
+                        })()}
                         <input type = "username" name = "username" value = {username} onChange = {exception => setUsername(exception.target.value)} placeholder = "Username" className = "input-element" required/>
                         <input type = "email" name = "email" value = {email} onChange = {exception => setEmail(exception.target.value)} placeholder = "Email" className = "input-element" required/>
                         <input type = "password" name = "password1" value = {password1} onChange = {exception => setPassword1(exception.target.value)} placeholder = "Password" className = "input-element" required/>

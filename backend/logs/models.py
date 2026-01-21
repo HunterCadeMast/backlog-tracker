@@ -27,7 +27,10 @@ class Logs(models.Model):
         ]
 
     def __str__(self):
-        return f"{self.user.username} logged {self.game_id.game_title} on {self.platform_id.label}"
+        username = self.user.username if self.user else "Unknown User"
+        game = self.game_id.game_title if self.game_id else "Unknown Game"
+        platform = self.platform_id.label if self.platform_id else "Unknown Platform"
+        return f"{username} logged {game} on {platform}"
     
 class LogSessions(models.Model):
     id = models.UUIDField(primary_key = True, default = uuid.uuid4, editable = False, null = False, blank = False)

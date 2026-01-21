@@ -10,6 +10,8 @@ from django.contrib.auth.password_validation import validate_password
 from django.core.mail import send_mail
 from django.db import transaction
 from django.conf import settings
+from django.utils.timezone import now
+from datetime import timedelta
 from accounts.models import CustomUser
 from accounts.serializers import CustomUserSerializer
 from profiles.models import Profiles
@@ -26,17 +28,19 @@ class RegisterViewSet(APIView):
         verification_url = f'{settings.FRONTEND_URL}/email/verification/{user.id}/{token}'
         send_mail(subject = 'Verify your Email - Gaming Logjam', message = f'Verify your email using this link:\n{verification_url}', from_email = settings.DEFAULT_FROM_EMAIL, recipient_list = [user.email],)
         return Response({'message': 'Account created!'}, status = 201)
-    
+
 class LoginViewSet(APIView):
     authentication_classes = []
     permission_classes = [AllowAny]
 
     def post(self, request):
-        user = authenticate(email = request.data.get('email'), password = request.data.get('password'))
+        email = request.data.get('email')
+        password = request.data.get('password')
+        if not email or not password:
+            return Response({'non_field_errors': ['Email and password are required!']}, status = 400)
+        user = authenticate(email = email, password = password)
         if not user:
-            return Response({'error': 'Invalid credentials!'}, status = 401)
-        if not user.has_usable_password():
-            return Response({'error': 'OAuthentication users cannot login with password!'}, status = 403)
+            return Response({'non_field_errors': ['Invalid email or password!']}, status = 401)
         else:
             refresh_token = RefreshToken.for_user(user)
             return Response({'message': 'User logged in!', 'access': str(refresh_token.access_token), 'refresh': str(refresh_token), 'user': CustomUserSerializer(user).data,}, status = 200)
@@ -90,15 +94,29 @@ class PasswordChangeViewSet(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
+        user = request.user
         current_password = request.data.get('current_password')
         new_password = request.data.get('new_password')
         new_password_confirm = request.data.get('new_password_confirm')
-        if not current_password or not new_password or not new_password_confirm:
+        if not user.has_usable_password():
+            if not new_password or not new_password_confirm:
+                return Response({'error': 'Password fields required!'}, status = 400)
+            if new_password != new_password_confirm:
+                return Response({'confirm_password': 'Passwords do not match!'}, status = 400)
+            validate_password(new_password, user)
+            user.set_password(new_password)
+            user.save(update_fields = ["password"])
+            return Response({'message': 'Password set successfully!'}, status = 200)
+        if not new_password or not new_password_confirm:
+            return Response({'error': 'All fields need filled out!'}, status = 400)
+        if new_password != new_password_confirm:
+            return Response({'confirm_password': 'Passwords do not match!'}, status = 400)
+        if not current_password:
             return Response({'error': 'All fields need filled out!'}, status = 400)
         elif not request.user.check_password(current_password):
-            return Response({'error': 'Current password is incorrect!'}, status = 400)
+            return Response({'current_password': 'Current password is incorrect!'}, status = 400)
         elif new_password != new_password_confirm:
-            return Response({'error': 'New password does not match!'}, status = 400)
+            return Response({'confirm_password': 'Passwords do not match!'}, status = 400)
         else:
             request.user.set_password(new_password)
             request.user.save()
@@ -116,22 +134,25 @@ class EmailChangeViewSet(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
-        new_email = request.data.get("email")
-        current_password = request.data.get("current_password")
+        new_email = request.data.get('email')
+        current_password = request.data.get('current_password')
         user = request.user
-        if not new_email or not current_password:
-            return Response({"error": "Need both password and email!"}, status = 400)
-        if not user.check_password(current_password):
-            return Response({"error": "Incorrect password!"}, status = 400)
+        if not new_email:
+            return Response({'error': 'Need both password and email!'}, status = 400)
+        if user.has_usable_password():
+            if not current_password:
+                return Response({'current_password': 'Password required!'}, status = 400)
+            if not user.check_password(current_password):
+                return Response({'current_password': 'Incorrect password!'}, status = 400)
         if CustomUser.objects.filter(email = new_email).exclude(id = user.id).exists():
-            return Response({"error": "Already using that email address!"}, status = 400)
+            return Response({'email': 'Already using that email address!'}, status = 400)
         user.email = new_email
         user.is_email_verified = False
-        user.save(update_fields=["email", "is_email_verified"])
+        user.save(update_fields = ['email', 'is_email_verified'])
         token = token_generator.make_token(user)
         verification_url = f'{settings.FRONTEND_URL}/email/verification/{user.id}/{token}'
         send_mail(subject = 'Verify your Email - Gaming Logjam', message = f'Verify your email using this link:\n{verification_url}', from_email = settings.DEFAULT_FROM_EMAIL, recipient_list = [user.email],)
-        return Response({"message": "Email updated successfully!"}, status = 200)
+        return Response({'message': 'Email updated successfully!'}, status = 200)
     
 class PasswordResetViewSet(APIView):
     authentication_classes = []
@@ -144,6 +165,8 @@ class PasswordResetViewSet(APIView):
         user = CustomUser.objects.filter(email = email).first()
         if not user:
             return Response({'error': 'User not found!'}, status = 404)
+        if user.password_reset_timestamp and now() - user.password_reset_timestamp < timedelta(minutes = 5):
+            return Response({'error': 'Password reset cooldown of 5 minutes!'}, status = 429)
         token = token_generator.make_token(user)
         password_reset_url = f'{settings.FRONTEND_URL}/password/reset/{user.id}/{token}'
         send_mail(
@@ -152,8 +175,9 @@ class PasswordResetViewSet(APIView):
             from_email = settings.DEFAULT_FROM_EMAIL,
             recipient_list = [user.email],
         )
+        user.password_reset_timestamp = now()
+        user.save(update_fields = ['password_reset_timestamp'])
         return Response({'message': 'If the email exists, password reset email sent!'}, status = 200)
-    
 
 class PasswordResetConfirmationViewSet(APIView):
     authentication_classes = []
@@ -175,7 +199,9 @@ class PasswordResetConfirmationViewSet(APIView):
                 {'error': 'Token invalid or expired!'}, status = 400)
         validate_password(new_password, user)
         user.set_password(new_password)
-        user.save()
+        user.password_reset_timestamp = None
+        user.password_reset_completed_timestamp = now()
+        user.save(update_fields = ['password', 'password_reset_timestamp', 'password_reset_completed_timestamp'])
         return Response({'message': 'Password reset successfully!'}, status = 200)
     
 class EmailVerificationViewSet(APIView):
@@ -192,9 +218,9 @@ class EmailVerificationViewSet(APIView):
         if user.is_email_verified:
             return Response({'message': 'Email already verified!'}, status = 200)
         user.is_email_verified = True
-        user.save(update_fields = ['is_email_verified'])
+        user.email_verification_timestamp = now()
+        user.save(update_fields = ['is_email_verified', 'email_verification_timestamp'])
         return Response({'message': 'Email verified!'}, status = 200)
-    
 
 class AccountDeletionViewSet(APIView):
     authentication_classes = [JWTAuthentication]
@@ -212,13 +238,13 @@ class OAuthenticationViewSet(APIView):
     permission_classes = [AllowAny]
 
     def get(self, request):
-        profile = Profiles.objects.get_or_create(user = request.user)
+        profile, _ = Profiles.objects.get_or_create(user = request.user)
         user_info = CustomUserSerializer(request.user).data
         refresh_token = RefreshToken.for_user(request.user)
-        return Response({'message': 'OAuthentication account created successfully!', 'user': user_info, 'profile_id': profile.id, 'providers': list(request.user.socialaccount_set.values_list('provider', flat = True)), 'access': str(refresh_token.access_token), 'refresh': str(refresh_token),}, status = 200,)
+        return Response({'message': 'OAuthentication account created successfully!', 'user': user_info, 'profile_id': profile.id, 'providers': list(request.user.socialaccount_set.values_list('provider', flat = True)), 'access': str(refresh_token.access_token), 'refresh': str(refresh_token),}, status = 200)
     
 class UnlinkAccountViewSet(APIView):
-    authentication_classes = []
+    authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
@@ -232,4 +258,4 @@ class UnlinkAccountViewSet(APIView):
             if not deleted_account:
                 return Response({'error': 'No linked provider!'}, status = 404)
             else:
-                return Response({'message': 'Unlinked accounts successfully!'}, status = 200)
+                return Response({'message': 'Unlinked accounts successfully!', 'has_password': request.user.has_usable_password(), 'providers': list(request.user.socialaccount_set.values_list('provider', flat = True))}, status = 200)
