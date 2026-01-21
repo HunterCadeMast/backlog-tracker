@@ -94,10 +94,24 @@ class PasswordChangeViewSet(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
+        user = request.user
         current_password = request.data.get('current_password')
         new_password = request.data.get('new_password')
         new_password_confirm = request.data.get('new_password_confirm')
-        if not current_password or not new_password or not new_password_confirm:
+        if not user.has_usable_password():
+            if not new_password or not new_password_confirm:
+                return Response({'error': 'Password fields required!'}, status = 400)
+            if new_password != new_password_confirm:
+                return Response({'confirm_password': 'Passwords do not match!'}, status = 400)
+            validate_password(new_password, user)
+            user.set_password(new_password)
+            user.save(update_fields = ["password"])
+            return Response({'message': 'Password set successfully!'}, status = 200)
+        if not new_password or not new_password_confirm:
+            return Response({'error': 'All fields need filled out!'}, status = 400)
+        if new_password != new_password_confirm:
+            return Response({'confirm_password': 'Passwords do not match!'}, status = 400)
+        if not current_password:
             return Response({'error': 'All fields need filled out!'}, status = 400)
         elif not request.user.check_password(current_password):
             return Response({'current_password': 'Current password is incorrect!'}, status = 400)
@@ -123,10 +137,13 @@ class EmailChangeViewSet(APIView):
         new_email = request.data.get('email')
         current_password = request.data.get('current_password')
         user = request.user
-        if not new_email or not current_password:
+        if not new_email:
             return Response({'error': 'Need both password and email!'}, status = 400)
-        if not user.check_password(current_password):
-            return Response({'current_password': 'Incorrect password!'}, status = 400)
+        if user.has_usable_password():
+            if not current_password:
+                return Response({'current_password': 'Password required!'}, status = 400)
+            if not user.check_password(current_password):
+                return Response({'current_password': 'Incorrect password!'}, status = 400)
         if CustomUser.objects.filter(email = new_email).exclude(id = user.id).exists():
             return Response({'email': 'Already using that email address!'}, status = 400)
         user.email = new_email
@@ -221,13 +238,13 @@ class OAuthenticationViewSet(APIView):
     permission_classes = [AllowAny]
 
     def get(self, request):
-        profile = Profiles.objects.get_or_create(user = request.user)
+        profile, _ = Profiles.objects.get_or_create(user = request.user)
         user_info = CustomUserSerializer(request.user).data
         refresh_token = RefreshToken.for_user(request.user)
-        return Response({'message': 'OAuthentication account created successfully!', 'user': user_info, 'profile_id': profile.id, 'providers': list(request.user.socialaccount_set.values_list('provider', flat = True)), 'access': str(refresh_token.access_token), 'refresh': str(refresh_token),}, status = 200,)
+        return Response({'message': 'OAuthentication account created successfully!', 'user': user_info, 'profile_id': profile.id, 'providers': list(request.user.socialaccount_set.values_list('provider', flat = True)), 'access': str(refresh_token.access_token), 'refresh': str(refresh_token),}, status = 200)
     
 class UnlinkAccountViewSet(APIView):
-    authentication_classes = []
+    authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
@@ -241,4 +258,4 @@ class UnlinkAccountViewSet(APIView):
             if not deleted_account:
                 return Response({'error': 'No linked provider!'}, status = 404)
             else:
-                return Response({'message': 'Unlinked accounts successfully!'}, status = 200)
+                return Response({'message': 'Unlinked accounts successfully!', 'has_password': request.user.has_usable_password(), 'providers': list(request.user.socialaccount_set.values_list('provider', flat = True))}, status = 200)

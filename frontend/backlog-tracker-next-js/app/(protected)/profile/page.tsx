@@ -155,11 +155,13 @@ const Profile = () => {
     else {
         return (
             <div className = "base-background pl-5 pr-5 pt-20 overflow-x-hidden">
+                <div className = "mb-5 text-left">
+                    <RandomColor constant><h1 className = "text-3xl font-main-title">{profile.username}</h1></RandomColor>
+                </div>
                 <div className = "grid grid-cols-[250px_1fr]">
                     <div className = "space-y-6 items-center flex flex-col">
-                        <RandomColor constant><h1 className="text-3xl font-main-title">{profile.username}</h1></RandomColor>
                         {profile.profile_photo && (<img src = {profile.profile_photo} alt = "Profile Photo" className = "w-48 h-48 rounded-full outline-4 outline-white object-cover" />)}
-                        <RandomColor element = "bg"><button onClick={() => router.push("/profile/edit")} className = "btn bg-ui mt-4">Edit Profile</button></RandomColor>
+                        <RandomColor element = "bg"><button onClick = {() => router.push("/profile/edit")} className = "btn bg-ui mt-4">Edit Profile</button></RandomColor>
                     </div>
                     <div className = "space-y-4">
                         <SectionHeader title = "Bio" /><p className = "indent-5 text-xl">{profile.bio || "No bio provided..."}</p>

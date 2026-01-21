@@ -146,6 +146,8 @@ class FavoriteGameSerializer(serializers.ModelSerializer):
 
 class ProfilesSerializer(ProfileStatisticsMixin, serializers.ModelSerializer):
     username = serializers.CharField(source = 'user.username')
+    has_password = serializers.SerializerMethodField()
+    providers = serializers.SerializerMethodField()
     profile_photo = serializers.ImageField(use_url = True)
     profile_photo_url = serializers.SerializerMethodField()
     logs = serializers.SerializerMethodField()
@@ -155,9 +157,15 @@ class ProfilesSerializer(ProfileStatisticsMixin, serializers.ModelSerializer):
 
     class Meta:
         model = Profiles
-        fields = ['id', 'user', 'username', 'profile_photo', 'profile_photo_url', 'private_profile', 'website_theme', 'bio', 'logs', 'favorite_game', 'favorite_game_id', 'favorite_developer', 'favorite_publisher', 'favorite_genre', 'favorite_platform', 'favorite_franchise', 'favorite_series', 'playstyle', 'statistics']
+        fields = ['id', 'user', 'username', 'has_password', 'providers', 'profile_photo', 'profile_photo_url', 'private_profile', 'website_theme', 'bio', 'logs', 'favorite_game', 'favorite_game_id', 'favorite_developer', 'favorite_publisher', 'favorite_genre', 'favorite_platform', 'favorite_franchise', 'favorite_series', 'playstyle', 'statistics']
         read_only_fields = ['id', 'user']
 
+    def get_has_password(self, obj):
+        return obj.user.has_usable_password()
+
+    def get_providers(self, obj):
+        return list(obj.user.socialaccount_set.values_list('provider', flat = True))
+    
     def get_profile_photo_url(self, obj):
         request = self.context.get('request')
         if obj.profile_photo and request:
