@@ -1,5 +1,4 @@
 "use client";
-import { apiFetch } from "@/lib/api";
 
 export async function loginAction(formData: FormData) {
     const email = formData.get('email');

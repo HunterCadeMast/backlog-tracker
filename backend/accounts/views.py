@@ -10,6 +10,8 @@ from django.contrib.auth.password_validation import validate_password
 from django.core.mail import send_mail
 from django.db import transaction
 from django.conf import settings
+from django.utils.timezone import now
+from datetime import timedelta
 from accounts.models import CustomUser
 from accounts.serializers import CustomUserSerializer
 from profiles.models import Profiles
@@ -146,6 +148,8 @@ class PasswordResetViewSet(APIView):
         user = CustomUser.objects.filter(email = email).first()
         if not user:
             return Response({'error': 'User not found!'}, status = 404)
+        if user.password_reset_timestamp and now() - user.password_reset_timestamp < timedelta(minutes = 5):
+            return Response({'error': 'Password reset cooldown of 5 minutes!'}, status = 429)
         token = token_generator.make_token(user)
         password_reset_url = f'{settings.FRONTEND_URL}/password/reset/{user.id}/{token}'
         send_mail(
@@ -154,8 +158,9 @@ class PasswordResetViewSet(APIView):
             from_email = settings.DEFAULT_FROM_EMAIL,
             recipient_list = [user.email],
         )
+        user.password_reset_timestamp = now()
+        user.save(update_fields = ['password_reset_timestamp'])
         return Response({'message': 'If the email exists, password reset email sent!'}, status = 200)
-    
 
 class PasswordResetConfirmationViewSet(APIView):
     authentication_classes = []
@@ -177,7 +182,9 @@ class PasswordResetConfirmationViewSet(APIView):
                 {'error': 'Token invalid or expired!'}, status = 400)
         validate_password(new_password, user)
         user.set_password(new_password)
-        user.save()
+        user.password_reset_timestamp = None
+        user.password_reset_completed_timestamp = now()
+        user.save(update_fields = ['password', 'password_reset_timestamp', 'password_reset_completed_timestamp'])
         return Response({'message': 'Password reset successfully!'}, status = 200)
     
 class EmailVerificationViewSet(APIView):
@@ -194,9 +201,9 @@ class EmailVerificationViewSet(APIView):
         if user.is_email_verified:
             return Response({'message': 'Email already verified!'}, status = 200)
         user.is_email_verified = True
-        user.save(update_fields = ['is_email_verified'])
+        user.email_verification_timestamp = now()
+        user.save(update_fields = ['is_email_verified', 'email_verification_timestamp'])
         return Response({'message': 'Email verified!'}, status = 200)
-    
 
 class AccountDeletionViewSet(APIView):
     authentication_classes = [JWTAuthentication]

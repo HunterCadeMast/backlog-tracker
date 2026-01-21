@@ -2,8 +2,8 @@
 import { useState } from "react";
 import { registerAction } from "./action";
 import { useRouter } from "next/navigation";
-import OAuthenticationButtons from "../components/oauthentication/";
-import RandomColor from "../components/RandomColor";
+import OAuthenticationButtons from "../../components/oauthentication/";
+import RandomColor from "../../components/RandomColor";
 
 const Register = () => {
     const router = useRouter();
@@ -39,7 +39,7 @@ const Register = () => {
                         {success && (<p className = "text-3xl text-white font-log-title mb-5">{success}</p>)}
                         {(() => {
                             const firstErrorKey = ['non_field_errors', 'username', 'email', 'password2'].find(key => error[key] && error[key].length > 0);
-                            return firstErrorKey ? (<p className="text-3xl text-red-500 font-log-title mb-5">{error[firstErrorKey][0]}</p>) : null;
+                            return firstErrorKey ? (<p className = "text-3xl text-red-500 font-log-title mb-5">{error[firstErrorKey][0]}</p>) : null;
                         })()}
                         <input type = "username" name = "username" value = {username} onChange = {exception => setUsername(exception.target.value)} placeholder = "Username" className = "input-element" required/>
                         <input type = "email" name = "email" value = {email} onChange = {exception => setEmail(exception.target.value)} placeholder = "Email" className = "input-element" required/>

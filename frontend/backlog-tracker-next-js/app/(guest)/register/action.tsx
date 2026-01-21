@@ -1,5 +1,4 @@
 "use client";
-import { apiFetch } from "@/lib/api";
 
 export async function registerAction(formData: FormData) {
     const username = formData.get('username');

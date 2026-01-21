@@ -6,12 +6,17 @@ import RandomColor from "../../components/RandomColor";
 const GameInfo = () => {
     const router = useRouter();
     const {igdbId} = useParams();
+    const [authenticated, setAuthenticated] = useState(false);
     const [game, setGame] = useState<any>(null);
     const [log, setLog] = useState<any>(null);
     const [favorite, setFavorite] = useState(false);
     const [editing, setEditing] = useState(false);
     const [editFields, setEditFields] = useState<any>({});
     const today = new Date().toISOString().split("T")[0];
+    useEffect(() => {
+        const token = localStorage.getItem("access");
+        setAuthenticated(!!token);
+    }, []);
     useEffect(() => {
         if (!igdbId) return;
         fetch(`${process.env.NEXT_PUBLIC_API_URL}/games/${igdbId}/`)
@@ -62,6 +67,10 @@ const GameInfo = () => {
     };
     const addLog = async () => {
         const token = localStorage.getItem("access");
+        if (!token) {
+            router.push("/login");
+            return;
+        }
         const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/logs/backlog/`, {method: "POST", headers: {"Content-Type": "application/json", Authorization: `Bearer ${token}`,}, body: JSON.stringify({game_id: igdbId, user_status: "backlog"}),});
         if (response.ok) {
             const data = await response.json();
@@ -159,7 +168,7 @@ const GameInfo = () => {
                         ) : (
                             <img src = "/images/missing.jpg" alt = "Missing" className = "w-48 mt-4 rounded-lg outline-4 outline-white"/>
                         )}
-                        {!log && (<RandomColor element = "bg"><button className = "btn mt-6 bg-ui" onClick = {addLog}>Add to Backlog</button></RandomColor>)}
+                        {authenticated && !log && (<RandomColor element = "bg"><button className = "btn mt-6 bg-ui" onClick = {addLog}>Add to Backlog</button></RandomColor>)}
                     </div>
                     <div className = "space-y-4">
                         <p className = "break-up-line"></p>

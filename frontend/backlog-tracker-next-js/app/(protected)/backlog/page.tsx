@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import RandomColor from "../components/RandomColor";
+import RandomColor from "../../components/RandomColor";
 
 const STATUS_ORDER = ["playing", "paused", "completed", "backlog", "dropped"];
 
@@ -47,7 +47,7 @@ const Backlog = () => {
     });
     return (
         <div className = "bg-main-compliment p-16 min-h-screen">
-            <div className = "fixed pt-5 top-29 left-0 right-0 z-50 px-16 pb-3 flex flex-wrap gap-4 items-center bg-main-compliment">
+            <div className = "fixed pt-5 top-29 left-0 right-0 z-25 px-16 pb-3 flex flex-wrap gap-4 items-center bg-main-compliment">
                 <h1 className = "text-3xl font-main-title w-full">Backlog</h1>
                 <input type = "text" placeholder = "Search games..." name = "games" value = {filters.games} onChange = {handleFilterChange} className = "btn px-3 py-2 bg-ui" />
                 <select name = "sort_user_logs" value = {filters.sort_user_logs} onChange = {handleFilterChange} className = "btn px-3 py-2 bg-ui">

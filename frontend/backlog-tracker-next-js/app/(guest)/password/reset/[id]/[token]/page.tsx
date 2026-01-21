@@ -2,7 +2,7 @@
 import { apiFetch } from "@/lib/api";
 import { useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import RandomColor from "../../../../components/RandomColor";
+import RandomColor from "../../../../../components/RandomColor";
 
 const PasswordResetConfirmPassword = () => {
     const router = useRouter();
@@ -18,10 +18,22 @@ const PasswordResetConfirmPassword = () => {
             setError("Passwords do not match!");
             return;
         }
+        const key = `password_reset_${id}_${token}`;
+        if (localStorage.getItem(key)) {
+            setError("This password reset link has already been used!");
+            return;
+        }
         try {
-            await apiFetch(`/authentication/password/reset/${id}/${token}/`, {method: "POST", body: JSON.stringify({new_password: newPassword, new_password_confirm: confirmPassword}),});
-            setMessage("Password reset!");
-            setTimeout(() => router.push("/login"), 2000);
+            await apiFetch(`/authentication/password/reset/${id}/${token}/`, {
+                method: "POST",
+                body: JSON.stringify({
+                    new_password: newPassword,
+                    new_password_confirm: confirmPassword,
+                }),
+            });
+            localStorage.setItem(key, "true");
+            setMessage("Password reset! Please login again...");
+            setTimeout(() => router.replace("/login"), 2000);
         }
         catch (error: any) {
             setError(error.message || "Password reset failed!");
