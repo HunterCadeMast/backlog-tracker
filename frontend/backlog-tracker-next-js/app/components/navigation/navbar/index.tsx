@@ -2,7 +2,7 @@
 import { useRouter } from "next/navigation";
 import Link from "next/link"
 import Image from "next/image";
-import { useAuthentication } from "@/src/lib/authentication";
+import { useAuthentication } from "../../../../src/lib/authentication";
 import SearchBar from "../../search/searchbar";
 import RandomColor from "../../RandomColor";
 

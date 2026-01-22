@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
-import { apiFetch } from "@/src/lib/api";
+import { apiFetch } from "../../../../../src/lib/api";
 import { useParams } from "next/navigation";
 
 const EmailVerification = () => {

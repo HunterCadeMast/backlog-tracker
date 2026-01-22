@@ -1,7 +1,7 @@
 "use client";
 import { useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useAuthentication } from "@/src/lib/authentication";
+import { useAuthentication } from "../../../../src/lib/authentication";
 
 const OAuthCallback = () => {
     const router = useRouter();
