@@ -1,8 +1,8 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { apiFetch } from "../../../../src/lib/api";
-import RandomColor from "../../../components/RandomColor";
+import { apiFetch } from "@/lib/api";
+import RandomColor from "@/components/RandomColor";
 
 const ProfileEdit = () => {
     const router = useRouter();

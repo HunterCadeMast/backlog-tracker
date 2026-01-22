@@ -1,5 +1,5 @@
 "use client";
-import RandomColor from "./components/RandomColor";
+import RandomColor from "../components/RandomColor";
 
 const Home = () => {
   return (

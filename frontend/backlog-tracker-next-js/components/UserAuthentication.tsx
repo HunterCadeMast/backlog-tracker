@@ -1,7 +1,7 @@
 "use client";
 import {useEffect} from "react";
 import {useRouter, usePathname} from "next/navigation";
-import {useAuthentication} from "../../src/lib/authentication";
+import {useAuthentication} from "@/lib/authentication";
 
 const UserAuthentication = ({children}: {children: React.ReactNode}) => {
     const {user, loading} = useAuthentication();

@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { ResponsiveContainer, Tooltip, Cell, Pie, PieChart, Bar, BarChart, XAxis, YAxis, CartesianGrid, Radar, RadarChart, PolarGrid, PolarAngleAxis, Line, LineChart } from "recharts";
 import { useRouter, useParams } from "next/navigation";
 import Link from "next/link";
-import RandomColor from "../../components/RandomColor";
+import RandomColor from "@/components/RandomColor";
 
 type FavoriteTypes = {
     id: number;

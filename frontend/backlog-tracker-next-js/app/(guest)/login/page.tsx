@@ -2,10 +2,10 @@
 import { useState } from "react";
 import { loginAction } from "./action";
 import { useRouter } from "next/navigation";
-import { useAuthentication } from "../../../src/lib/authentication";
+import { useAuthentication } from "@/lib/authentication";
 import Link from "next/link";
-import OAuthenticationButtons from "../../components/oauthentication";
-import RandomColor from "../../components/RandomColor";
+import OAuthenticationButtons from "@/components/oauthentication";
+import RandomColor from "@/components/RandomColor";
 
 const Login = () => {
     const router = useRouter();

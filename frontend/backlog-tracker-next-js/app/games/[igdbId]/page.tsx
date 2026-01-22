@@ -1,7 +1,7 @@
 "use client";
 import {useEffect, useState} from "react";
 import {useParams, useRouter} from "next/navigation";
-import RandomColor from "../../components/RandomColor";
+import RandomColor from "@/components/RandomColor";
 
 const GameInfo = () => {
     const router = useRouter();

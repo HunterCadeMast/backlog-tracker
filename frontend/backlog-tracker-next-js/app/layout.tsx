@@ -2,8 +2,8 @@ import type {Metadata} from "next";
 import {Bebas_Neue, PT_Serif} from "next/font/google"
 import localFont from "next/font/local"
 import "./globals.css";
-import ClientProvider from "./components/ClientProvider";
-import RandomColor from "./components/RandomColor";
+import ClientProvider from "../components/ClientProvider";
+import RandomColor from "../components/RandomColor";
 
 export const metadata: Metadata = {
   title: "Gaming Logjam - Backlog Tracker",

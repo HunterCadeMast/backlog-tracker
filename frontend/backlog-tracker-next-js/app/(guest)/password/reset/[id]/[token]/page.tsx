@@ -1,8 +1,8 @@
 "use client";
-import { apiFetch } from "../../../../../../src/lib/api";
+import { apiFetch } from "@/lib/api";
 import { useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import RandomColor from "../../../../../components/RandomColor";
+import RandomColor from "@/components/RandomColor";
 
 const PasswordResetConfirmPassword = () => {
     const router = useRouter();

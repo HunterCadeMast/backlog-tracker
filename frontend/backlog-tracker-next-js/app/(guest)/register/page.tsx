@@ -2,8 +2,8 @@
 import { useState } from "react";
 import { registerAction } from "./action";
 import { useRouter } from "next/navigation";
-import OAuthenticationButtons from "../../components/oauthentication";
-import RandomColor from "../../components/RandomColor";
+import OAuthenticationButtons from "@/components/oauthentication";
+import RandomColor from "@/components/RandomColor";
 
 const Register = () => {
     const router = useRouter();

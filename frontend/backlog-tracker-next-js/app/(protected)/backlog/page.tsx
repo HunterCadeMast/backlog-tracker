@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import RandomColor from "../../components/RandomColor";
+import RandomColor from "@/components/RandomColor";
 
 const STATUS_ORDER = ["playing", "paused", "completed", "backlog", "dropped"];
 
