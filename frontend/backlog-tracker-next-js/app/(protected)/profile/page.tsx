@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
-import { apiFetch } from "@/lib/api";
+import { apiFetch } from "@/src/lib/api";
 import { ResponsiveContainer, Tooltip, Cell, Pie, PieChart, Bar, BarChart, XAxis, YAxis, CartesianGrid, Radar, RadarChart, PolarGrid, PolarAngleAxis, Line, LineChart } from "recharts";
 import { useRouter } from "next/navigation";
 import Link from "next/link";

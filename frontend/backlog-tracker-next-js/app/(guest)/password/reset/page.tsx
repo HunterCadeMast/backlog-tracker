@@ -1,5 +1,5 @@
 "use client";
-import { apiFetch } from "@/lib/api";
+import { apiFetch } from "@/src/lib/api";
 import { useState } from "react";
 import RandomColor from "../../../components/RandomColor";
 
