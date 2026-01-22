@@ -14,6 +14,7 @@ from pathlib import Path
 from dotenv import load_dotenv
 from datetime import timedelta
 from celery.schedules import crontab
+from urllib.parse import urlparse
 import os
 
 load_dotenv()
@@ -161,16 +162,31 @@ MEDIA_ROOT = BASE_DIR / "media"
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.postgresql",
-        "HOST": os.getenv("PGSQL_Host"),
-        "USER": os.getenv("PGSQL_User"),
-        "NAME": os.getenv("PGSQL_Name"),
-        "PASSWORD": os.getenv("PGSQL_Pass"),
-        "PORT": os.getenv("PGSQL_Port"),
+DATABASE_URL = os.environ.get("DATABASE_URL")
+
+if DATABASE_URL:
+    result = urlparse(DATABASE_URL)
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': result.path[1:],
+            'USER': result.username,
+            'PASSWORD': result.password,
+            'HOST': result.hostname,
+            'PORT': result.port or 5432,
+        }
     }
-}
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': 'backlog',
+            'USER': 'postgres',
+            'PASSWORD': 'postgres',
+            'HOST': 'localhost',
+            'PORT': '5432',
+        }
+    }
 
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
