@@ -2,6 +2,8 @@ from django.db import models
 from django.utils import timezone
 from accounts.models import CustomUser
 from games.models import Games
+from io import BytesIO
+from django.core.files.base import ContentFile
 from PIL import Image
 import uuid
 
@@ -27,12 +29,15 @@ class Profiles(models.Model):
         return self.user.username
     
     def save(self, *args, **kwargs):
-        super().save(*args, **kwargs)
         if self.profile_photo:
-            image = Image.open(self.profile_photo.path)
-            if image.height > 300 or image.width > 300:
-                image.thumbnail((300, 300))
-                image.save(self.profile_photo.path)
+            img = Image.open(self.profile_photo)
+            img = img.convert("RGB")
+            img.thumbnail((300, 300))
+            buffer = BytesIO()
+            img.save(buffer, format = "JPEG", quality = 85)
+            buffer.seek(0)
+            self.profile_photo.save(self.profile_photo.name, ContentFile(buffer.read()), save = False,)
+        super().save(*args, **kwargs)
     
 class APIKeys(models.Model):
     id = models.UUIDField(primary_key = True, default = uuid.uuid4, editable = False, null = False, blank = False)

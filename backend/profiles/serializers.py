@@ -168,10 +168,9 @@ class ProfilesSerializer(ProfileStatisticsMixin, serializers.ModelSerializer):
         return list(obj.user.socialaccount_set.values_list('provider', flat = True))
     
     def get_profile_photo_url(self, obj):
-        request = self.context.get('request')
-        if obj.profile_photo and obj.profile_photo.name != 'profile_pictures/default.jpg':
-            return request.build_absolute_uri(obj.profile_photo.url)
-        return request.build_absolute_uri(static('profile_pictures/default.jpg'))
+        if obj.profile_photo:
+            return obj.profile_photo.url
+        return static('profile_pictures/default.jpg')
     
     def get_logs(self, obj):
         return LogsSerializer(Logs.objects.filter(user = obj.user), many = True).data

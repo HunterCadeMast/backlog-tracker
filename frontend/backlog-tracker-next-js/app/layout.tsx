@@ -7,11 +7,7 @@ import RandomColor from "../components/RandomColor";
 
 export const metadata: Metadata = {
   title: "Gaming Logjam - Backlog Tracker",
-  description: "Track your video game backlog with UI and terminal interface",
-  icons: {
-    icon: "/favicon.ico",
-    apple: "/favicon.ico",
-  },
+  description: "Track your video game backlog!",
 };
 
 const bebasNeue = Bebas_Neue({subsets: ["latin"], weight: "400", variable: "--font-bebasneue"});
