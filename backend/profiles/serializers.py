@@ -169,7 +169,7 @@ class ProfilesSerializer(ProfileStatisticsMixin, serializers.ModelSerializer):
     
     def get_profile_photo_url(self, obj):
         request = self.context.get('request')
-        if obj.profile_photo and request:
+        if obj.profile_photo and obj.profile_photo.name != 'profile_pictures/default.jpg':
             return request.build_absolute_uri(obj.profile_photo.url)
         return request.build_absolute_uri(static('profile_pictures/default.jpg'))
     
