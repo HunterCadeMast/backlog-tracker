@@ -31,9 +31,6 @@ class Profiles(models.Model):
 
     def __str__(self):
         return self.user.username
-    
-    MAX_TOTAL_BYTES = 10 * 1024 * 1024 * 1024
-    MAX_OBJECTS = 10000
 
     def save(self, *args, **kwargs):
         if self.profile_photo:
@@ -44,12 +41,6 @@ class Profiles(models.Model):
             img.save(buffer, format = "JPEG", quality = 85)
             buffer.seek(0)
             self.profile_photo.save(self.profile_photo.name, ContentFile(buffer.read()), save = False,)
-        session = boto3.session.Session()
-        s3 = session.client('s3', endpoint_url = settings.AWS_S3_ENDPOINT_URL, aws_access_key_id = settings.AWS_ACCESS_KEY_ID, aws_secret_access_key = settings.AWS_SECRET_ACCESS_KEY)
-        response = s3.list_objects_v2(Bucket = settings.AWS_STORAGE_BUCKET_NAME, Prefix = 'profile_pictures/')
-        object_count = response.get('KeyCount', 0)
-        if object_count >= self.MAX_OBJECTS:
-            raise ValidationError(f"Cannot upload new profile photo! Storage has reached {self.MAX_OBJECTS} files in profile_pictures/ folder!")
         super().save(*args, **kwargs)
     
 class APIKeys(models.Model):
