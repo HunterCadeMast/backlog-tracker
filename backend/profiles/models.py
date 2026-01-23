@@ -31,6 +31,9 @@ class Profiles(models.Model):
 
     def __str__(self):
         return self.user.username
+    
+    MAX_TOTAL_BYTES = 10 * 1024 * 1024 * 1024
+    MAX_OBJECTS = 10000
 
     def save(self, *args, **kwargs):
         if self.profile_photo:
