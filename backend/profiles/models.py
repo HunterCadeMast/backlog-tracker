@@ -41,7 +41,7 @@ class Profiles(models.Model):
             img.save(buffer, format = fmt, quality = 85)
             buffer.seek(0)
             ext = fmt.lower()
-            filename = f"profile_pictures/{uuid.uuid4().hex}.{ext}"
+            filename = f"{uuid.uuid4().hex}.{ext}"
             self.profile_photo.save(filename, ContentFile(buffer.read()), save = False)
         super().save(*args, **kwargs)
     
