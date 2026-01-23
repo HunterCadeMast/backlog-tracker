@@ -35,12 +35,14 @@ class Profiles(models.Model):
     def save(self, *args, **kwargs):
         if self.profile_photo:
             img = Image.open(self.profile_photo)
-            img = img.convert("RGB")
             img.thumbnail((300, 300))
             buffer = BytesIO()
-            img.save(buffer, format = "JPEG", quality = 85)
+            fmt = img.format if img.format in ['JPEG', 'PNG', 'WEBP'] else 'JPEG'
+            img.save(buffer, format = fmt, quality = 85)
             buffer.seek(0)
-            self.profile_photo.save(self.profile_photo.name, ContentFile(buffer.read()), save = False,)
+            ext = fmt.lower()
+            filename = f"profile_pictures/{uuid.uuid4().hex}.{ext}"
+            self.profile_photo.save(filename, ContentFile(buffer.read()), save = False)
         super().save(*args, **kwargs)
     
 class APIKeys(models.Model):
