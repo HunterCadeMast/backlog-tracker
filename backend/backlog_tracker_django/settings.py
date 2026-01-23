@@ -54,7 +54,6 @@ INSTALLED_APPS = [
     'allauth.socialaccount.providers.github',
     'django_celery_beat',
     'corsheaders',
-    'storages',
     'accounts',
     'games',
     'profiles',
@@ -71,6 +70,8 @@ LOGIN_REDIRECT_URL = 'https://gaminglogjam.com/login/'
 LOGOUT_REDIRECT_URL = 'https://gaminglogjam.com/'
 
 SITE_ID = 1
+
+ACCOUNT_DEFAULT_HTTP_PROTOCOL = "https"
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -162,8 +163,8 @@ CORS_ALLOW_CREDENTIALS = True
 
 WSGI_APPLICATION = 'backlog_tracker_django.wsgi.application'
 
-MEDIA_URL = "/media/"
-MEDIA_ROOT = BASE_DIR / "media"
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+SECURE_SSL_REDIRECT = True
 
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
