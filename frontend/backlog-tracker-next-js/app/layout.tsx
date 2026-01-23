@@ -1,5 +1,4 @@
 import type {Metadata} from "next";
-import Head from "next/head";
 import {Bebas_Neue, PT_Serif} from "next/font/google"
 import localFont from "next/font/local"
 import "./globals.css";
@@ -9,6 +8,10 @@ import RandomColor from "../components/RandomColor";
 export const metadata: Metadata = {
   title: "Gaming Logjam - Backlog Tracker",
   description: "Track your video game backlog with UI and terminal interface",
+  icons: {
+    icon: "/favicon.ico",
+    apple: "/favicon.ico",
+  },
 };
 
 const bebasNeue = Bebas_Neue({subsets: ["latin"], weight: "400", variable: "--font-bebasneue"});
@@ -20,7 +23,6 @@ export const dynamic = "force-dynamic";
 export default function RootLayout({children}: Readonly<{children: React.ReactNode;}>) {
   return (
     <html lang = "en" className = {`${bebasNeue.variable} ${ptSerif.variable} ${sekuya.variable}`}>
-      <Head><link rel = "icon" href = "/favicon.ico" /></Head>
       <body>
         <ClientProvider>
         <main className = "pt-16 h-screen flex flex-col">
