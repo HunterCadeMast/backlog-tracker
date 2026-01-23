@@ -62,7 +62,7 @@ class Profiles(models.Model):
     MAX_OBJECTS = 10000
 
     def save(self, *args, **kwargs):
-        if self.profile_photo and getattr(self.profile_photo, 'file', None):
+        if self.profile_photo and getattr(self.profile_photo.file, 'file', None) and not self._state.adding:
             object_count = self.get_r2_object_count()
             if object_count >= self.MAX_OBJECTS:
                 raise ValidationError(f"Cannot upload new profile photo! Storage has reached {self.MAX_OBJECTS} files!")
@@ -70,6 +70,7 @@ class Profiles(models.Model):
             total_size = self.get_r2_total_size()
             if total_size + new_file_size > self.MAX_TOTAL_BYTES:
                 raise ValidationError("Cannot upload new profile photo! Storage would exceed 10GB!")
+            self.profile_photo.open()
             img = Image.open(self.profile_photo)
             img = img.convert("RGB")
             img.thumbnail((300, 300))
