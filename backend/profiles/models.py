@@ -5,7 +5,11 @@ from games.models import Games
 from io import BytesIO
 from django.core.files.base import ContentFile
 from PIL import Image
+from django.core.exceptions import ValidationError
+import os
 import uuid
+import boto3
+from django.conf import settings
 
 class Profiles(models.Model):
     id = models.UUIDField(primary_key = True, default = uuid.uuid4, editable = False, null = False, blank = False)
@@ -27,8 +31,44 @@ class Profiles(models.Model):
 
     def __str__(self):
         return self.user.username
+
+    @staticmethod
+    def get_r2_object_count():
+        session = boto3.session.Session()
+        s3 = session.client('s3', endpoint_url = settings.AWS_S3_ENDPOINT_URL, aws_access_key_id = settings.AWS_ACCESS_KEY_ID, aws_secret_access_key = settings.AWS_SECRET_ACCESS_KEY)
+        response = s3.list_objects_v2(Bucket = settings.AWS_STORAGE_BUCKET_NAME)
+        return response.get('KeyCount', 0)
+
+    @staticmethod
+    def get_r2_total_size():
+        session = boto3.session.Session()
+        s3 = session.client('s3', endpoint_url = settings.AWS_S3_ENDPOINT_URL, aws_access_key_id = settings.AWS_ACCESS_KEY_ID, aws_secret_access_key = settings.AWS_SECRET_ACCESS_KEY)
+        total_size = 0
+        continuation_token = None
+        while True:
+            if continuation_token:
+                response = s3.list_objects_v2(Bucket = settings.AWS_STORAGE_BUCKET_NAME, ContinuationToken = continuation_token)
+            else:
+                response = s3.list_objects_v2(Bucket = settings.AWS_STORAGE_BUCKET_NAME)
+            for obj in response.get('Contents', []):
+                total_size += obj['Size']
+            if response.get('IsTruncated'):
+                continuation_token = response.get('NextContinuationToken')
+            else:
+                break
+        return total_size
     
+    MAX_TOTAL_BYTES = 10 * 1024 * 1024 * 1024
+    MAX_OBJECTS = 10000
+
     def save(self, *args, **kwargs):
+        object_count = self.get_r2_object_count()
+        if object_count >= self.MAX_OBJECTS:
+            raise ValidationError(f"Cannot upload new profile photo! Storage has reached {self.MAX_OBJECTS} files!")
+        new_file_size = self.profile_photo.size if self.profile_photo else 0
+        total_size = self.get_r2_total_size()
+        if total_size + new_file_size > self.MAX_TOTAL_BYTES:
+            raise ValidationError("Cannot upload new profile photo! Storage would exceed 10GB!")
         if self.profile_photo:
             img = Image.open(self.profile_photo)
             img = img.convert("RGB")
@@ -36,7 +76,7 @@ class Profiles(models.Model):
             buffer = BytesIO()
             img.save(buffer, format = "JPEG", quality = 85)
             buffer.seek(0)
-            self.profile_photo.save(self.profile_photo.name, ContentFile(buffer.read()), save = False,)
+            self.profile_photo.save(self.profile_photo.name, ContentFile(buffer.read()), save = False)
         super().save(*args, **kwargs)
     
 class APIKeys(models.Model):
@@ -50,4 +90,4 @@ class APIKeys(models.Model):
     expired = models.BooleanField(default = False, null = False, blank = False)
 
     def __str__(self):
-        return f"{self.profile_id.username}\'s API Keys"
+        return f"{self.profile_id.username}'s API Keys"
