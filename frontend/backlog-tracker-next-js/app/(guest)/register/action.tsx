@@ -21,7 +21,7 @@ export async function registerAction(formData: FormData) {
         if (!registerResponse.ok) {
             throw data
         }
-        return data.user;
+        return data;
     }
     catch (error: any) {
         if (error.username || error.email || error.password2 || error.non_field_errors) {

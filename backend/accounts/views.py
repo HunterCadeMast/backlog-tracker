@@ -15,6 +15,7 @@ from datetime import timedelta
 from accounts.models import CustomUser
 from accounts.serializers import CustomUserSerializer
 from profiles.models import Profiles
+import logging
 
 class RegisterViewSet(APIView):
     authentication_classes = []
@@ -24,9 +25,12 @@ class RegisterViewSet(APIView):
         serializer = CustomUserSerializer(data = request.data)
         serializer.is_valid(raise_exception = True)
         user = serializer.save()
-        token = token_generator.make_token(user)
-        verification_url = f'{settings.FRONTEND_URL}/email/verification/{user.id}/{token}'
-        send_mail(subject = 'Verify your Email - Gaming Logjam', message = f'Verify your email using this link:\n{verification_url}', from_email = settings.DEFAULT_FROM_EMAIL, recipient_list = [user.email],)
+        try:
+            token = token_generator.make_token(user)
+            verification_url = f'{settings.FRONTEND_URL}/email/verification/{user.id}/{token}'
+            send_mail(subject = 'Verify your Email - Gaming Logjam', message = f'Verify your email using this link:\n{verification_url}', from_email = settings.DEFAULT_FROM_EMAIL, recipient_list = [user.email],)
+        except Exception as error:
+            logging.getLogger(__name__).error(f"Email failed for user {user.id}! {error}!")
         return Response({'message': 'Account created!'}, status = 201)
 
 class LoginViewSet(APIView):
@@ -149,9 +153,12 @@ class EmailChangeViewSet(APIView):
         user.email = new_email
         user.is_email_verified = False
         user.save(update_fields = ['email', 'is_email_verified'])
-        token = token_generator.make_token(user)
-        verification_url = f'{settings.FRONTEND_URL}/email/verification/{user.id}/{token}'
-        send_mail(subject = 'Verify your Email - Gaming Logjam', message = f'Verify your email using this link:\n{verification_url}', from_email = settings.DEFAULT_FROM_EMAIL, recipient_list = [user.email],)
+        try:
+            token = token_generator.make_token(user)
+            verification_url = f'{settings.FRONTEND_URL}/email/verification/{user.id}/{token}'
+            send_mail(subject = 'Verify your Email - Gaming Logjam', message = f'Verify your email using this link:\n{verification_url}', from_email = settings.DEFAULT_FROM_EMAIL, recipient_list = [user.email],)
+        except Exception as error:
+            logging.getLogger(__name__).error(f"Email failed for user {user.id}! {error}!")
         return Response({'message': 'Email updated successfully!'}, status = 200)
     
 class PasswordResetViewSet(APIView):
@@ -167,14 +174,12 @@ class PasswordResetViewSet(APIView):
             return Response({'error': 'User not found!'}, status = 404)
         if user.password_reset_timestamp and now() - user.password_reset_timestamp < timedelta(minutes = 5):
             return Response({'error': 'Password reset cooldown of 5 minutes!'}, status = 429)
-        token = token_generator.make_token(user)
-        password_reset_url = f'{settings.FRONTEND_URL}/password/reset/{user.id}/{token}'
-        send_mail(
-            subject = 'Reset Password - Gaming Logjam',
-            message = f'Reset your password using this link:\n{password_reset_url}',
-            from_email = settings.DEFAULT_FROM_EMAIL,
-            recipient_list = [user.email],
-        )
+        try:
+            token = token_generator.make_token(user)
+            password_reset_url = f'{settings.FRONTEND_URL}/password/reset/{user.id}/{token}'
+            send_mail(subject = 'Reset Password - Gaming Logjam', message = f'Reset your password using this link:\n{password_reset_url}', from_email = settings.DEFAULT_FROM_EMAIL, recipient_list = [user.email],)
+        except Exception as error:
+            logging.getLogger(__name__).error(f"Email failed for user {user.id}! {error}!")
         user.password_reset_timestamp = now()
         user.save(update_fields = ['password_reset_timestamp'])
         return Response({'message': 'If the email exists, password reset email sent!'}, status = 200)
