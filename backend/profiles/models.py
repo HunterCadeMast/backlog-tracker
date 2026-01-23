@@ -31,32 +31,6 @@ class Profiles(models.Model):
 
     def __str__(self):
         return self.user.username
-
-    @staticmethod
-    def get_r2_object_count():
-        session = boto3.session.Session()
-        s3 = session.client('s3', endpoint_url = settings.AWS_S3_ENDPOINT_URL, aws_access_key_id = settings.AWS_ACCESS_KEY_ID, aws_secret_access_key = settings.AWS_SECRET_ACCESS_KEY)
-        response = s3.list_objects_v2(Bucket = settings.AWS_STORAGE_BUCKET_NAME)
-        return response.get('KeyCount', 0)
-
-    @staticmethod
-    def get_r2_total_size():
-        session = boto3.session.Session()
-        s3 = session.client('s3', endpoint_url = settings.AWS_S3_ENDPOINT_URL, aws_access_key_id = settings.AWS_ACCESS_KEY_ID, aws_secret_access_key = settings.AWS_SECRET_ACCESS_KEY)
-        total_size = 0
-        continuation_token = None
-        while True:
-            if continuation_token:
-                response = s3.list_objects_v2(Bucket = settings.AWS_STORAGE_BUCKET_NAME, ContinuationToken = continuation_token)
-            else:
-                response = s3.list_objects_v2(Bucket = settings.AWS_STORAGE_BUCKET_NAME)
-            for obj in response.get('Contents', []):
-                total_size += obj['Size']
-            if response.get('IsTruncated'):
-                continuation_token = response.get('NextContinuationToken')
-            else:
-                break
-        return total_size
     
     MAX_TOTAL_BYTES = 10 * 1024 * 1024 * 1024
     MAX_OBJECTS = 10000
@@ -73,13 +47,28 @@ class Profiles(models.Model):
                 self.profile_photo.save(self.profile_photo.name, ContentFile(buffer.read()), save = False,)
             except Exception as error:
                 raise ValidationError(f"Error processing profile photo! {error}!")
-        object_count = self.get_r2_object_count()
+        session = boto3.session.Session()
+        s3 = session.client('s3', endpoint_url = settings.AWS_S3_ENDPOINT_URL, aws_access_key_id = settings.AWS_ACCESS_KEY_ID, aws_secret_access_key = settings.AWS_SECRET_ACCESS_KEY)
+        response = s3.list_objects_v2(Bucket = settings.AWS_STORAGE_BUCKET_NAME, Prefix = 'profile_pictures/')
+        object_count = response.get('KeyCount', 0)
         if object_count >= self.MAX_OBJECTS:
-            raise ValidationError(f"Cannot upload new profile photo! Storage has reached {self.MAX_OBJECTS} files!")
+            raise ValidationError(f"Cannot upload new profile photo! Storage has reached {self.MAX_OBJECTS} files in profile_pictures/ folder!")
+        total_size = 0
+        continuation_token = None
+        while True:
+            if continuation_token:
+                response = s3.list_objects_v2(Bucket = settings.AWS_STORAGE_BUCKET_NAME, Prefix = 'profile_pictures/', ContinuationToken = continuation_token)
+            else:
+                response = s3.list_objects_v2(Bucket = settings.AWS_STORAGE_BUCKET_NAME, Prefix = 'profile_pictures/')
+            for obj in response.get('Contents', []):
+                total_size += obj['Size']
+            if response.get('IsTruncated'):
+                continuation_token = response.get('NextContinuationToken')
+            else:
+                break
         new_file_size = self.profile_photo.size if self.profile_photo else 0
-        total_size = self.get_r2_total_size()
         if total_size + new_file_size > self.MAX_TOTAL_BYTES:
-            raise ValidationError("Cannot upload new profile photo! Storage would exceed 10GB!")
+            raise ValidationError(f"Cannot upload new profile photo! Storage would exceed {self.MAX_TOTAL_BYTES / (1024**3):.1f} GB for profile_pictures/ folder!")
         super().save(*args, **kwargs)
     
 class APIKeys(models.Model):
