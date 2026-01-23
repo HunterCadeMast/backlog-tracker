@@ -1,4 +1,5 @@
 import type {Metadata} from "next";
+import Head from "next/head";
 import {Bebas_Neue, PT_Serif} from "next/font/google"
 import localFont from "next/font/local"
 import "./globals.css";
@@ -19,6 +20,7 @@ export const dynamic = "force-dynamic";
 export default function RootLayout({children}: Readonly<{children: React.ReactNode;}>) {
   return (
     <html lang = "en" className = {`${bebasNeue.variable} ${ptSerif.variable} ${sekuya.variable}`}>
+      <Head><link rel = "icon" href = "/favicon.ico" /></Head>
       <body>
         <ClientProvider>
         <main className = "pt-16 h-screen flex flex-col">
