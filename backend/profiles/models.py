@@ -62,23 +62,24 @@ class Profiles(models.Model):
     MAX_OBJECTS = 10000
 
     def save(self, *args, **kwargs):
-        if self.profile_photo and getattr(self.profile_photo.file, 'file', None) and not self._state.adding:
-            object_count = self.get_r2_object_count()
-            if object_count >= self.MAX_OBJECTS:
-                raise ValidationError(f"Cannot upload new profile photo! Storage has reached {self.MAX_OBJECTS} files!")
-            new_file_size = self.profile_photo.size if self.profile_photo else 0
-            total_size = self.get_r2_total_size()
-            if total_size + new_file_size > self.MAX_TOTAL_BYTES:
-                raise ValidationError("Cannot upload new profile photo! Storage would exceed 10GB!")
-            self.profile_photo.open()
-            img = Image.open(self.profile_photo)
-            img = img.convert("RGB")
-            img.thumbnail((300, 300))
-            buffer = BytesIO()
-            img.save(buffer, format = "JPEG", quality = 85)
-            buffer.seek(0)
-            name = os.path.basename(self.profile_photo.name)
-            self.profile_photo.save(name, ContentFile(buffer.read()), save = False)
+        if self.profile_photo:
+            try:
+                img = Image.open(self.profile_photo)
+                img = img.convert("RGB")
+                img.thumbnail((300, 300))
+                buffer = BytesIO()
+                img.save(buffer, format = "JPEG", quality = 85)
+                buffer.seek(0)
+                self.profile_photo.save(self.profile_photo.name, ContentFile(buffer.read()), save = False,)
+            except Exception as error:
+                raise ValidationError(f"Error processing profile photo! {error}!")
+        object_count = self.get_r2_object_count()
+        if object_count >= self.MAX_OBJECTS:
+            raise ValidationError(f"Cannot upload new profile photo! Storage has reached {self.MAX_OBJECTS} files!")
+        new_file_size = self.profile_photo.size if self.profile_photo else 0
+        total_size = self.get_r2_total_size()
+        if total_size + new_file_size > self.MAX_TOTAL_BYTES:
+            raise ValidationError("Cannot upload new profile photo! Storage would exceed 10GB!")
         super().save(*args, **kwargs)
     
 class APIKeys(models.Model):
