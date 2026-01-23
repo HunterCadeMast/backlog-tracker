@@ -31,7 +31,7 @@ SECRET_KEY = os.getenv("SECRET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = ['gaminglogjam.com', 'www.gaminglogjam.com']
+ALLOWED_HOSTS = ['gaminglogjam.com', 'www.gaminglogjam.com', 'api.gaminglogjam.com']
 
 # Application definition
 
@@ -145,12 +145,16 @@ API_KEY = {
 
 CORS_ALLOWED_ORIGINS = [
     "https://gaminglogjam.com",
+    "https://www.gaminglogjam.com",
 ]
 
 CSRF_TRUSTED_ORIGINS = [
     "https://gaminglogjam.com",
+    "https://www.gaminglogjam.com",
 ]
 
+CORS_ALLOWED_ORIGINS.append("https://api.gaminglogjam.com")
+CSRF_TRUSTED_ORIGINS.append("https://api.gaminglogjam.com")
 
 CORS_ALLOW_CREDENTIALS = True
 

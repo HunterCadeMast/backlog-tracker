@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from django.db.models import Sum
+from django.templatetags.static import static
 from collections import Counter, defaultdict
 from accounts.models import CustomUser
 from profiles.models import Profiles, APIKeys
@@ -170,7 +171,7 @@ class ProfilesSerializer(ProfileStatisticsMixin, serializers.ModelSerializer):
         request = self.context.get('request')
         if obj.profile_photo and request:
             return request.build_absolute_uri(obj.profile_photo.url)
-        return None
+        return request.build_absolute_uri(static('profile_pictures/default.jpg'))
     
     def get_logs(self, obj):
         return LogsSerializer(Logs.objects.filter(user = obj.user), many = True).data
