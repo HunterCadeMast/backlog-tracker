@@ -29,9 +29,16 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.getenv("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
-ALLOWED_HOSTS = ['gaminglogjam.com', 'www.gaminglogjam.com', 'api.gaminglogjam.com']
+if DEBUG:
+    ALLOWED_HOSTS = ['*']
+    SECURE_SSL_REDIRECT = False
+    SECURE_PROXY_SSL_HEADER = None
+else:
+    ALLOWED_HOSTS = ['gaminglogjam.com', 'www.gaminglogjam.com', 'api.gaminglogjam.com']
+    SECURE_SSL_REDIRECT = True
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 # Application definition
 
@@ -71,8 +78,6 @@ LOGIN_REDIRECT_URL = 'https://gaminglogjam.com/login/'
 LOGOUT_REDIRECT_URL = 'https://gaminglogjam.com/'
 
 SITE_ID = 1
-
-ACCOUNT_DEFAULT_HTTP_PROTOCOL = "https"
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -163,9 +168,6 @@ CSRF_TRUSTED_ORIGINS.append("https://api.gaminglogjam.com")
 CORS_ALLOW_CREDENTIALS = True
 
 WSGI_APPLICATION = 'backlog_tracker_django.wsgi.application'
-
-SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
-SECURE_SSL_REDIRECT = True
 
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
