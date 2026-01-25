@@ -74,8 +74,8 @@ INSTALLED_APPS = [
 
 AUTH_USER_MODEL = 'accounts.CustomUser'
 
-LOGIN_REDIRECT_URL = 'https://gaminglogjam.com/login/'
-LOGOUT_REDIRECT_URL = 'https://gaminglogjam.com/'
+LOGIN_REDIRECT_URL = 'https://gaminglogjam.com/'
+LOGOUT_REDIRECT_URL = 'https://gaminglogjam.com/login/'
 
 SITE_ID = 1
 
@@ -104,7 +104,6 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
-                'django.template.context_processors.request',
             ],
         },
     },
@@ -127,6 +126,8 @@ REST_FRAMEWORK = {
         'rest_framework.throttling.AnonRateThrottle',
     ],
     'DEFAULT_THROTTLE_RATES': {
+        'user': '1000/hour',
+        'anon': '500/hour',
         'register': '5/hour',
         'login': '10/min',
         'password_reset': '25/hour',
@@ -272,7 +273,6 @@ REDIS_URL = os.getenv('REDIS_URL', 'redis://127.0.0.1:6379/1')
 CELERY_BROKER_URL = REDIS_URL
 CELERY_RESULT_BACKEND = REDIS_URL
 CELERY_ACCEPT_CONTENT = ['json']
-CELERY_TASK_SERIALIZER = 'json'
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_TIMEZONE = 'UTC'
 
