@@ -267,8 +267,10 @@ IGDB_BASE_URL = 'https://api.igdb.com/v4'
 STEAM_API_KEY = os.getenv("STEAM_API_KEY")
 STEAM_OPENID_URL = 'https://steamcommunity.com/openid'
 
-CELERY_BROKER_URL = 'redis://127.0.0.1:6379/2'
-CELERY_RESULT_BACKEND = 'redis://127.0.0.1:6379/3'
+REDIS_URL = os.getenv('REDIS_URL', 'redis://127.0.0.1:6379/1')
+
+CELERY_BROKER_URL = REDIS_URL
+CELERY_RESULT_BACKEND = REDIS_URL
 CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_TASK_SERIALIZER = 'json'
@@ -288,7 +290,7 @@ CELERY_BEAT_SCHEDULE = {
 CACHES = {
     'default': {
         'BACKEND': 'django.core.cache.backends.redis.RedisCache',
-        'LOCATION': 'redis://127.0.0.1:6379/1',
+        'LOCATION': REDIS_URL,
     }
 }
 CSRF_COOKIE_SECURE = True
