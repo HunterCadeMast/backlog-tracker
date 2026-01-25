@@ -8,7 +8,8 @@ from rest_framework.response import Response
 from django.utils import timezone
 from django.shortcuts import get_object_or_404
 from datetime import timedelta
-from accounts.permissions import APIKeyAuthenticated, APIKeyThrottle
+from accounts.permissions import APIKeyAuthenticated
+from accounts.throttle import APIKeyThrottle
 from profiles.models import Profiles, APIKeys
 from profiles.serializers import ProfilesSerializer, UsersSerializer, APIKeysSerializer
 
