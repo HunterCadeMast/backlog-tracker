@@ -15,8 +15,7 @@ const PasswordReset = () => {
             await apiFetch("/authentication/password/reset/", {method: "POST", body: JSON.stringify({email}),});
             setMessage("Reset link sent! If not received, email may not exist.");
         }
-        catch (error: any) {
-            console.error("Error sending password reset:", error);
+        catch {
             setMessage("Reset link sent! If not received, email may not exist.");
         }
     };
