@@ -183,12 +183,7 @@ class PasswordResetViewSet(APIView):
             password_reset_url = f'{settings.FRONTEND_URL}/password/reset/{user.id}/{token}'
             send_mail(subject = 'Reset Password - Gaming Logjam', message = f'Reset your password using this link:\n{password_reset_url}', from_email = settings.DEFAULT_FROM_EMAIL, recipient_list = [user.email],)
         except Exception as error:
-            print(settings.EMAIL_HOST)
-            print(settings.EMAIL_HOST_USER)
-            print(settings.EMAIL_PORT)
-            print(settings.EMAIL_USE_TLS)
-            print(settings.DEFAULT_FROM_EMAIL)
-            raise
+            logging.getLogger(__name__).error(f"Email failed for user {user.id}! {error}!")
         user.password_reset_timestamp = now()
         user.save(update_fields = ['password_reset_timestamp'])
         return Response({'message': 'If the email exists, password reset email sent!'}, status = 200)
