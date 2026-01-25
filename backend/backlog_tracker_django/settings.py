@@ -127,8 +127,9 @@ REST_FRAMEWORK = {
         'rest_framework.throttling.AnonRateThrottle',
     ],
     'DEFAULT_THROTTLE_RATES': {
-        'anon': '100/day',
-        'user': '1000/day',
+        'register': '5/hour',
+        'login': '10/min',
+        'password_reset': '25/hour',
     },
 }
 
@@ -141,7 +142,7 @@ SIMPLE_JWT = {
 }
 
 REST_FRAMEWORK['DEFAULT_THROTTLE_CLASSES'] += [
-    'accounts.permissions.APIKeyThrottle'
+    'accounts.throttle.APIKeyThrottle'
 ]
 
 REST_FRAMEWORK['DEFAULT_THROTTLE_RATES'].update({
@@ -285,7 +286,8 @@ CELERY_BEAT_SCHEDULE = {
 
 CACHES = {
     'default': {
-        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+        'BACKEND': 'django.core.cache.backends.redis.RedisCache',
+        'LOCATION': 'redis://127.0.0.1:6379/1',
     }
 }
 

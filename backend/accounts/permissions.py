@@ -1,6 +1,5 @@
 from rest_framework.permissions import BasePermission, IsAuthenticated
 from rest_framework_api_key.permissions import HasAPIKey
-from rest_framework.throttling import SimpleRateThrottle
 from django.utils import timezone
 from profiles.models import APIKeys
 
@@ -38,15 +37,3 @@ class APIKeyAuthenticated(BasePermission):
                     return True
             except APIKeys.DoesNotExist:
                 return False
-            
-class APIKeyThrottle(SimpleRateThrottle):
-    scope = 'api_key'
-
-    def get_cache_key(self, request, view):
-        api_key = request.META.get('HTTP_AUTHORIZATION', '')
-        if not api_key.startswith('api-key '):
-            return None
-        api_key_prefix = api_key.split()[1][:8]
-        if not APIKeys.objects.filter(api_key_prefix = api_key_prefix, expired = False, expiration_date__gt = timezone.now()).exists():
-            return None
-        return f'api_key_{api_key_prefix}'

@@ -12,6 +12,7 @@ from django.db import transaction
 from django.conf import settings
 from django.utils.timezone import now
 from datetime import timedelta
+from accounts.throttle import RegisterThrottle, LoginThrottle, PasswordResetThrottle
 from accounts.models import CustomUser
 from accounts.serializers import CustomUserSerializer
 from profiles.models import Profiles
@@ -20,6 +21,7 @@ import logging
 class RegisterViewSet(APIView):
     authentication_classes = []
     permission_classes = [AllowAny]
+    throttle_classes = [RegisterThrottle]
 
     def post(self, request):
         serializer = CustomUserSerializer(data = request.data)
@@ -36,6 +38,7 @@ class RegisterViewSet(APIView):
 class LoginViewSet(APIView):
     authentication_classes = []
     permission_classes = [AllowAny]
+    throttle_classes = [LoginThrottle]
 
     def post(self, request):
         email = request.data.get('email')
@@ -164,6 +167,7 @@ class EmailChangeViewSet(APIView):
 class PasswordResetViewSet(APIView):
     authentication_classes = []
     permission_classes = [AllowAny]
+    throttle_classes = [PasswordResetThrottle]
 
     def post(self, request):
         email = request.data.get('email')
@@ -171,7 +175,7 @@ class PasswordResetViewSet(APIView):
             return Response({'error': 'Email required!'}, status = 400)
         user = CustomUser.objects.filter(email = email).first()
         if not user:
-            return Response({'error': 'User not found!'}, status = 404)
+            return Response({'message': 'If the email exists, password reset email sent!'}, status = 200)
         if user.password_reset_timestamp and now() - user.password_reset_timestamp < timedelta(minutes = 5):
             return Response({'error': 'Password reset cooldown of 5 minutes!'}, status = 429)
         try:
