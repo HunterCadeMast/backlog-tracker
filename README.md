@@ -1,4 +1,4 @@
-# backlog-tracker
+# Gaming Logjam (Backlog Tracker) [READ ME IN PROGRESS]
 <!-- Improved compatibility of back to top link: See: https://github.com/othneildrew/Best-README-Template/pull/73 -->
 <a id="readme-top"></a>
 <!--
@@ -35,7 +35,7 @@
     <img src="images/logo.png" alt="Logo" width="80" height="80">
   </a>
 
-<h3 align="center">Gaming Logjam - Backlog Tracker (Full Stack Web App)</h3>
+<h3 align="center">Full Stack Web App</h3>
 
   <p align="center">
     https://www.gaminglogjam.com/
