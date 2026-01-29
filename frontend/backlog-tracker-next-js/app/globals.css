@@ -79,7 +79,7 @@ input::placeholder {
 
 @layer components {
   .base-background {
-    @apply h-full flex flex-col justify-center flex-1 bg-main-compliment;
+    @apply min-h-screen flex flex-col justify-center bg-main-compliment;
   }
   .btn {
     @apply h-10 rounded-lg outline-4 outline-white font-main-title text-white items-center justify-center flex bg-ui px-4 py-2;
