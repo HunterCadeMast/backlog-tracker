@@ -32,7 +32,7 @@ class RegisterViewSet(APIView):
             verification_url = f'{settings.FRONTEND_URL}/email/verification/{user.id}/{token}'
             send_mail(subject = 'Verify your Email - Gaming Logjam', message = f'Verify your email using this link:\n{verification_url}', from_email = settings.DEFAULT_FROM_EMAIL, recipient_list = [user.email],)
         except Exception as error:
-            logging.getLogger(__name__).error(f"Email failed for user {user.id}! {error}!")
+            logging.getLogger(__name__).exception(f"Email failed for user {user.id}! {error}!")
         return Response({'message': 'Account created!'}, status = 201)
 
 class LoginViewSet(APIView):
@@ -161,7 +161,7 @@ class EmailChangeViewSet(APIView):
             verification_url = f'{settings.FRONTEND_URL}/email/verification/{user.id}/{token}'
             send_mail(subject = 'Verify your Email - Gaming Logjam', message = f'Verify your email using this link:\n{verification_url}', from_email = settings.DEFAULT_FROM_EMAIL, recipient_list = [user.email],)
         except Exception as error:
-            logging.getLogger(__name__).error(f"Email failed for user {user.id}! {error}!")
+            logging.getLogger(__name__).exception(f"Email failed for user {user.id}! {error}!")
         return Response({'message': 'Email updated successfully!'}, status = 200)
     
 class PasswordResetViewSet(APIView):
@@ -183,7 +183,7 @@ class PasswordResetViewSet(APIView):
             password_reset_url = f'{settings.FRONTEND_URL}/password/reset/{user.id}/{token}'
             send_mail(subject = 'Reset Password - Gaming Logjam', message = f'Reset your password using this link:\n{password_reset_url}', from_email = settings.DEFAULT_FROM_EMAIL, recipient_list = [user.email],)
         except Exception as error:
-            logging.getLogger(__name__).error(f"Email failed for user {user.id}! {error}!")
+            logging.getLogger(__name__).exception(f"Email failed for user {user.id}! {error}!")
         user.password_reset_timestamp = now()
         user.save(update_fields = ['password_reset_timestamp'])
         return Response({'message': 'If the email exists, password reset email sent!'}, status = 200)
