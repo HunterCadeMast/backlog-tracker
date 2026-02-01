@@ -29,7 +29,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.getenv("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 if DEBUG:
     ALLOWED_HOSTS = ['*']
@@ -154,6 +154,7 @@ API_KEY = {
     "FERNET_SECRET": os.getenv("FERNET_SECRET"),
 }
 
+
 CORS_ALLOWED_ORIGINS = [
     "https://gaminglogjam.com",
     "https://www.gaminglogjam.com",
@@ -163,6 +164,16 @@ CSRF_TRUSTED_ORIGINS = [
     "https://gaminglogjam.com",
     "https://www.gaminglogjam.com",
 ]
+
+if DEBUG:
+    CORS_ALLOWED_ORIGINS += [
+        "http://localhost:3000",
+        "http://127.0.0.1:3000",
+    ]
+    CSRF_TRUSTED_ORIGINS += [
+        "http://localhost:3000",
+        "http://127.0.0.1:3000",
+    ]
 
 CORS_ALLOWED_ORIGINS.append("https://api.gaminglogjam.com")
 CSRF_TRUSTED_ORIGINS.append("https://api.gaminglogjam.com")

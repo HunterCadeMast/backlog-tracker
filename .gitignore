@@ -246,3 +246,4 @@ next-env.d.ts
 node_modules
 
 .env.local/
+frontend/backlog-tracker-next-js/.env.local

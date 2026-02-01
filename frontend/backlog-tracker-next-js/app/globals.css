@@ -79,7 +79,7 @@ input::placeholder {
 
 @layer components {
   .base-background {
-    @apply min-h-screen flex flex-col justify-center bg-main-compliment;
+    @apply h-full flex flex-col justify-center bg-main-compliment;
   }
   .btn {
     @apply h-10 rounded-lg outline-4 outline-white font-main-title text-white items-center justify-center flex bg-ui px-4 py-2;
@@ -91,7 +91,7 @@ input::placeholder {
     @apply container flex items-center justify-between max-w-screen mx-auto px-4;
   }
   .sideline {
-    @apply w-10 h-1 bg-gray-800 m-1.5;
+    @apply w-10 h-1 bg-white m-1.5;
   }
   .input-element {
     @apply mb-5 p-3 text-3xl text-white font-log-title outline-4 outline-white rounded-2xl items-center justify-center flex;

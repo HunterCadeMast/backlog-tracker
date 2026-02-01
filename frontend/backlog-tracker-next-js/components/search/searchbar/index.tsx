@@ -75,7 +75,7 @@ const SearchBar = () => {
         }
     };
     return (
-        <div ref = {containerReference} className = "relative w-96">
+        <div ref = {containerReference} className = "relative w-full sm:w-96">
             <input type = "text" placeholder = "Search games..." onFocus = {() => setOpen(true)} value = {query} onChange = {(x) => setQuery(x.target.value)} spellCheck = {false} className = "w-full btn px-4 py-3 placeholder:placehold"/>
             {open && (
                 <div className = "absolute mt-5 w-full max-h-96 min-h-12 overflow-y-auto rounded-lg bg-ui shadow-lg z-50 outline-4 outline-button-border">
