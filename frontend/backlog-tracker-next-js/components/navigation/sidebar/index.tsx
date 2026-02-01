@@ -11,7 +11,7 @@ const Sidebar = ({navigationState, navigationToggle, user, logout}: SidebarProps
     return (
         <>
             <div className = {`fixed w-full h-full overflow-hidden justify-center grid pt-30 left-0 z-10 bg-main-compliment ${navigationState ? "opacity-100 top-0 pointer-events-auto" : "opacity-0 -top-full pointer-events-none"}`}>
-                <button className = "fixed justify-right p-2" onClick = {navigationToggle}>
+                <button className = "absolute right-0 p-8" onClick = {navigationToggle}>
                     <div className = "container">
                         <div className = {`w-10 h-1 bg-white m-1.5 transition-all duration-500 ${navigationState ? `translate-y-2.5 -rotate-45` : ''}`}></div>
                         <div className = {`w-10 h-1 bg-white m-1.5 transition-all duration-500 ${navigationState ? `opacity-0` : ''}`}></div>
