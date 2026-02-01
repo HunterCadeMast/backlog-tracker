@@ -21,13 +21,13 @@ export default function RootLayout({children}: Readonly<{children: React.ReactNo
     <html lang = "en" className = {`${bebasNeue.variable} ${ptSerif.variable} ${sekuya.variable}`}>
       <body>
         <ClientProvider>
-        <main className = "pt-16 h-screen flex flex-col">
+        <main className = "min-h-screen flex flex-col">
           <div className = "flex-1">
             {children}
           </div>
-          <footer className = "pl-10 pr-10 pb-5 flex items-center justify-between text-center bg-main-compliment">
-            <h1 className = "font-main-title text-3xl text-white"><RandomColor>Database from IGDB</RandomColor></h1>
-            <h1 className = "font-main-title text-xl text-white">Contact: <a href = "mailto:gaming.logjam@gmail.com" className = "underline"><RandomColor>gaming.logjam@gmail.com</RandomColor></a></h1>
+          <footer className = "gap-3 px-4 sm:px-10 pb-5 flex flex-col sm:flex-row items-center justify-center sm:justify-between text-center bg-main-compliment">
+            <h1 className = "font-main-title text-lg sm:text-3xl text-white"><RandomColor>Database from IGDB</RandomColor></h1>
+            <h1 className = "font-main-title text-lg sm:text-3xl text-white">Contact:{" "}<a href = "mailto:gaming.logjam@gmail.com" className = "underline break-all"><RandomColor>gaming.logjam@gmail.com</RandomColor></a></h1>
           </footer>
         </main>
         </ClientProvider>
