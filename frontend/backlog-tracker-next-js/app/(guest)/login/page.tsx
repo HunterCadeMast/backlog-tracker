@@ -30,7 +30,7 @@ const Login = () => {
     };
     return (
         <>
-            <div className = "h-dvh flex items-center justify-center bg-main-compliment">
+            <div className = "h-full flex items-center justify-center bg-main-compliment">
                 <div className = "flex flex-col items-center gap-6">
                     <form onSubmit = {handleSubmit} className = "w-90 p-8 rounded-2xl shadow-2xl bg-ui">
                         <h1 className = "text-7xl text-white font-log-title mb-3">Login</h1>

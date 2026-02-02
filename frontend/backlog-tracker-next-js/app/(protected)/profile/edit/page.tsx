@@ -158,7 +158,7 @@ const ProfileEdit = () => {
                             </RandomColor>
                         </section>
                         <section>
-                            <button onClick = {deleteAccount} className="btn px-6 py-2 hover:bg-red-500 transition-colors">Delete Account</button>
+                            <button onClick = {deleteAccount} className="btn px-6 py-2 mb-5 hover:bg-red-500 transition-colors">Delete Account</button>
                         </section>
                     </div>
                 </div>

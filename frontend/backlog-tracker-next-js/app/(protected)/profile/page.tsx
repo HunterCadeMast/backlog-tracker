@@ -125,25 +125,25 @@ const Profile = () => {
     const timelineData = (profile.logs ?? []).filter(log => log.start_date).map(log => ({gameTitle: profile.favorite_game?.game_title ?? "Unknown", y: log.user_playtime ?? 0, start: new Date(log.start_date).getTime(), end: log.completion_date ? new Date(log.completion_date).getTime() : null,})).filter(log => log.start >= oneYearAgo.getTime());
     const SectionHeader = ({title}: {title: string}) => (
         <>
-            <RandomColor constant><h1 className = "text-xl font-main-title">{title}</h1></RandomColor>
+            <RandomColor constant><h1 className = "text-sm md:text-xl font-main-title">{title}</h1></RandomColor>
             <p className = "break-up-line"></p>
         </>
     );
     const StatCard = ({title, value}: {title: string; value: string | number}) => (
         <div className = "bg-ui rounded-lg p-4 outline-4 outline-white text-center">
-            <RandomColor constant><h1 className = "text-xl font-main-title">{title}</h1></RandomColor>
+            <RandomColor constant><h1 className = "text-sm md:text-xl font-main-title">{title}</h1></RandomColor>
             <p className = "text-3xl mt-2">{value}</p>
         </div>
     );
     const DataNotAvailable = ({text = "No data available yet"}) => (
-        <div className="flex items-center justify-center h-75 opacity-60 text-xl">{text}</div>
+        <div className="flex items-center justify-center h-75 opacity-60 text-sm md:text-xl">{text}</div>
     );
     const CustomTooltip = ({ active, payload, label }: any) => {
         if (active && payload && payload.length) {
             return (
                 <div className = "bg-ui p-2 rounded-lg outline-4 outline-white shadow-md">
                     {label && <p className = "font-main-title">{label}</p>}
-                    {payload.map((entry: any, idx: number) => (<p key = {idx} className = "text-xl">{entry.name}: {entry.value}</p>))}
+                    {payload.map((entry: any, idx: number) => (<p key = {idx} className = "text-sm md:text-xl">{entry.name}: {entry.value}</p>))}
                 </div>
             );
         }
@@ -154,23 +154,23 @@ const Profile = () => {
     }
     else {
         return (
-            <div className = "base-background pl-5 pr-5 pt-20 overflow-x-hidden">
+            <div className = "base-background pl-5 pr-5 pt-10 sm:pt-20 overflow-x-hidden">
                 <div className = "mb-5 text-left">
-                    <RandomColor constant><h1 className = "text-3xl font-main-title">{profile.username}</h1></RandomColor>
+                    <RandomColor constant><h1 className = "text-2xl md:text-3xl font-main-title">{profile.username}</h1></RandomColor>
                 </div>
-                <div className = "grid grid-cols-[250px_1fr]">
-                    <div className = "space-y-6 items-center flex flex-col">
+                <div className = "grid grid-cols-1 md:grid-cols-[250px_1fr] gap-8 mb-5">
+                    <div className = "flex flex-col items-center text-center md:items-start md:text-left space-y-4">
                         {profile.profile_photo && (<img src = {profile.profile_photo} alt = "Profile Photo" className = "w-48 h-48 rounded-full outline-4 outline-white object-cover" />)}
                         <RandomColor element = "bg"><button onClick = {() => router.push("/profile/edit")} className = "btn bg-ui mt-4">Edit Profile</button></RandomColor>
                     </div>
                     <div className = "space-y-4">
-                        <SectionHeader title = "Bio" /><p className = "indent-5 text-xl">{profile.bio || "No bio provided..."}</p>
+                        <SectionHeader title = "Bio" /><p className = "text-base md:text-xl leading-relaxed">{profile.bio || "No bio provided..."}</p>
                         <p className = "break-up-line mb-10"></p>
                         {profile.favorite_game && (
                             <>
                                 <SectionHeader title = "Favorite Game" />
                                 <RandomColor element = "bg">
-                                    <Link href = {`/games/${profile.favorite_game.igdb_id}`} className = "p-4 bg-ui rounded-lg outline-4 outline-white flex items-center gap-5 transition">
+                                    <Link href = {`/games/${profile.favorite_game.igdb_id}`} className = "p-4 bg-ui rounded-lg outline-4 outline-white flex flex-col md:flex-row gap-4 transition">
                                         {profile.favorite_game.cover_artwork_link ? (
                                             <img src = {profile.favorite_game.cover_artwork_link} alt = {profile.favorite_game.game_title} className="w-50 rounded-lg outline-4 outline-white" />
                                         ) : (
@@ -178,20 +178,20 @@ const Profile = () => {
                                         )}
                                         <div className = "flex-1">
                                             <p className = "text-3xl font-main-title mb-3">{profile.favorite_game.game_title}</p>
-                                            <div className = "grid grid-cols-3 gap-x-8 gap-y-4 ml-10">
+                                            <div className = "grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
                                                 <div className = "space-y-3">
                                                     <h1 className = "text-2xl font-main-title">Status:</h1>
-                                                    <p className = "indent-5 text-xl">{favoriteGameLog?.user_status}</p>
+                                                    <p className = "indent-5 text-sm md:text-xl">{favoriteGameLog?.user_status}</p>
                                                     {favoriteGameLog?.user_rating !== null && (
                                                         <>
                                                             <h1 className = "text-2xl font-main-title">Rating:</h1>
-                                                            <p className = "indent-5 text-xl">{favoriteGameLog?.user_rating}/10</p>
+                                                            <p className = "indent-5 text-sm md:text-xl">{favoriteGameLog?.user_rating}/10</p>
                                                         </>
                                                     )}
                                                     {favoriteGameLog?.user_playtime !== null && (
                                                         <>
                                                             <h1 className = "text-2xl font-main-title">Playtime:</h1>
-                                                            <p className = "indent-5 text-xl">{favoriteGameLog?.user_playtime} Hours</p>
+                                                            <p className = "indent-5 text-sm md:text-xl">{favoriteGameLog?.user_playtime} Hours</p>
                                                         </>
                                                     )}
                                                 </div>
@@ -199,17 +199,17 @@ const Profile = () => {
                                                     {favoriteGameLog?.start_date && (
                                                         <>
                                                             <h1 className = "text-2xl font-main-title">Start Date:</h1>
-                                                            <p className = "indent-5 text-xl">{favoriteGameLog?.start_date}</p>
+                                                            <p className = "indent-5 text-sm md:text-xl">{favoriteGameLog?.start_date}</p>
                                                         </>
                                                     )}
                                                     {favoriteGameLog?.completion_date && (
                                                         <>
                                                             <h1 className = "text-2xl font-main-title">Completion Date:</h1>
-                                                            <p className = "indent-5 text-xl">{favoriteGameLog?.completion_date}</p>
+                                                            <p className = "indent-5 text-sm md:text-xl">{favoriteGameLog?.completion_date}</p>
                                                         </>
                                                     )}
                                                     <h1 className = "text-2xl font-main-title">100% Completion:</h1>
-                                                    <p className = "indent-5 text-xl">{favoriteGameLog?.full_completion ? "Yes" : "No"}</p>
+                                                    <p className = "indent-5 text-sm md:text-xl">{favoriteGameLog?.full_completion ? "Yes" : "No"}</p>
                                                 </div>
                                             </div>
                                         </div>
@@ -219,24 +219,24 @@ const Profile = () => {
                             </>
                         )}
                         <SectionHeader title = "Favorites" />
-                        <div className = "grid grid-cols-2 gap-6 indent-5">
+                        <div className = "grid grid-cols-2 gap-6">
                             <div className = "space-y-2">
                                 <div className = "space-y-2 pr-4 border-r border-white">
-                                    <RandomColor constant><h1 className = "text-xl font-main-title">Developer(s):</h1></RandomColor>
-                                    <p className = "break-up-line indent-10"> {profile.statistics?.favorite_developers?.length ? profile.statistics.favorite_developers.map(x => x.label).join(", ") : "No favorite developers..."}</p>
-                                    <RandomColor constant><h1 className = "text-xl font-main-title">Publisher(s):</h1></RandomColor>
-                                    <p className = "break-up-line indent-10"> {profile.statistics?.favorite_publishers?.length ? profile.statistics.favorite_publishers.map(x => x.label).join(", ") : "No favorite publishers..."}</p>
-                                    <RandomColor constant><h1 className = "text-xl font-main-title">Genre(s):</h1></RandomColor>
-                                    <p className = "break-up-line indent-10"> {profile.statistics?.favorite_genres?.length ? profile.statistics.favorite_genres.map(x => x.label).join(", ") : "No favorite genres..."}</p>
+                                    <RandomColor constant><h1 className = "text-sm md:text-xl font-main-title">Developer(s):</h1></RandomColor>
+                                    <p className = "break-up-line"> {profile.statistics?.favorite_developers?.length ? profile.statistics.favorite_developers.map(x => x.label).join(", ") : "No favorite developers..."}</p>
+                                    <RandomColor constant><h1 className = "text-sm md:text-xl font-main-title">Publisher(s):</h1></RandomColor>
+                                    <p className = "break-up-line"> {profile.statistics?.favorite_publishers?.length ? profile.statistics.favorite_publishers.map(x => x.label).join(", ") : "No favorite publishers..."}</p>
+                                    <RandomColor constant><h1 className = "text-sm md:text-xl font-main-title">Genre(s):</h1></RandomColor>
+                                    <p className = "break-up-line"> {profile.statistics?.favorite_genres?.length ? profile.statistics.favorite_genres.map(x => x.label).join(", ") : "No favorite genres..."}</p>
                                 </div>
                             </div>
                             <div className = "space-y-2 mb-10">
-                                <RandomColor constant><h1 className = "text-xl font-main-title">Platform(s):</h1></RandomColor>
-                                <p className = "break-up-line indent-10"> {profile.statistics?.favorite_platforms?.length ? profile.statistics.favorite_platforms.map(x => x.label).join(", ") : "No favorite platforms..."}</p>
-                                <RandomColor constant><h1 className = "text-xl font-main-title">Franchise(s):</h1></RandomColor>
-                                <p className = "break-up-line indent-10"> {profile.statistics?.favorite_franchises?.length ? profile.statistics.favorite_franchises.map(x => x.label).join(", ") : "No favorite franchises..."}</p>
-                                <RandomColor constant><h1 className = "text-xl font-main-title">Series:</h1></RandomColor>
-                                <p className = "break-up-line indent-10"> {profile.statistics?.favorite_series?.length ? profile.statistics.favorite_series.map(x => x.label).join(", ") : "No favorite series..."}</p>
+                                <RandomColor constant><h1 className = "text-sm md:text-xl font-main-title">Platform(s):</h1></RandomColor>
+                                <p className = "break-up-line"> {profile.statistics?.favorite_platforms?.length ? profile.statistics.favorite_platforms.map(x => x.label).join(", ") : "No favorite platforms..."}</p>
+                                <RandomColor constant><h1 className = "text-sm md:text-xl font-main-title">Franchise(s):</h1></RandomColor>
+                                <p className = "break-up-line"> {profile.statistics?.favorite_franchises?.length ? profile.statistics.favorite_franchises.map(x => x.label).join(", ") : "No favorite franchises..."}</p>
+                                <RandomColor constant><h1 className = "text-sm md:text-xl font-main-title">Series:</h1></RandomColor>
+                                <p className = "break-up-line"> {profile.statistics?.favorite_series?.length ? profile.statistics.favorite_series.map(x => x.label).join(", ") : "No favorite series..."}</p>
                             </div>
                         </div>
                     </div>
@@ -251,7 +251,7 @@ const Profile = () => {
                             <StatCard title = "Total Playtime" value = {`${profile.statistics!.total_playtime} Hours`} />
                         </div>
                         <div className = "bg-ui p-4 rounded-lg outline-4 outline-white mb-5">
-                            <RandomColor constant><h1 className = "text-xl font-main-title mb-2">Genre Variety</h1></RandomColor>
+                            <RandomColor constant><h1 className = "text-sm md:text-xl font-main-title mb-2">Genre Variety</h1></RandomColor>
                             {profile.statistics.genre_variety.index === 0 ? (
                                 <DataNotAvailable text = "Add games to calculate genre variety data!" />
                             ) : (
@@ -266,7 +266,7 @@ const Profile = () => {
                         </div>
                         <div className = "grid grid-cols-1 lg:grid-cols-2 gap-10 mb-5">
                             <div>
-                                <RandomColor constant><h1 className = "text-xl font-main-title mb-2">Overall Game Status</h1></RandomColor>
+                                <RandomColor constant><h1 className = "text-sm md:text-xl font-main-title mb-2">Overall Game Status</h1></RandomColor>
                                 {(profile.statistics.completed_games === 0 && profile.statistics.paused_games === 0 && profile.statistics.playing_games === 0 && profile.statistics.backlog_games === 0 && profile.statistics.dropped_games === 0) ? (
                                     <DataNotAvailable text = "Add games to calculate game status data!" />
                                 ) : (
@@ -281,7 +281,7 @@ const Profile = () => {
                                 )}
                             </div>
                             <div>
-                                <RandomColor constant><h1 className = "text-xl font-main-title mb-2">Games Completed Per Year</h1></RandomColor>
+                                <RandomColor constant><h1 className = "text-sm md:text-xl font-main-title mb-2">Games Completed Per Year</h1></RandomColor>
                                 {profile.statistics.yearly_completed_games.length === 0 ? (
                                     <DataNotAvailable text = "Add games to calculate game completion data!" />
                                 ) : (
@@ -299,7 +299,7 @@ const Profile = () => {
                         </div>
                         <div className = "grid grid-cols-1 lg:grid-cols-2 gap-10 mb-5">
                             <div>
-                                <RandomColor constant><h1 className = "text-xl font-main-title">Commitment Chart</h1></RandomColor>
+                                <RandomColor constant><h1 className = "text-sm md:text-xl font-main-title">Commitment Chart</h1></RandomColor>
                                 <p className = "indent-5">Average playtime per game!</p>
                                 {commitmentData.length === 0 ? (
                                     <DataNotAvailable text = "Add games to calculate commitment data!" />
@@ -315,7 +315,7 @@ const Profile = () => {
                                 )}
                             </div>
                             <div>
-                                <RandomColor constant><h1 className = "text-xl font-main-title mb-2">Playstyle Type: {profile.statistics.playstyle.primary.replace("_", " ")}</h1></RandomColor>
+                                <RandomColor constant><h1 className = "text-sm md:text-xl font-main-title mb-2">Playstyle Type: {profile.statistics.playstyle.primary.replace("_", " ")}</h1></RandomColor>
                                 {playstyleRadarData.length === 0 ? (
                                     <DataNotAvailable text = "Add games to calculate playstyle data!" />
                                 ) : (
@@ -331,7 +331,7 @@ const Profile = () => {
                             </div>
                         </div>
                         <div>
-                            <RandomColor constant><h1 className = "text-xl font-main-title mb-2">Games Timeline (Past Year)</h1></RandomColor>
+                            <RandomColor constant><h1 className = "text-sm md:text-xl font-main-title mb-2">Games Timeline (Past Year)</h1></RandomColor>
                             {(timelineData.length === 0) ? (
                                 <DataNotAvailable text = "No games completed within past year!" />
                             ) : (
@@ -370,19 +370,19 @@ const Profile = () => {
                             )}
                         </div>
                         <div className = "bg-ui p-4 rounded-lg outline-4 outline-white mb-5">
-                            <RandomColor constant><h1 className = "text-xl font-main-title mb-2">Drop-Off Depth</h1></RandomColor>
+                            <RandomColor constant><h1 className = "text-sm md:text-xl font-main-title mb-2">Drop-Off Depth</h1></RandomColor>
                             {profile.statistics.dropoff_depth === 0 ? (
                                 <DataNotAvailable text = "Add games to calculate drop-off data!" />
                             ) : (
                                 <>
                                     <p className = "text-2xl">{profile.statistics.dropoff_depth.toFixed(1)} Hours</p>
-                                    <p className = "text-xl opacity-80 mt-1">Average playtime before dropping a game!</p>
+                                    <p className = "text-sm md:text-xl opacity-80 mt-1">Average playtime before dropping a game!</p>
                                     <div className = "w-full bg-black h-3 rounded mt-3">
                                         <div className = "h-3 bg-blue-500 rounded" style = {{width: `${Math.min(profile.statistics.dropoff_depth / 40, 1) * 100}%`,}} />
                                     </div>
                                 </>
                             )}
-                            <p className="text-xl mt-1 opacity-70">Lower = Quicker Drop | Higher = More Commitment</p>
+                            <p className="text-sm md:text-xl mt-1 opacity-70">Lower = Quicker Drop | Higher = More Commitment</p>
                         </div>
                     </>
                 )}

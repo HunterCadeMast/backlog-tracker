@@ -31,7 +31,7 @@ const Register = () => {
         };
     };
     return (
-        <div className = "px-4 pt-12 sm:pt-25 pb-8 flex flex-col h-dvh items-center justify-center bg-main-compliment">
+        <div className = "px-4 pt-10 sm:pt-20 pb-8 flex flex-col h-full items-center justify-center bg-main-compliment">
             <div className = "flex-1 items-center gap-6">
                 <form onSubmit = {handleSubmit} className = "w-90 p-8 rounded-2xl shadow-2xl bg-ui">
                     <h1 className = "text-7xl text-white font-log-title mb-3">Register</h1>
