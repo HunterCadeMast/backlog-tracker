@@ -159,43 +159,43 @@ const GameInfo = () => {
     if (!game) return <p>Loading...</p>;
     return (
         <div className = "base-background">
-            <div className = "flex-1 p-6 overflow-y-auto ml-5 mr-5">
-                <div className = "grid grid-cols-[275px_1fr] gap-10 pt-12">
+            <div className = "flex-1 p-4 sm:p-6 overflow-y-auto">
+                <div className = "grid grid-cols-1 md:grid-cols-[275px_1fr]  gap-10 pt-12">
                     <div className = "space-y-4 pt-4 items-center">
-                        <RandomColor constant><h1 className = "text-3xl font-main-title">{game.game_title}</h1></RandomColor>
+                        <RandomColor constant><h1 className = "text-2xl md:text-3xl font-main-title">{game.game_title}</h1></RandomColor>
                         {game.cover_artwork_link ? (
-                            <img src = {game.cover_artwork_link} alt = {game.game_title} className = "w-70 mt-4 rounded-lg outline-4 outline-white"/>
+                            <img src = {game.cover_artwork_link} alt = {game.game_title} className = "w-full max-w-xs md:max-w-68.75 mt-4 rounded-lg outline-4 outline-white"/>
                         ) : (
-                            <img src = "/images/missing.jpg" alt = "Missing" className = "w-48 mt-4 rounded-lg outline-4 outline-white"/>
+                            <img src = "/images/missing.jpg" alt = "Missing" className = "w-full max-w-xs md:max-w-68.75 mt-4 rounded-lg outline-4 outline-white"/>
                         )}
                         {authenticated && !log && (<RandomColor element = "bg"><button className = "btn mt-6 bg-ui" onClick = {addLog}>Add to Backlog</button></RandomColor>)}
                     </div>
                     <div className = "space-y-4">
                         <p className = "break-up-line"></p>
-                        <RandomColor constant><h1 className = "text-xl font-main-title">Summary:</h1></RandomColor>
-                        <p className = "break-up-line indent-10"> {game.summary || "No description available..."}</p>
+                        <RandomColor constant><h1 className = "text-sm md:text-xl font-main-title">Summary:</h1></RandomColor>
+                        <p className = "wrap-break-words break-up-line indent-0 md:indent-10"> {game.summary || "No description available..."}</p>
                         <div className="grid grid-cols-2 gap-6">
                             <div className = "space-y-2">
                                 <div className = "space-y-2 pr-4 border-r border-white">
-                                    <RandomColor constant><h1 className = "text-xl font-main-title">Release Date:</h1></RandomColor>
-                                    <p className = "break-up-line indent-10"> {game.release_date || "Unknown"}</p>
-                                    <RandomColor constant><h1 className = "text-xl font-main-title">Average Rating:</h1></RandomColor>
-                                    <p className = "break-up-line indent-10"> {game.average_rating ?? "Unknown"}</p>
-                                    <RandomColor constant><h1 className = "text-xl font-main-title">Developer(s):</h1></RandomColor>
-                                    <p className = "break-up-line indent-10"> {game.developers?.length ? game.developers.join(", ") : "Unknown"}</p>
-                                    <RandomColor constant><h1 className = "text-xl font-main-title">Publisher(s):</h1></RandomColor>
-                                    <p className = "break-up-line indent-10"> {game.publishers?.length ? game.publishers.join(", ") : "Unknown"}</p>
+                                    <RandomColor constant><h1 className = "text-sm md:text-xl font-main-title">Release Date:</h1></RandomColor>
+                                    <p className = "wrap-break-words break-up-line indent-0 md:indent-10"> {game.release_date || "Unknown"}</p>
+                                    <RandomColor constant><h1 className = "text-sm md:text-xl font-main-title">Average Rating:</h1></RandomColor>
+                                    <p className = "wrap-break-words break-up-line indent-0 md:indent-10"> {game.average_rating ?? "Unknown"}</p>
+                                    <RandomColor constant><h1 className = "text-sm md:text-xl font-main-title">Developer(s):</h1></RandomColor>
+                                    <p className = "wrap-break-words break-up-line indent-0 md:indent-10"> {game.developers?.length ? game.developers.join(", ") : "Unknown"}</p>
+                                    <RandomColor constant><h1 className = "text-sm md:text-xl font-main-title">Publisher(s):</h1></RandomColor>
+                                    <p className = "wrap-break-words break-up-line indent-0 md:indent-10"> {game.publishers?.length ? game.publishers.join(", ") : "Unknown"}</p>
                                 </div>
                             </div>
                             <div className = "space-y-2">
-                                <RandomColor constant><h1 className = "text-xl font-main-title">Genre(s):</h1></RandomColor>
-                                <p className = "break-up-line indent-10"> {game.genres?.length ? game.genres.join(", ") : "Unknown"}</p>
-                                <RandomColor constant><h1 className = "text-xl font-main-title">Platform(s):</h1></RandomColor>
-                                <p className = "break-up-line indent-10"> {game.platforms?.length ? game.platforms.join(", ") : "Unknown"}</p>
-                                <RandomColor constant><h1 className = "text-xl font-main-title">Franchise(s):</h1></RandomColor>
-                                <p className = "break-up-line indent-10"> {game.franchises?.length ? game.franchises.join(", ") : "Unknown"}</p>
-                                <RandomColor constant><h1 className = "text-xl font-main-title">Series:</h1></RandomColor>
-                                <p className = "break-up-line indent-10"> {game.series?.length ? game.series.join(", ") : "Unknown"}</p>
+                                <RandomColor constant><h1 className = "text-sm md:text-xl font-main-title">Genre(s):</h1></RandomColor>
+                                <p className = "wrap-break-words break-up-line indent-0 md:indent-10"> {game.genres?.length ? game.genres.join(", ") : "Unknown"}</p>
+                                <RandomColor constant><h1 className = "text-sm md:text-xl font-main-title">Platform(s):</h1></RandomColor>
+                                <p className = "wrap-break-words break-up-line indent-0 md:indent-10"> {game.platforms?.length ? game.platforms.join(", ") : "Unknown"}</p>
+                                <RandomColor constant><h1 className = "text-sm md:text-xl font-main-title">Franchise(s):</h1></RandomColor>
+                                <p className = "wrap-break-words break-up-line indent-0 md:indent-10"> {game.franchises?.length ? game.franchises.join(", ") : "Unknown"}</p>
+                                <RandomColor constant><h1 className = "text-sm md:text-xl font-main-title">Series:</h1></RandomColor>
+                                <p className = "wrap-break-words break-up-line indent-0 md:indent-10"> {game.series?.length ? game.series.join(", ") : "Unknown"}</p>
                             </div>
                         </div>
                     </div>
@@ -205,47 +205,47 @@ const GameInfo = () => {
                 <div className="border-t rounded-lg outline-4 outline-white font-log-title text-white bg-ui p-6 ml-10 mr-10 mb-5">
                     {!editing ? (
                         <>
-                            <div className="grid grid-cols-2 gap-x-8 gap-y-4">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-4">
                                 <div className="space-y-3">
-                                    <RandomColor constant><h1 className = "text-xl font-main-title">Status:</h1></RandomColor><p className = "indent-5"> {log.user_status}</p>
-                                    {log.user_rating !== null && (<><RandomColor constant><h1 className = "text-xl font-main-title">Rating:</h1></RandomColor><p className = "indent-5"> {log.user_rating}/10</p></>)}
-                                    {log.user_playtime !== null && (<><RandomColor constant><h1 className = "text-xl font-main-title">Playtime:</h1></RandomColor><p className = "indent-5"> {log.user_playtime} Hours</p></>)}
+                                    <RandomColor constant><h1 className = "text-sm md:text-xl font-main-title">Status:</h1></RandomColor><p className = "indent-5"> {log.user_status}</p>
+                                    {log.user_rating !== null && (<><RandomColor constant><h1 className = "text-sm md:text-xl font-main-title">Rating:</h1></RandomColor><p className = "indent-5"> {log.user_rating}/10</p></>)}
+                                    {log.user_playtime !== null && (<><RandomColor constant><h1 className = "text-sm md:text-xl font-main-title">Playtime:</h1></RandomColor><p className = "indent-5"> {log.user_playtime} Hours</p></>)}
                                 </div>
                                 <div className="space-y-3">
-                                    {log.start_date && (<><RandomColor constant><h1 className = "text-xl font-main-title">Start Date:</h1></RandomColor><p className = "indent-5"> {log.start_date}</p></>)}
-                                    {log.completion_date && (<><RandomColor constant><h1 className = "text-xl font-main-title">Completion Date:</h1></RandomColor><p className = "indent-5"> {log.completion_date}</p></>)}
-                                    <><RandomColor constant><h1 className = "text-xl font-main-title">100% Completion:{" "}</h1></RandomColor><p className = "indent-5">{log.full_completion ? "Yes" : "No"}</p></>
+                                    {log.start_date && (<><RandomColor constant><h1 className = "text-sm md:text-xl font-main-title">Start Date:</h1></RandomColor><p className = "indent-5"> {log.start_date}</p></>)}
+                                    {log.completion_date && (<><RandomColor constant><h1 className = "text-sm md:text-xl font-main-title">Completion Date:</h1></RandomColor><p className = "indent-5"> {log.completion_date}</p></>)}
+                                    <><RandomColor constant><h1 className = "text-sm md:text-xl font-main-title">100% Completion:{" "}</h1></RandomColor><p className = "indent-5">{log.full_completion ? "Yes" : "No"}</p></>
                                 </div>
                             </div>
-                            {log.user_review && (<><RandomColor constant><h1 className = "text-xl font-main-title">Review:</h1></RandomColor><p className = "mt-3 whitespace-pre-line indent-5"> {log.user_review}</p></>)}
+                            {log.user_review && (<><RandomColor constant><h1 className = "text-sm md:text-xl font-main-title">Review:</h1></RandomColor><p className = "mt-3 whitespace-pre-line indent-5"> {log.user_review}</p></>)}
                             <div className = "flex gap-4 mt-4">
                                 <RandomColor element = "bg"><button className = "btn bg-ui" onClick = {() => setEditing(true)}>Edit Log</button></RandomColor>
                                 <RandomColor element = "bg"><button className = "btn bg-ui" onClick = {removeLog}>Remove from Backlog</button></RandomColor>
                             </div>
                         </>
                     ) : (
-                        <div className = "grid grid-cols-6 gap-4">
-                            <select value = {editFields.user_status} onChange = {(x) => setEditFields({ ...editFields, user_status: x.target.value })} className = "btn bg-ui col-span-2">
+                        <div className = "grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <select value = {editFields.user_status} onChange = {(x) => setEditFields({ ...editFields, user_status: x.target.value })} className = "form-field col-span-4 sm:col-span-2">
                                 <option value = "playing">Playing</option>
                                 <option value = "paused">Paused</option>
                                 <option value = "completed">Completed</option>
                                 <option value = "backlog">Backlog</option>
                                 <option value = "dropped">Dropped</option>
                             </select>
-                            <input type = "number" step = {1} inputMode = "numeric" pattern = "[0-9]*" min = {0} max = {10} placeholder = "Rating (1 - 10)" value = {editFields.user_rating} onChange = {(x) => setEditFields({...editFields, user_rating: x.target.value.replace(/\D/g, "")})} className = "btn bg-ui col-span-2" />
-                            <input type = "number" step = {1} inputMode = "numeric" pattern = "[0-9]*" min = {0} placeholder = "Total Hours Played" value = {editFields.user_playtime} onChange = {(x) => setEditFields({...editFields, user_playtime: x.target.value.replace(/\D/g, "")})} className = "btn bg-ui col-span-2" />
-                            <input type = "date" max = {today} value = {editFields.start_date} onChange = {(x) => setEditFields({...editFields, start_date: x.target.value})} className = "btn bg-ui col-span-2" />
-                            <input type = "date" max = {today} min = {editFields.start_date || undefined} value = {editFields.completion_date} onChange = {(x) => setEditFields({...editFields, completion_date: x.target.value})} className = "btn bg-ui col-span-2" />
-                            <label className = "flex items-center gap-2 col-span-2 text-white">
+                            <input type = "number" step = {1} inputMode = "numeric" pattern = "[0-9]*" min = {0} max = {10} placeholder = "Rating (1 - 10)" value = {editFields.user_rating} onChange = {(x) => setEditFields({...editFields, user_rating: x.target.value.replace(/\D/g, "")})} className = "form-field col-span-4 sm:col-span-2" />
+                            <input type = "number" step = {1} inputMode = "numeric" pattern = "[0-9]*" min = {0} placeholder = "Total Hours Played" value = {editFields.user_playtime} onChange = {(x) => setEditFields({...editFields, user_playtime: x.target.value.replace(/\D/g, "")})} className = "form-field col-span-4 sm:col-span-2" />
+                            <input type = "date" max = {today} value = {editFields.start_date} onChange = {(x) => setEditFields({...editFields, start_date: x.target.value})} className = "form-field col-span-4 sm:col-span-2" />
+                            <input type = "date" max = {today} min = {editFields.start_date || undefined} value = {editFields.completion_date} onChange = {(x) => setEditFields({...editFields, completion_date: x.target.value})} className = "form-field col-span-4 sm:col-span-2" />
+                            <label className = "md:flex items-center gap-2 col-span-4 sm:col-span-2 text-white">
                                 <input type = "checkbox" checked = {editFields.full_completion} onChange = {(x) => setEditFields({...editFields, full_completion: x.target.checked})} className = "w-4 h-4" />
                                 100% Completion
                             </label>
-                            <textarea placeholder = "Review" value = {editFields.user_review} onChange = {(x) => setEditFields({...editFields, user_review: x.target.value})} className = "btn bg-ui col-span-6 min-h-37.5 resize-y" />
-                            <div className = "col-span-6 flex justify-between items-center mt-2">
-                                <RandomColor element = "bg"><button onClick = {toggleFavorite} className = "btn bg-ui">{favorite ? "Unfavorite Game" : "Set as Favorite"}</button></RandomColor>
-                                <div className = "flex gap-3">
-                                    <RandomColor element = "bg"><button className = "btn bg-ui" onClick = {saveLog}>Save Edits</button></RandomColor>
-                                    <RandomColor element = "bg"><button className = "btn bg-ui" onClick = {() => setEditing(false)}>Cancel Edits</button></RandomColor>
+                            <textarea placeholder = "Review" value = {editFields.user_review} onChange = {(x) => setEditFields({...editFields, user_review: x.target.value})} className = "btn md:col-span-6 col-span-4 min-h-37.5 resize-y" />
+                            <div className = "col-span-6 md:flex justify-between items-center mt-2">
+                                <RandomColor element = "bg"><button onClick = {toggleFavorite} className = "btn">{favorite ? "Unfavorite Game" : "Set as Favorite"}</button></RandomColor>
+                                <div className = "md:flex gap-3">
+                                    <RandomColor element = "bg"><button className = "btn mt-5" onClick = {saveLog}>Save Edits</button></RandomColor>
+                                    <RandomColor element = "bg"><button className = "btn mt-5" onClick = {() => setEditing(false)}>Cancel Edits</button></RandomColor>
                                 </div>
                             </div>
                         </div>

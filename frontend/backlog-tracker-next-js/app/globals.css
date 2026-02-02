@@ -82,7 +82,10 @@ input::placeholder {
     @apply h-full flex flex-col justify-center bg-main-compliment;
   }
   .btn {
-    @apply h-10 rounded-lg outline-4 outline-white font-main-title text-white items-center justify-center flex bg-ui px-4 py-2;
+    @apply rounded-lg outline-4 outline-white font-main-title text-white items-center justify-center flex bg-ui px-4 py-2;
+  }
+  .form-field {
+    @apply rounded-lg outline-4 outline-white font-main-title text-white items-center justify-center bg-ui px-4 py-2;
   }
   .navbar {
     @apply fixed top-0 left-0 w-full z-50 bg-ui shadow-2xl;

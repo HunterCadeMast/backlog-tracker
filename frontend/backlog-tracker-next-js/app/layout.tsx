@@ -22,7 +22,9 @@ export default function RootLayout({children}: Readonly<{children: React.ReactNo
       <body>
         <ClientProvider>
         <main className = "pt-16 h-dvh flex flex-col">
-          {children}
+          <div className = "flex-1">
+            {children}
+          </div>
           <footer className = "gap-3 px-4 sm:px-10 pb-5 flex flex-col sm:flex-row items-center justify-center sm:justify-between text-center bg-main-compliment">
             <h1 className = "font-main-title text-lg sm:text-3xl text-white"><RandomColor>Database from IGDB</RandomColor></h1>
             <h1 className = "font-main-title text-lg sm:text-3xl text-white">Contact:{" "}<a href = "mailto:gaming.logjam@gmail.com" className = "underline break-all"><RandomColor>gaming.logjam@gmail.com</RandomColor></a></h1>
