@@ -35,10 +35,16 @@ if DEBUG:
     ALLOWED_HOSTS = ['*']
     SECURE_SSL_REDIRECT = False
     SECURE_PROXY_SSL_HEADER = None
+    FRONTEND_URL = 'http://localhost:3000'
+    LOGIN_REDIRECT_URL = 'http://localhost:3000/'
+    LOGOUT_REDIRECT_URL = 'http://localhost:3000/login/'
 else:
     ALLOWED_HOSTS = ['gaminglogjam.com', 'www.gaminglogjam.com', 'api.gaminglogjam.com']
     SECURE_SSL_REDIRECT = True
     SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+    FRONTEND_URL = 'https://gaminglogjam.com'
+    LOGIN_REDIRECT_URL = 'https://gaminglogjam.com/'
+    LOGOUT_REDIRECT_URL = 'https://gaminglogjam.com/login/'
 
 # Application definition
 
@@ -73,9 +79,6 @@ INSTALLED_APPS = [
 ]
 
 AUTH_USER_MODEL = 'accounts.CustomUser'
-
-LOGIN_REDIRECT_URL = 'https://gaminglogjam.com/'
-LOGOUT_REDIRECT_URL = 'https://gaminglogjam.com/login/'
 
 SITE_ID = 1
 
@@ -252,8 +255,6 @@ SOCIALACCOUNT_EMAIL_AUTHENTICATION_AUTO_CONNECT = True
 SOCIALACCOUNT_EMAIL_VERIFICATION = "none"
 SOCIALACCOUNT_ADAPTER = "accounts.adapters.AllAuthAdapter"
 
-FRONTEND_URL = 'https://gaminglogjam.com'
-
 EMAIL_BACKEND = os.getenv('EMAIL_BACKEND', 'django.core.mail.backends.smtp.EmailBackend')
 EMAIL_HOST = os.getenv('EMAIL_HOST')
 EMAIL_PORT = int(os.getenv('EMAIL_PORT', 587))
@@ -300,25 +301,24 @@ CELERY_BEAT_SCHEDULE = {
     }
 }
 
-try:
-    if not DEBUG:
-        CACHES = {
-            'default': {
-                'BACKEND': 'django_redis.cache.RedisCache',
-                'LOCATION': REDIS_URL,
-                'OPTIONS': {
-                    'CLIENT_CLASS': 'django_redis.client.DefaultClient',
-                },
-            }
-        }
-except Exception:
+if DEBUG:
     CACHES = {
         'default': {
             'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
         }
     }
-CSRF_COOKIE_SECURE = True
-SESSION_COOKIE_SECURE = True
+else:
+    CACHES = {
+        'default': {
+            'BACKEND': 'django_redis.cache.RedisCache',
+            'LOCATION': REDIS_URL,
+            'OPTIONS': {
+                'CLIENT_CLASS': 'django_redis.client.DefaultClient',
+            },
+        }
+    }
+CSRF_COOKIE_SECURE = not DEBUG
+SESSION_COOKIE_SECURE = not DEBUG
 SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
 SESSION_CACHE_ALIAS = 'default'
 
