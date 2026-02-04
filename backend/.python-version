@@ -1,1 +1,1 @@
-echo "3.11.13" > .python-version
+echo "3.12.10" > .python-version
