@@ -301,7 +301,7 @@ CELERY_BEAT_SCHEDULE = {
     }
 }
 
-if DEBUG:
+if not DEBUG:
     CACHES = {
         'default': {
             'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
