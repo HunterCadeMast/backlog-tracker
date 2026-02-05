@@ -45,6 +45,10 @@ const Login = () => {
                             <RandomColor element="bg"><button type="submit" className="text-2xl btn mr-2">Submit</button></RandomColor>
                         </div>
                     </form>
+                    <div className = "flex gap-4">
+                        <OAuthenticationButtons provider = "google" />
+                        <OAuthenticationButtons provider = "github" />
+                    </div>
                 </div>
             </div>
         </>
