@@ -30,8 +30,8 @@ const Login = () => {
     };
     return (
         <>
-            <div className = "h-full flex items-center justify-center bg-main-compliment">
-                <div className = "flex flex-col items-center gap-6">
+            <div className = "px-4 pt-10 sm:pt-20 pb-8 flex flex-col h-full items-center justify-center bg-main-compliment">
+                <div className = "flex flex-col items-center justify-center gap-6 flex-1">
                     <form onSubmit = {handleSubmit} className = "w-90 p-8 rounded-2xl shadow-2xl bg-ui">
                         <h1 className = "text-7xl text-white font-log-title mb-3">Login</h1>
                         <div className="flex justify-left mb-5">
@@ -45,7 +45,7 @@ const Login = () => {
                             <RandomColor element="bg"><button type="submit" className="text-2xl btn mr-2">Submit</button></RandomColor>
                         </div>
                     </form>
-                    <div className = "flex gap-4">
+                    <div className = "flex flex-col sm:flex-row items-center justify-center gap-5 w-full px-5">
                         <OAuthenticationButtons provider = "google" />
                         <OAuthenticationButtons provider = "github" />
                     </div>
