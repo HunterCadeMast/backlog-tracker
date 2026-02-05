@@ -278,7 +278,7 @@ Track play history and view statistics about your gaming habits.
 - [x] IGDB integration.
 - [x] Profile customization.
 - [x] Media storage for images.
-- [ ] Mobile-friendly UI.
+- [x] Mobile-friendly UI.
 - [ ] OAuthentication.
 - [ ] Terminal for logging.
 - [ ] Advanced recommendation system.
