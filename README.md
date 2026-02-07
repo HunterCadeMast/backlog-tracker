@@ -279,7 +279,7 @@ Track play history and view statistics about your gaming habits.
 - [x] Profile customization.
 - [x] Media storage for images.
 - [x] Mobile-friendly UI.
-- [ ] OAuthentication.
+- [x] OAuthentication.
 - [ ] Terminal for logging.
 - [ ] Advanced recommendation system.
 - [ ] Social features.
