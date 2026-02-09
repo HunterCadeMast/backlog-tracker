@@ -30,12 +30,12 @@ const Navbar = ({navigationToggle}: NavbarProps) => {
                                 <>
                                     <li>
                                         <Link href = "/profile">
-                                            <p><RandomColor>Profile</RandomColor></p>
+                                            <RandomColor element = "bg"><button className = "btn px-5">Profile</button></RandomColor>
                                         </Link>
                                     </li>
                                     <li>
                                         <Link href = "/backlog">
-                                            <p><RandomColor>Backlog</RandomColor></p>
+                                            <RandomColor element = "bg"><button className = "btn px-5">Backlog</button></RandomColor>
                                         </Link>
                                     </li>
                                 </>
