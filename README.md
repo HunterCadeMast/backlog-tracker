@@ -280,6 +280,7 @@ Track play history and view statistics about your gaming habits.
 - [x] Media storage for images.
 - [x] Mobile-friendly UI.
 - [x] OAuthentication.
+- [x] Email verification.
 - [ ] Terminal for logging.
 - [ ] Advanced recommendation system.
 - [ ] Social features.
